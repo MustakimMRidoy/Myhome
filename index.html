@@ -707,9 +707,11 @@
         }
         
         .window {
-            touch-action: none;
-            -webkit-user-select: none;
-            user-select: none;
+            touch-action: none !important;
+            -webkit-touch-callout: none !important;
+            -webkit-user-select: none !important;
+            user-select: none !important;
+            -webkit-tap-highlight-color: transparent;
             cursor: move; /* Desktop এ cursor স্টাইল */
             position: absolute;
             background: var(--bg-secondary);
@@ -822,12 +824,13 @@
             position: absolute;
             bottom: 0;
             right: 0;
-            width: 20px;
-            height: 20px;
+            width: 30px;
+            height: 30px;
             background: rgba(255,255,255,0.1);
+            border-radius: 0 0 var(--window-radius) 0;
             cursor: se-resize;
             z-index: 1000;
-            touch-action: none;
+            touch-action: none !important;
         }
         .window-resize-handle:hover {
             background: linear-gradient(135deg, transparent 40%, var(--glass-border) 50%, transparent 60%);
@@ -1961,6 +1964,7 @@
         // Initialize when page loads
 window.addEventListener('DOMContentLoaded', () => {
   initializeSystem();
+    initializeWindowSystem();
   history.pushState({ panel: null }, '');
 });
 
@@ -1987,93 +1991,163 @@ window.addEventListener('popstate', (event) => {
   history.pushState({ panel: null }, '');
 });
 //-----------------------------------
-        function initializeWindowControls(window) {
+  function initializeWindowSystem() {
+    let activeWindow = null;
+    let initialX = 0;
+    let initialY = 0;
     let isDragging = false;
     let isResizing = false;
-    let currentX;
-    let currentY;
-    let initialWidth;
-    let initialHeight;
     
-    // Touch events for mobile
-    window.addEventListener('touchstart', startDragging);
-    window.addEventListener('touchmove', drag);
-    window.addEventListener('touchend', stopDragging);
+    // টাচ ইভেন্ট ট্র্যাকিং এর জন্য ভ্যারিয়েবল
+    let touchTimeout;
+    let longPressDelay = 500; // মিলিসেকেন্ড
     
-    // Mouse events for desktop 
-    window.addEventListener('mousedown', startDragging);
-    window.addEventListener('mousemove', drag);
-    window.addEventListener('mouseup', stopDragging);
-    
-    // Resize handle events
-    const resizeHandle = window.querySelector('.window-resize-handle');
-    resizeHandle.addEventListener('touchstart', startResizing);
-    resizeHandle.addEventListener('mousedown', startResizing);
-    
-    function startDragging(e) {
-        if (e.target.classList.contains('window-resize-handle')) return;
+    function handleWindowInteraction(window) {
+        const resizeHandle = window.querySelector('.window-resize-handle');
         
-        isDragging = true;
-        const touch = e.touches ? e.touches[0] : e;
-        currentX = touch.clientX - window.offsetLeft;
-        currentY = touch.clientY - window.offsetTop;
+        // লং প্রেস ডিটেক্ট করার ফাংশন
+        function startLongPress(e) {
+            const touch = e.touches[0];
+            touchTimeout = setTimeout(() => {
+                isDragging = true;
+                activeWindow = window;
+                initialX = touch.clientX - window.offsetLeft;
+                initialY = touch.clientY - window.offsetTop;
+                window.style.transition = 'none';
+                
+                // ভিজ্যুয়াল ফিডব্যাক
+                window.style.opacity = '0.8';
+                navigator.vibrate && navigator.vibrate(50); // ভাইব্রেশন ফিডব্যাক
+            }, longPressDelay);
+        }
         
-        window.style.cursor = 'move';
+        function cancelLongPress() {
+            clearTimeout(touchTimeout);
+            if (isDragging) {
+                window.style.opacity = '1';
+                window.style.transition = '';
+            }
+        }
+        
+        // টাচ ইভেন্ট হ্যান্ডলার
+        window.addEventListener('touchstart', (e) => {
+            if (e.target.classList.contains('window-resize-handle')) {
+                isResizing = true;
+                activeWindow = window;
+                const touch = e.touches[0];
+                initialX = touch.clientX;
+                initialY = touch.clientY;
+                e.preventDefault();
+                return;
+            }
+            
+            if (e.target.closest('.window-controls')) return;
+            startLongPress(e);
+        }, { passive: false });
+        
+        window.addEventListener('touchmove', (e) => {
+            if (!isDragging && !isResizing) return;
+            e.preventDefault();
+            
+            const touch = e.touches[0];
+            
+            if (isDragging) {
+                const newX = touch.clientX - initialX;
+                const newY = touch.clientY - initialY;
+                
+                // সীমানা চেক
+                const maxX = window.parentElement.clientWidth - window.offsetWidth;
+                const maxY = window.parentElement.clientHeight - window.offsetHeight;
+                
+                window.style.left = `${Math.min(Math.max(0, newX), maxX)}px`;
+                window.style.top = `${Math.min(Math.max(0, newY), maxY)}px`;
+            } else if (isResizing) {
+                const deltaX = touch.clientX - initialX;
+                const deltaY = touch.clientY - initialY;
+                
+                const newWidth = Math.max(320, window.offsetWidth + deltaX);
+                const newHeight = Math.max(240, window.offsetHeight + deltaY);
+                
+                // সীমানা চেক
+                const maxWidth = window.parentElement.clientWidth - window.offsetLeft;
+                const maxHeight = window.parentElement.clientHeight - window.offsetTop;
+                
+                window.style.width = `${Math.min(newWidth, maxWidth)}px`;
+                window.style.height = `${Math.min(newHeight, maxHeight)}px`;
+                
+                initialX = touch.clientX;
+                initialY = touch.clientY;
+            }
+        }, { passive: false });
+        
+        window.addEventListener('touchend', () => {
+            cancelLongPress();
+            isDragging = false;
+            isResizing = false;
+            activeWindow = null;
+        });
+        
+        // মাউস ইভেন্ট হ্যান্ডলার
+        window.addEventListener('mousedown', (e) => {
+            if (e.target.classList.contains('window-resize-handle')) {
+                isResizing = true;
+                activeWindow = window;
+                initialX = e.clientX;
+                initialY = e.clientY;
+                e.preventDefault();
+                return;
+            }
+            
+            if (e.target.closest('.window-controls')) return;
+            
+            isDragging = true;
+            activeWindow = window;
+            initialX = e.clientX - window.offsetLeft;
+            initialY = e.clientY - window.offsetTop;
+        });
     }
     
-    function startResizing(e) {
-        e.stopPropagation();
-        isResizing = true;
-        
-        const touch = e.touches ? e.touches[0] : e;
-        currentX = touch.clientX;
-        currentY = touch.clientY;
-        initialWidth = window.offsetWidth;
-        initialHeight = window.offsetHeight;
-        
-        window.style.cursor = 'se-resize';
-    }
-    
-    function drag(e) {
-        if (!isDragging && !isResizing) return;
-        e.preventDefault();
-        
-        const touch = e.touches ? e.touches[0] : e;
+    // গ্লোবাল মাউস ইভেন্ট
+    document.addEventListener('mousemove', (e) => {
+        if (!activeWindow || (!isDragging && !isResizing)) return;
         
         if (isDragging) {
-            // Handle dragging
-            const newX = touch.clientX - currentX;
-            const newY = touch.clientY - currentY;
+            const newX = e.clientX - initialX;
+            const newY = e.clientY - initialY;
             
-            // Check boundaries
-            const maxX = document.documentElement.clientWidth - window.offsetWidth;
-            const maxY = document.documentElement.clientHeight - window.offsetHeight;
+            const maxX = activeWindow.parentElement.clientWidth - activeWindow.offsetWidth;
+            const maxY = activeWindow.parentElement.clientHeight - activeWindow.offsetHeight;
             
-            window.style.left = `${Math.min(Math.max(0, newX), maxX)}px`;
-            window.style.top = `${Math.min(Math.max(0, newY), maxY)}px`;
-            
+            activeWindow.style.left = `${Math.min(Math.max(0, newX), maxX)}px`;
+            activeWindow.style.top = `${Math.min(Math.max(0, newY), maxY)}px`;
         } else if (isResizing) {
-            // Handle resizing
-            const deltaX = touch.clientX - currentX;
-            const deltaY = touch.clientY - currentY;
+            const deltaX = e.clientX - initialX;
+            const deltaY = e.clientY - initialY;
             
-            const newWidth = Math.max(320, initialWidth + deltaX);  // Min width
-            const newHeight = Math.max(240, initialHeight + deltaY); // Min height
+            const newWidth = Math.max(320, activeWindow.offsetWidth + deltaX);
+            const newHeight = Math.max(240, activeWindow.offsetHeight + deltaY);
             
-            window.style.width = `${newWidth}px`;
-            window.style.height = `${newHeight}px`;
+            const maxWidth = activeWindow.parentElement.clientWidth - activeWindow.offsetLeft;
+            const maxHeight = activeWindow.parentElement.clientHeight - activeWindow.offsetTop;
+            
+            activeWindow.style.width = `${Math.min(newWidth, maxWidth)}px`;
+            activeWindow.style.height = `${Math.min(newHeight, maxHeight)}px`;
+            
+            initialX = e.clientX;
+            initialY = e.clientY;
         }
-    }
+    });
     
-    function stopDragging() {
+    document.addEventListener('mouseup', () => {
         isDragging = false;
         isResizing = false;
-        window.style.cursor = '';
-    }
+        activeWindow = null;
+    });
+    
+    // সব window এর জন্য initialize করুন
+    document.querySelectorAll('.window').forEach(handleWindowInteraction);
 }
 
-// Initialize for all windows
-document.querySelectorAll('.window').forEach(initializeWindowControls);
     </script>
 </body>
 </html>

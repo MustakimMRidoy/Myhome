@@ -1954,6 +1954,7 @@
         }
         // Initialize when page loads
 window.addEventListener('DOMContentLoaded', () => {
+  history.pushState({ panel: 'start' }, '');
   initializeSystem();
   history.pushState({ panel: null }, '');
 });

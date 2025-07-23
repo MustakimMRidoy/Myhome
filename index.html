@@ -1960,25 +1960,27 @@
 });
         
 window.addEventListener('popstate', (event) => {
-  // ১. Start Menu open থাকলে সেটা বন্ধ করো
+  // ১. যদি Start Menu খোলা থাকে—বন্ধ কর এবং রিটার্ন
   if (startMenu.style.display === 'flex') {
     startMenu.style.display = 'none';
     startButton.classList.remove('active');
-   // return;
-  } else
-  // ২. Notification Panel open থাকলে সেটা বন্ধ করো
+    return;
+  }
+
+  // ২. যদি Notification Panel খোলা থাকে—বন্ধ কর এবং রিটার্ন
   if (notificationPanel.classList.contains('open')) {
     notificationPanel.classList.remove('open');
-   // return;
-  } else
-  // ৩. Power Options modal open থাকলে সেটি close করো
+    return;
+  }
+
+  // ৩. যদি Power Options modal খোলা থাকে—বন্ধ কর এবং রিটার্ন
   if (modalOverlay.style.display === 'flex') {
     closeModal();
-  //  return;
-  } else {
-  // ৪. আর যদি কোনটা open না থাকে, তখনই Power Options দেখাবে
-  showPowerMenu();
+    return;
   }
+
+  // ৪. আর কিছুই খোলা না থাকলে—Power Options দেখাও
+  showPowerMenu();
 });
 
     </script>

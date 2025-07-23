@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+        }
+        
+        .security-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .security-header {
+            background-color: #0078d7;
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .security-header i {
+            font-size: 24px;
+            margin-right: 15px;
+        }
+        
+        .security-header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        
+        .security-content {
+            padding: 20px;
+        }
+        
+        .security-section {
+            margin-bottom: 30px;
+        }
+        
+        .security-section h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e9ecef;
+            color: #333;
+        }
+        
+        .security-card {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #0078d7;
+        }
+        
+        .security-card.warning {
+            border-left-color: #ffc107;
+        }
+        
+        .security-card.danger {
+            border-left-color: #dc3545;
+        }
+        
+        .security-card h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: #333;
+            display: flex;
+            align-items: center;
+        }
+        
+        .security-card h3 i {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+        
+        .security-card p {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .security-card .actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .security-card .actions button {
+            background-color: #0078d7;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .security-card .actions button:hover {
+            background-color: #005baa;
+        }
+        
+        .security-card .actions button.secondary {
+            background-color: #6c757d;
+        }
+        
+        .security-card .actions button.secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .security-status {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #e8f5e9;
+            border-radius: 4px;
+        }
+        
+        .security-status.warning {
+            background-color: #fff8e1;
+        }
+        
+        .security-status.danger {
+            background-color: #ffebee;
+        }
+        
+        .security-status i {
+            font-size: 24px;
+            margin-right: 15px;
+        }
+        
+        .security-status.warning i {
+            color: #ffc107;
+        }
+        
+        .security-status.danger i {
+            color: #dc3545;
+        }
+        
+        .security-status h3 {
+            margin: 0;
+            font-size: 16px;
+            color: #333;
+        }
+        
+        .security-status p {
+            margin: 5px 0 0 0;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .scan-progress {
+            margin-top: 15px;
+        }
+        
+        .scan-progress-bar {
+            height: 8px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+        
+        .scan-progress-fill {
+            height: 100%;
+            background-color: #0078d7;
+            width: 75%;
+            transition: width 0.3s ease;
+        }
+        
+        .scan-progress-text {
+            font-size: 12px;
+            color: #666;
+            text-align: right;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: #0078d7;
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+        
+        .security-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f3f5;
+        }
+        
+        .security-item:last-child {
+            border-bottom: none;
+        }
+        
+        .security-item-label {
+            display: flex;
+            align-items: center;
+        }
+        
+        .security-item-label i {
+            font-size: 18px;
+            margin-right: 12px;
+            color: #555;
+            width: 24px;
+            text-align: center;
+        }
+        
+        .security-item-text {
+            font-size: 16px;
+            color: #333;
+        }
+        
+        .security-item-value {
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="security-container">
+        <div class="security-header">
+            <i class="fas fa-shield-alt"></i>
+            <h1>Security</h1>
+        </div>
+        
+        <div class="security-content">
+            <div class="security-section">
+                <h2>Security Status</h2>
+                
+                <div class="security-status">
+                    <i class="fas fa-check-circle"></i>
+                    <div>
+                        <h3>Your system is secure</h3>
+                        <p>All security checks passed. Your system is protected against threats.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="security-section">
+                <h2>Recent Scans</h2>
+                
+                <div class="security-card">
+                    <h3><i class="fas fa-shield-virus"></i> Antivirus Scan</h3>
+                    <p>Last scan completed 2 hours ago. No threats detected.</p>
+                    <div class="scan-progress">
+                        <div class="scan-progress-bar">
+                            <div class="scan-progress-fill" style="width: 100%;"></div>
+                        </div>
+                        <div class="scan-progress-text">Completed</div>
+                    </div>
+                    <div class="actions">
+                        <button onclick="startScan()">Run New Scan</button>
+                    </div>
+                </div>
+                
+                <div class="security-card warning">
+                    <h3><i class="fas fa-wifi"></i> Network Security</h3>
+                    <p>Your network connection is using a standard connection. Consider using a VPN for enhanced security.</p>
+                    <div class="actions">
+                        <button onclick="enableVPN()">Enable VPN</button>
+                        <button class="secondary" onclick="learnMore()">Learn More</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="security-section">
+                <h2>Security Settings</h2>
+                
+                <div class="security-item">
+                    <div class="security-item-label">
+                        <i class="fas fa-fingerprint"></i>
+                        <span class="security-item-text">Biometric Authentication</span>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                
+                <div class="security-item">
+                    <div class="security-item-label">
+                        <i class="fas fa-lock"></i>
+                        <span class="security-item-text">Two-Factor Authentication</span>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                
+                <div class="security-item">
+                    <div class="security-item-label">
+                        <i class="fas fa-eye-slash"></i>
+                        <span class="security-item-text">Privacy Mode</span>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                
+                <div class="security-item">
+                    <div class="security-item-label">
+                        <i class="fas fa-bell"></i>
+                        <span class="security-item-text">Security Alerts</span>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="security-section">
+                <h2>Account Security</h2>
+                
+                <div class="security-card">
+                    <h3><i class="fas fa-key"></i> Password Strength</h3>
+                    <p>Your password is strong and secure.</p>
+                    <div class="actions">
+                        <button onclick="changePassword()">Change Password</button>
+                    </div>
+                </div>
+                
+                <div class="security-card">
+                    <h3><i class="fas fa-history"></i> Recent Activity</h3>
+                    <p>No suspicious activity detected in the last 30 days.</p>
+                    <div class="actions">
+                        <button onclick="viewActivity()">View Activity Log</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulate scan progress
+        function startScan() {
+            const progressBar = document.querySelector('.scan-progress-fill');
+            const progressText = document.querySelector('.scan-progress-text');
+            
+            // Reset progress
+            progressBar.style.width = '0%';
+            progressText.textContent = 'Scanning...';
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 5;
+                progressBar.style.width = `${progress}%`;
+                
+                if (progress === 30) {
+                    progressText.textContent = 'Scanning files...';
+                } else if (progress === 60) {
+                    progressText.textContent = 'Checking for threats...';
+                } else if (progress === 90) {
+                    progressText.textContent = 'Finalizing...';
+                } else if (progress >= 100) {
+                    clearInterval(interval);
+                    progressText.textContent = 'Completed';
+                    
+                    // Show success notification
+                    showNotification('Scan completed successfully!', 'success');
+                }
+            }, 100);
+        }
+        
+        // Enable VPN
+        function enableVPN() {
+            showNotification('VPN connection established!', 'success');
+        }
+        
+        // Learn more
+        function learnMore() {
+            alert('Network security is important to protect your data from unauthorized access. A VPN encrypts your connection and hides your IP address.');
+        }
+        
+        // Change password
+        function changePassword() {
+            const newPassword = prompt('Enter your new password:');
+            if (newPassword) {
+                const confirmPassword = prompt('Confirm your new password:');
+                if (newPassword === confirmPassword) {
+                    showNotification('Password changed successfully!', 'success');
+                } else {
+                    showNotification('Passwords do not match!', 'error');
+                }
+            }
+        }
+        
+        // View activity log
+        function viewActivity() {
+            alert('No recent activity to display.');
+        }
+        
+        // Show notification
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.style.position = 'fixed';
+            notification.style.bottom = '60px';
+            notification.style.right = '20px';
+            notification.style.padding = '10px 20px';
+            notification.style.borderRadius = '4px';
+            notification.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+            notification.style.zIndex = '1000';
+            
+            if (type === 'success') {
+                notification.style.backgroundColor = '#4CAF50';
+                notification.style.color = 'white';
+            } else if (type === 'error') {
+                notification.style.backgroundColor = '#F44336';
+                notification.style.color = 'white';
+            } else if (type === 'warning') {
+                notification.style.backgroundColor = '#FFC107';
+                notification.style.color = 'black';
+            }
+            
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            // Remove notification after 3 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

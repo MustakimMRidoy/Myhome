@@ -1953,10 +1953,9 @@
             }
         }
         // Initialize when page loads
-       // শুরুতেই history एक "bouncer" স্টেট রেখে দাও
 window.addEventListener('DOMContentLoaded', () => {
-  history.replaceState({ panel: null }, '');  // base state
   initializeSystem();
+  history.pushState({ panel: null }, '');
 });
 
 // Popstate হ্যান্ডলার

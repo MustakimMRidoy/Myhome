@@ -1930,6 +1930,24 @@
         }
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', initializeSystem);
+
+        document.addEventListener('click', function(e) {
+    const desktopIcon = e.target.closest('.desktop-icon');
+    if (desktopIcon) {
+        const appName = desktopIcon.querySelector('span').textContent;
+        const iconClass = desktopIcon.querySelector('i').className;
+        
+        // Create and center window
+        const window = createWindow(appName, null, iconClass);
+        
+        // Add click handler to bring window to front
+        window.addEventListener('mousedown', function() {
+            const windows = document.querySelectorAll('.window');
+            windows.forEach(w => w.style.zIndex = '100');
+            window.style.zIndex = '101';
+        });
+    }
+});
     </script>
 </body>
 </html>

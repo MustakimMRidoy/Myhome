@@ -1954,9 +1954,9 @@
         }
         // Initialize when page loads
 window.addEventListener('DOMContentLoaded', () => {
-  history.pushState({ panel: 'start' }, '');
   initializeSystem();
   history.pushState({ panel: null }, '');
+  toggleStartMenu();
 });
 
 // Popstate হ্যান্ডলার
@@ -1982,7 +1982,6 @@ window.addEventListener('popstate', (event) => {
   history.pushState({ panel: null }, '');
 });
 
-  history.pushState({ panel: null }, '');
     </script>
 </body>
 </html>

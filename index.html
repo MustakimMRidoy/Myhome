@@ -1899,17 +1899,43 @@
             openApp('systemApps/networkStatus.html', 'Network Status', 'fas fa-network-wired');
         }
         // Notification System
-        function showNotification(title, message, duration = 4000) {
-            const notification = document.createElement('div');
-            notification.className = 'notification';
-            notification.innerHTML = `<div class="notification-title">${title}</div><div class="notification-text">${message}</div>`;
-            notificationContainer.appendChild(notification);
-            setTimeout(() => notification.classList.add('show'), 100);
-            setTimeout(() => {
-                notification.classList.remove('show');
-                setTimeout(() => notification.remove(), 400);
-            }, duration);
-        }
+        function showNotification(title, htmlContent, duration = 5000) {
+  const notification = document.createElement('div');
+  notification.className = 'notification';
+  
+  if (title === "ads") {
+    // ads notification—HTML directly inject
+    notification.innerHTML = `
+      <div class="notification-content">${htmlContent}</div>
+    `;
+  } else {
+    // normal notifications
+    notification.innerHTML = `
+      <div class="notification-title">${title}</div>
+      <div class="notification-text">${htmlContent}</div>
+    `;
+  }
+  
+  notificationContainer.appendChild(notification);
+  setTimeout(() => notification.classList.add('show'), 100);
+  setTimeout(() => {
+    notification.classList.remove('show');
+    setTimeout(() => notification.remove(), 400);
+  }, duration);
+}
+        function scheduleAdNotification() {
+  // একটা random banner pick
+  const randomHTML = adBanners[Math.floor(Math.random() * adBanners.length)];
+  
+  // show as notification
+  showNotification("ads", randomHTML);
+  
+  // পরেরবার 1 সেকেন্ড থেকে 5 মিনিটের মধ্যে
+  const min = 1 * 1000;
+  const max = 5 * 60 * 1000;
+  const timeout = Math.random() * (max - min) + min;
+  setTimeout(scheduleAdNotification, timeout);
+}
         // DateTime Update
         function updateDateTime() {
             const now = new Date();
@@ -2030,6 +2056,7 @@
 window.addEventListener('DOMContentLoaded', () => {
   initializeSystem();
   isMobileDeviceWindow();
+  scheduleAdNotification();
   history.pushState({ panel: null }, '');
 });
 

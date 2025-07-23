@@ -810,12 +810,6 @@
             background: var(--bg-primary);
             overflow: auto;
             position: relative;
-            scrollbar-width: thin;
-            scrollbar-color: var(--bg-tertiary) var(--bg-primary);
-            scroll-behavior: smooth;
-    overflow-x: auto;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
         }
         
         .window-content iframe {
@@ -824,12 +818,6 @@
             border: none;
             background: var(--bg-primary);
         }
-
-        /* Prevent Content Overflow */
-.window-content > * {
-    max-width: 100%;
-    box-sizing: border-box;
-}
         .window-resize-handle {
             position: absolute;
             bottom: 0;
@@ -987,19 +975,6 @@
             padding: 24px;
             overflow-y: auto;
         }
-
-        /* Custom Scroll for Small Windows */
-@media (max-height: 600px) {
-    .window-content::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
-    }
-    
-    .window-content::-webkit-scrollbar-thumb {
-        background: var(--accent-color);
-        opacity: 0.8;
-    }
-}
         
         /* Responsive Design */
         @media (max-width: 768px) {
@@ -1060,20 +1035,14 @@
             width: 8px;
             height: 8px;
         }
-        /*
+        
         ::-webkit-scrollbar-track {
             background: transparent;
         }
-        */
-        ::-webkit-scrollbar-track {
-             background: var(--bg-primary);
-             border-radius: 4px;
-         }
         
         ::-webkit-scrollbar-thumb {
             background: var(--glass-border);
             border-radius: 4px;
-            transition: all 0.3s ease;
         }
         
         ::-webkit-scrollbar-thumb:hover {

@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found | Interactive Experience</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-primary: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+            --bg-secondary: linear-gradient(135deg, #2b88d8 0%, #7b68ee 100%);
+            --text-primary: #ffffff;
+            --text-secondary: #e0e0e0;
+            --accent-color: #ff6b6b;
+            --accent-hover: #ff5252;
+            --glass-bg: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --microsoft-blue: #0078d4;
+            --microsoft-green: #107c10;
+            --microsoft-yellow: #ffb900;
+            --microsoft-red: #d83b01;
+            --microsoft-orange: #f25022;
+            --microsoft-purple: #8064a2;
+            --neon-cyan: #00ffff;
+            --neon-pink: #ff00ff;
+            --neon-yellow: #ffff00;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-primary);
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        .error-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 2px solid var(--glass-border);
+            border-radius: 30px;
+            padding: 60px;
+            max-width: 700px;
+            width: 95%;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                0 0 50px rgba(255, 255, 255, 0.1),
+                inset 0 0 50px rgba(255, 255, 255, 0.05);
+            animation: cardFloat 6s ease-in-out infinite, cardGlow 3s ease-in-out infinite alternate;
+            position: relative;
+            overflow: hidden;
+        }
+        .error-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, 
+                transparent, 
+                rgba(0, 255, 255, 0.3), 
+                transparent, 
+                rgba(255, 0, 255, 0.3), 
+                transparent, 
+                rgba(255, 255, 0, 0.3), 
+                transparent);
+            animation: rotate 10s linear infinite;
+            pointer-events: none;
+        }
+        .error-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, 
+                rgba(255, 255, 255, 0.1) 0%, 
+                transparent 25%, 
+                transparent 75%, 
+                rgba(255, 255, 255, 0.1) 100%);
+            animation: shimmer 2s ease-in-out infinite;
+            pointer-events: none;
+        }
+        .error-icon {
+            font-size: 120px;
+            color: var(--microsoft-red);
+            margin-bottom: 40px;
+            animation: iconBounce 2s infinite, iconGlow 1.5s ease-in-out infinite alternate;
+            display: inline-block;
+            padding: 30px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.05) 100%);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .error-icon:hover {
+            transform: scale(1.2) rotate(360deg);
+            color: var(--neon-cyan);
+            text-shadow: 0 0 30px var(--neon-cyan);
+        }
+        .error-title {
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, 
+                var(--neon-cyan), 
+                var(--neon-pink), 
+                var(--neon-yellow), 
+                var(--neon-cyan));
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: textShine 3s ease-in-out infinite, textFloat 4s ease-in-out infinite;
+            text-shadow: 0 0 50px rgba(255, 255, 255, 0.5);
+            letter-spacing: 3px;
+        }
+        .error-message {
+            font-size: 28px;
+            margin-bottom: 40px;
+            line-height: 1.8;
+            color: var(--text-primary);
+            font-weight: 600;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            animation: messageGlow 2s ease-in-out infinite alternate;
+            background: linear-gradient(45deg, #ffffff, #e0e0e0, #ffffff);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .fun-message {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 40px; /* Changed from 50px to 40px */
+            background: linear-gradient(45deg, 
+                var(--microsoft-blue), 
+                var(--microsoft-green), 
+                var(--microsoft-yellow), 
+                var(--microsoft-red));
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: rainbowText 4s ease-in-out infinite, bounceText 3s ease-in-out infinite;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+            letter-spacing: 2px;
+        }
+        .install-btn {
+            background: linear-gradient(45deg, 
+                var(--microsoft-blue), 
+                var(--microsoft-green), 
+                var(--microsoft-yellow), 
+                var(--microsoft-red));
+            background-size: 300% 300%;
+            color: white;
+            padding: 20px 50px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 24px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 
+                0 10px 30px rgba(0, 120, 212, 0.5),
+                0 0 50px rgba(255, 255, 255, 0.2);
+            margin-top: 15px; /* Changed from 30px to 15px */
+            position: relative;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            animation: buttonPulse 2s ease-in-out infinite, gradientMove 3s ease-in-out infinite;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .install-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.6s;
+        }
+        .install-btn:hover::before {
+            left: 100%;
+        }
+        .install-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 
+                0 15px 40px rgba(0, 120, 212, 0.7),
+                0 0 80px rgba(255, 255, 255, 0.4);
+            animation: buttonExplode 0.6s ease-out;
+        }
+        .microsoft-ribbon {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, 
+                var(--microsoft-red) 0%, 
+                var(--microsoft-orange) 16.66%, 
+                var(--microsoft-yellow) 33.33%, 
+                var(--microsoft-green) 50%, 
+                var(--microsoft-blue) 66.66%, 
+                var(--microsoft-purple) 83.33%, 
+                var(--microsoft-red) 100%);
+            animation: ribbonFlow 5s linear infinite;
+        }
+        .bubbles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+        .bubble {
+            position: absolute;
+            bottom: -100px;
+            border-radius: 50%;
+            animation: rise 12s infinite ease-in;
+            opacity: 0.7;
+        }
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+        .shape {
+            position: absolute;
+            animation: floatShape 15s infinite linear;
+            opacity: 0.3;
+        }
+        .custom-cursor {
+            position: fixed;
+            width: 30px;
+            height: 30px;
+            border: 2px solid var(--neon-cyan);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transition: all 0.1s ease;
+            box-shadow: 
+                0 0 20px var(--neon-cyan),
+                inset 0 0 20px rgba(0, 255, 255, 0.2);
+            animation: cursorPulse 2s ease-in-out infinite;
+        }
+        .custom-cursor::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background: var(--neon-cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--neon-cyan);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1000;
+            animation: particleFade 2s ease-out forwards;
+        }
+        /* Animations */
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        @keyframes cardFloat {
+            0%, 100% { transform: translateY(0px) rotateX(0deg); }
+            50% { transform: translateY(-20px) rotateX(5deg); }
+        }
+        @keyframes cardGlow {
+            0% { box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 50px rgba(255, 255, 255, 0.1); }
+            100% { box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 100px rgba(255, 255, 255, 0.3); }
+        }
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        @keyframes iconBounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-30px); }
+            60% { transform: translateY(-15px); }
+        }
+        @keyframes iconGlow {
+            0% { text-shadow: 0 0 20px var(--microsoft-red); }
+            100% { text-shadow: 0 0 40px var(--microsoft-red), 0 0 60px var(--microsoft-red); }
+        }
+        @keyframes textShine {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        @keyframes textFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes messageGlow {
+            0% { text-shadow: 0 0 20px rgba(255, 255, 255, 0.3); }
+            100% { text-shadow: 0 0 40px rgba(255, 255, 255, 0.6); }
+        }
+        @keyframes rainbowText {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        @keyframes bounceText {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        @keyframes buttonPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        @keyframes gradientMove {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        @keyframes buttonExplode {
+            0% { transform: translateY(-5px) scale(1.05); }
+            50% { transform: translateY(-8px) scale(1.1); }
+            100% { transform: translateY(-5px) scale(1.05); }
+        }
+        @keyframes ribbonFlow {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+        @keyframes rise {
+            0% {
+                transform: translateY(0) scale(1) rotate(0deg);
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(-120vh) scale(0.3) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        @keyframes floatShape {
+            0% {
+                transform: translateX(-100px) translateY(-100px) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.3;
+            }
+            90% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: translateX(calc(100vw + 100px)) translateY(100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        @keyframes cursorPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        @keyframes particleFade {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0) translateY(-50px);
+            }
+        }
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .error-card {
+                padding: 40px 25px;
+            }
+            
+            .error-icon {
+                font-size: 80px;
+            }
+            
+            .error-title {
+                font-size: 2.5rem;
+            }
+            
+            .error-message {
+                font-size: 22px;
+            }
+            
+            .fun-message {
+                font-size: 24px;
+            }
+            
+            .install-btn {
+                padding: 15px 35px;
+                font-size: 18px;
+            }
+        }
+        @media (max-width: 480px) {
+            .error-title {
+                font-size: 2rem;
+            }
+            
+            .error-message {
+                font-size: 20px;
+            }
+            
+            .fun-message {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="custom-cursor" id="customCursor"></div>
+    
+    <div class="bubbles" id="bubbles"></div>
+    <div class="floating-shapes" id="floatingShapes"></div>
+    
+    <div class="container">
+        <div class="error-card" id="errorCard">
+            <div class="microsoft-ribbon"></div>
+            <i class="fas fa-exclamation-circle error-icon" id="errorIcon"></i>
+            
+            <div class="error-title">App Not Installed</div>
+            
+            <div class="error-message">
+                This <strong>app</strong> is not installed or the page you're looking for doesn't exist.
+            </div>
+            
+            <div class="fun-message">
+                But don't worry! You can still enjoy some fun while we get things sorted.
+            </div>
+            
+            <button class="install-btn" onclick="window.open('https://mustakimridoymr.github.io', '_blank')" id="installBtn">
+                <i class="fas fa-download"></i>
+                Install Now
+            </button>
+        </div>
+    </div>
+    <script>
+        // Mouse trail effect - Previous animation
+        const customCursor = document.getElementById('customCursor');
+        let trailElements = [];
+        const maxTrails = 5;
+        
+        document.addEventListener('mousemove', (e) => {
+            customCursor.style.left = e.clientX - 15 + 'px';
+            customCursor.style.top = e.clientY - 15 + 'px';
+            
+            // Create trail elements
+            const trail = document.createElement('div');
+            trail.className = 'particle';
+            trail.style.left = e.clientX + 'px';
+            trail.style.top = e.clientY + 'px';
+            document.body.appendChild(trail);
+            
+            trailElements.push(trail);
+            
+            if (trailElements.length > maxTrails) {
+                const oldTrail = trailElements.shift();
+                oldTrail.style.opacity = '0';
+                setTimeout(() => {
+                    oldTrail.remove();
+                }, 300);
+            }
+            
+            setTimeout(() => {
+                trail.style.opacity = '0';
+                setTimeout(() => {
+                    trail.remove();
+                }, 300);
+            }, 100);
+        });
+        
+        // Create bubbles
+        function createBubbles() {
+            const bubblesContainer = document.getElementById('bubbles');
+            const bubbleCount = 25;
+            
+            for (let i = 0; i < bubbleCount; i++) {
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                
+                const size = Math.random() * 80 + 30;
+                const left = Math.random() * 100;
+                const delay = Math.random() * 8;
+                const duration = Math.random() * 6 + 6;
+                
+                // Random colors
+                const colors = [
+                    'linear-gradient(45deg, #ff6b6b, #ff8e53)',
+                    'linear-gradient(45deg, #4ecdc4, #44a08d)',
+                    'linear-gradient(45deg, #a8edea, #fed6e3)',
+                    'linear-gradient(45deg, #ffecd2, #fcb69f)',
+                    'linear-gradient(45deg, #667eea, #764ba2)',
+                    'linear-gradient(45deg, #f093fb, #f5576c)',
+                ];
+                
+                bubble.style.width = size + 'px';
+                bubble.style.height = size + 'px';
+                bubble.style.left = left + '%';
+                bubble.style.background = colors[Math.floor(Math.random() * colors.length)];
+                bubble.style.animationDelay = delay + 's';
+                bubble.style.animationDuration = duration + 's';
+                bubble.style.boxShadow = '0 0 30px rgba(255, 255, 255, 0.3)';
+                
+                bubblesContainer.appendChild(bubble);
+            }
+        }
+        
+        // Create floating shapes
+        function createFloatingShapes() {
+            const shapesContainer = document.getElementById('floatingShapes');
+            const shapes = ['fas fa-star', 'fas fa-heart', 'fas fa-diamond', 'fas fa-circle', 'fas fa-square'];
+            
+            setInterval(() => {
+                const shape = document.createElement('i');
+                shape.className = `shape ${shapes[Math.floor(Math.random() * shapes.length)]}`;
+                shape.style.fontSize = Math.random() * 30 + 20 + 'px';
+                shape.style.color = `hsl(${Math.random() * 360}, 70%, 60%)`;
+                shape.style.top = Math.random() * 100 + '%';
+                shape.style.left = '-50px';
+                shape.style.animationDuration = Math.random() * 10 + 10 + 's';
+                
+                shapesContainer.appendChild(shape);
+                
+                setTimeout(() => {
+                    shape.remove();
+                }, 20000);
+            }, 2000);
+        }
+        
+        // Initialize
+        createBubbles();
+        createFloatingShapes();
+        
+        // Easter egg: Konami code
+        let konamiCode = [];
+        const konami = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65]; // Up Up Down Down Left Right Left Right B A
+        
+        document.addEventListener('keydown', (e) => {
+            konamiCode.push(e.keyCode);
+            if (konamiCode.length > konami.length) {
+                konamiCode.shift();
+            }
+            
+            if (konamiCode.join(',') === konami.join(',')) {
+                // Create epic visual effect
+                for (let i = 0; i < 50; i++) {
+                    setTimeout(() => {
+                        const particle = document.createElement('div');
+                        particle.className = 'particle';
+                        particle.style.left = Math.random() * window.innerWidth + 'px';
+                        particle.style.top = Math.random() * window.innerHeight + 'px';
+                        particle.style.background = `hsl(${Math.random() * 360}, 70%, 60%)`;
+                        document.body.appendChild(particle);
+                        
+                        setTimeout(() => {
+                            particle.remove();
+                        }, 2000);
+                    }, i * 100);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

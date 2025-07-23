@@ -1980,6 +1980,73 @@ window.addEventListener('popstate', (event) => {
 
   history.pushState({ panel: null }, '');
 });
+//--------------------------------------------
+
+        // inside createWindow(), right after you hook up titlebar.onmousedown:
+titlebar.addEventListener('touchstart', e => {
+  if (windows[windowId].maximized) return;
+  e.preventDefault();
+  // Kick off a “mouse‐like” drag using the first touch point
+  startDrag({
+    clientX: e.touches[0].clientX,
+    clientY: e.touches[0].clientY,
+    button: 0
+  }, windowId);
+  // Listen for moves and end on the document
+  document.addEventListener('touchmove', handleTouchDrag, {passive: false});
+  document.addEventListener('touchend', stopTouchDrag, {passive: false});
+});
+
+// mirror your handleDrag/stopDrag but for touch:
+function handleTouchDrag(e) {
+  e.preventDefault();
+  if (!isDragging || !dragWindow) return;
+  handleDrag({
+    clientX: e.touches[0].clientX,
+    clientY: e.touches[0].clientY
+  });
+}
+
+function stopTouchDrag(e) {
+  e.preventDefault();
+  stopDrag();
+  document.removeEventListener('touchmove', handleTouchDrag);
+  document.removeEventListener('touchend', stopTouchDrag);
+}
+
+// same thing on the resize handle:
+const resizeHandle = windowEl.querySelector('.window-resize-handle');
+resizeHandle.addEventListener('touchstart', e => {
+  if (windows[windowId].maximized) return;
+  e.preventDefault();
+  startResize({
+    clientX: e.touches[0].clientX,
+    clientY: e.touches[0].clientY,
+    stopPropagation: () => {},
+    preventDefault: () => {}
+  }, windowId);
+  document.addEventListener('touchmove', handleTouchResize, {passive: false});
+  document.addEventListener('touchend', stopTouchResize, {passive: false});
+});
+
+function handleTouchResize(e) {
+  e.preventDefault();
+  if (!isResizing) return;
+  // reuse your existing resizeHandler logic:
+  const fakeEvent = { clientX: e.touches[0].clientX, clientY: e.touches[0].clientY };
+  // you’ll need a reference to the original startX/startY etc;
+  // if you captured them in startResize you can just call that same handler
+  // here, or inline calculation:
+  resizeHandler(fakeEvent);
+}
+
+function stopTouchResize(e) {
+  e.preventDefault();
+  isResizing = false;
+  windowEl.style.transition = '';
+  document.removeEventListener('touchmove', handleTouchResize);
+  document.removeEventListener('touchend', stopTouchResize);
+}
 
     </script>
 </body>

@@ -1961,6 +1961,7 @@
         // Initialize when page loads
 window.addEventListener('DOMContentLoaded', () => {
   initializeSystem();
+  isMobileDeviceWindow();
   history.pushState({ panel: null }, '');
 });
 
@@ -2074,6 +2075,41 @@ window.addEventListener('popstate', (event) => {
 
 // Initialize for all windows
 document.querySelectorAll('.window').forEach(initializeWindowControls);
+        //-----------------------------------------------
+
+// Device detection function
+function isMobileDevice() {
+    return (window.innerWidth <= 768) || 
+           (navigator.maxTouchPoints > 0 && navigator.maxTouchPoints !== 256) ||
+           /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+// Update window creation logic
+function isMobileDeviceWindow() {
+    // Existing windows check and maximize if mobile
+    if (isMobileDevice()) {
+        document.querySelectorAll('.window').forEach(window => {
+            window.classList.add('maximized');
+        });
+    }
+    
+    // Observer for new windows
+    const observer = new MutationObserver(mutations => {
+        mutations.forEach(mutation => {
+            mutation.addedNodes.forEach(node => {
+                if (node.classList && node.classList.contains('window') && isMobileDevice()) {
+                    node.classList.add('maximized');
+                }
+            });
+        });
+    });
+    
+    // Start observing
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+}
     </script>
 </body>
 </html>

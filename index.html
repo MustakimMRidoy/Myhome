@@ -1954,26 +1954,21 @@
         }
         // Initialize when page loads
        // document.addEventListener('DOMContentLoaded', initializeSystem);
-window.addEventListener('DOMContentLoaded', () => {
-  history.replaceState({ panel: null }, '');  // একটি “খালি” স্টেট
-  initializeSystem();
-});
-      
-      window.addEventListener('popstate', (event) => {
-  const panel = event.state?.panel;
-  if (panel === 'start') {
+window.addEventListener('popstate', (event) => {
+  // যদি Start Menu খোলা থাকে, সেটি বন্ধ করে দিলেই হবে
+  if (startMenu.style.display === 'flex') {
     startMenu.style.display = 'none';
     startButton.classList.remove('active');
-  } 
-  else if (panel === 'quick') {
-    notificationPanel.classList.remove('open');
-  } 
-  else {
-    // কোনো panel open নেই
-    showPowerMenu();
+    return;  // আর power options দেখাবে না
   }
+  // যদি Quick Settings (notificationPanel) খোলা থাকে, সেটিও বন্ধ
+  if (notificationPanel.classList.contains('open')) {
+    notificationPanel.classList.remove('open');
+    return;
+  }
+  // অন্য কোন panel open নেই—তখনই Show Power Options
+  showPowerMenu();
 });
-
 
     </script>
 </body>

@@ -991,12 +991,44 @@ const adContainer = document.getElementById('adContainer');
 
 function showRandomAd() {
   const randomIndex = Math.floor(Math.random() * ad.length);
+  const html = ad[randomIndex];
+
+  // প্রথমে container খালি করো
   adContainer.innerHTML = `
-    <div style="position: relative;">
+    <div id="adInner" style="position: relative;">
       <button class="close-btn" onclick="closeAd()">×</button>
-      ${ad[randomIndex]}
+      <div id="adContent"></div>
     </div>
   `;
+
+  const contentDiv = document.getElementById('adContent');
+
+  // HTML string টা parse করার জন্য temporary div
+  const temp = document.createElement('div');
+  temp.innerHTML = html;
+
+  // প্রথমে non-script elements যোগ করো
+  Array.from(temp.childNodes).forEach(node => {
+    if (node.tagName !== 'SCRIPT') {
+      contentDiv.appendChild(node.cloneNode(true));
+    }
+  });
+
+  // তারপর script tags আলাদা করে execute করো
+  Array.from(temp.querySelectorAll('script')).forEach(oldScript => {
+    const newScript = document.createElement('script');
+    // inline script
+    if (oldScript.textContent) {
+      newScript.textContent = oldScript.textContent;
+    }
+    // external src হলে
+    if (oldScript.src) {
+      newScript.src = oldScript.src;
+      newScript.async = true;
+    }
+    document.getElementById('adInner').appendChild(newScript);
+  });
+
   scheduleNextAd();
 }
 
@@ -1009,8 +1041,4 @@ function scheduleNextAd() {
   const max = 10 * 60 * 1000;
   const timeout = Math.random() * (max - min) + min;
   setTimeout(showRandomAd, timeout);
-}
-
- function closeAd() {
-  adContainer.innerHTML = '';
 }

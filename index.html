@@ -2056,8 +2056,10 @@
 window.addEventListener('DOMContentLoaded', () => {
   initializeSystem();
   isMobileDeviceWindow();
-  scheduleAdNotification();
-  history.pushState({ panel: null }, '');
+    setTimeout(() => {
+      scheduleAdNotification();
+      history.pushState({ panel: null }, '');
+    }, 4000);
 });
 
 // Popstate হ্যান্ডলার

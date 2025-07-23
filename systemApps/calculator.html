@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+        }
+        
+        .calculator {
+            width: 300px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .calculator-display {
+            background-color: #f8f9fa;
+            padding: 20px;
+            text-align: right;
+            font-size: 24px;
+            border-bottom: 1px solid #e9ecef;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        
+        .calculator-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background-color: #e9ecef;
+        }
+        
+        .calculator-button {
+            border: none;
+            background-color: white;
+            font-size: 18px;
+            padding: 15px 0;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .calculator-button:hover {
+            background-color: #f1f3f5;
+        }
+        
+        .calculator-button.operator {
+            background-color: #e7f5ff;
+            color: #0078d7;
+        }
+        
+        .calculator-button.operator:hover {
+            background-color: #d0ebff;
+        }
+        
+        .calculator-button.equals {
+            background-color: #0078d7;
+            color: white;
+        }
+        
+        .calculator-button.equals:hover {
+            background-color: #005baa;
+        }
+        
+        .calculator-button.clear {
+            background-color: #fff4e6;
+            color: #ff8c00;
+        }
+        
+        .calculator-button.clear:hover {
+            background-color: #ffe8cc;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="calculator-display" id="display">0</div>
+        <div class="calculator-buttons">
+            <button class="calculator-button clear" onclick="clearDisplay()">C</button>
+            <button class="calculator-button operator" onclick="appendToDisplay('(')">(</button>
+            <button class="calculator-button operator" onclick="appendToDisplay(')')">)</button>
+            <button class="calculator-button operator" onclick="appendToDisplay('/')">/</button>
+            
+            <button class="calculator-button" onclick="appendToDisplay('7')">7</button>
+            <button class="calculator-button" onclick="appendToDisplay('8')">8</button>
+            <button class="calculator-button" onclick="appendToDisplay('9')">9</button>
+            <button class="calculator-button operator" onclick="appendToDisplay('*')">×</button>
+            
+            <button class="calculator-button" onclick="appendToDisplay('4')">4</button>
+            <button class="calculator-button" onclick="appendToDisplay('5')">5</button>
+            <button class="calculator-button" onclick="appendToDisplay('6')">6</button>
+            <button class="calculator-button operator" onclick="appendToDisplay('-')">-</button>
+            
+            <button class="calculator-button" onclick="appendToDisplay('1')">1</button>
+            <button class="calculator-button" onclick="appendToDisplay('2')">2</button>
+            <button class="calculator-button" onclick="appendToDisplay('3')">3</button>
+            <button class="calculator-button operator" onclick="appendToDisplay('+')">+</button>
+            
+            <button class="calculator-button" onclick="appendToDisplay('0')">0</button>
+            <button class="calculator-button" onclick="appendToDisplay('.')">.</button>
+            <button class="calculator-button" onclick="backspace()">⌫</button>
+            <button class="calculator-button equals" onclick="calculate()">=</button>
+        </div>
+    </div>
+
+    <script>
+        let currentDisplay = '0';
+        
+        function updateDisplay() {
+            document.getElementById('display').textContent = currentDisplay;
+        }
+        
+        function appendToDisplay(value) {
+            if (currentDisplay === '0' && value !== '.') {
+                currentDisplay = value;
+            } else {
+                currentDisplay += value;
+            }
+            updateDisplay();
+        }
+        
+        function clearDisplay() {
+            currentDisplay = '0';
+            updateDisplay();
+        }
+        
+        function backspace() {
+            if (currentDisplay.length > 1) {
+                currentDisplay = currentDisplay.slice(0, -1);
+            } else {
+                currentDisplay = '0';
+            }
+            updateDisplay();
+        }
+        
+        function calculate() {
+            try {
+                // Replace × with * for evaluation
+                let expression = currentDisplay.replace(/×/g, '*');
+                currentDisplay = eval(expression).toString();
+                updateDisplay();
+            } catch (error) {
+                currentDisplay = 'Error';
+                updateDisplay();
+                setTimeout(clearDisplay, 1000);
+            }
+        }
+    </script>
+</body>
+</html>

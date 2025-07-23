@@ -1965,14 +1965,16 @@ window.addEventListener('popstate', (event) => {
     startMenu.style.display = 'none';
     startButton.classList.remove('active');
     return;  // আর power options দেখাবে না
-  }
+  } else
   // যদি Quick Settings (notificationPanel) খোলা থাকে, সেটিও বন্ধ
   if (notificationPanel.classList.contains('open')) {
     notificationPanel.classList.remove('open');
     return;
-  }
+  } else {
   // অন্য কোন panel open নেই—তখনই Show Power Options
   showPowerMenu();
+  } 
+
 });
 
     </script>

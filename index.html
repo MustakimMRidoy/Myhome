@@ -63,6 +63,7 @@
   right: 12px;
   font-size: 12px;
   font-weight: 500;
+  margin: 30px;
   color: rgba(255,255,255,0.5);
   pointer-events: none; /* পরের ইনটের্যাকশন এর মধ্যে বাধা না দেবে */
   user-select: none;
@@ -73,16 +74,20 @@
 }
 
   .ad-container {
- /* position: fixed;*/
+ position: fixed;
  display: inline-block;
  position: relative;
-  bottom: calc(var(--taskbar-height) + 60px); /* watermark এর উপরের দিকে */
+ bottom: calc(var(--taskbar-height) + 60px + 12px); /* watermark এর উপরের দিকে */
   right: 12px;
   width: 300px;
   height: 250px;
   z-index: 1100;
   max-width: 300px;
   margin: 20px;
+}
+
+ .ad-container > div {
+  position: relative; /* close-btn এর জন্য */
 }
         
 .ad-container img {

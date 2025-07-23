@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blaster Game</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            overflow: hidden;
+        }
+        
+        .game-container {
+            width: 100%;
+            height: calc(100vh - 100px);
+            background-color: #222;
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+        }
+        
+        .game-header {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .game-title {
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        
+        .game-title i {
+            margin-right: 10px;
+            color: #FF6B6B;
+        }
+        
+        .game-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .game-controls button {
+            background-color: #444;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        
+        .game-controls button:hover {
+            background-color: #555;
+        }
+        
+        .game-area {
+            width: 100%;
+            height: calc(100% - 50px);
+            position: relative;
+            background-image: url('https://picsum.photos/seed/space-background/800/600.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .player {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            background-color: #0078d7;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.1s;
+        }
+        
+        .player:hover {
+            transform: translateX(-50%) scale(1.1);
+        }
+        
+        .bullet {
+            position: absolute;
+            width: 4px;
+            height: 15px;
+            background-color: #FFD700;
+            border-radius: 2px;
+        }
+        
+        .enemy {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: #FF6B6B;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 16px;
+        }
+        
+        .explosion {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background-color: transparent;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 30px;
+            color: #FFD700;
+            animation: explode 0.5s forwards;
+        }
+        
+        @keyframes explode {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+        
+        .game-score {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .game-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+        }
+        
+        .game-message h2 {
+            margin-top: 0;
+            color: #FFD700;
+        }
+        
+        .game-message button {
+            background-color: #0078d7;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 15px;
+            transition: all 0.2s;
+        }
+        
+        .game-message button:hover {
+            background-color: #005baa;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <div class="game-title">
+                <i class="fas fa-gamepad"></i>
+                Space Blaster
+            </div>
+            <div class="game-controls">
+                <button onclick="pauseGame()">
+                    <i class="fas fa-pause"></i> Pause
+                </button>
+                <button onclick="restartGame()">
+                    <i class="fas fa-redo"></i> Restart
+                </button>
+            </div>
+        </div>
+        
+        <div class="game-area" id="gameArea">
+            <div class="player" id="player">
+                <i class="fas fa-rocket"></i>
+            </div>
+            
+            <div class="game-score">
+                Score: <span id="score">0</span>
+            </div>
+            
+            <div class="game-message" id="gameMessage">
+                <h2>Game Over!</h2>
+                <p>Your final score: <span id="finalScore">0</span></p>
+                <button onclick="restartGame()">Play Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game variables
+        let score = 0;
+        let gameRunning = true;
+        let enemies = [];
+        let bullets = [];
+        let playerX = window.innerWidth / 2;
+        let playerSpeed = 5;
+        let enemySpeed = 2;
+        let enemySpawnRate = 1500;
+        let lastEnemySpawn = 0;
+        let lastBulletTime = 0;
+        let bulletCooldown = 300;
+        
+        // DOM elements
+        const gameArea = document.getElementById('gameArea');
+        const player = document.getElementById('player');
+        const scoreElement = document.getElementById('score');
+        const gameMessage = document.getElementById('gameMessage');
+        const finalScoreElement = document.getElementById('finalScore');
+        
+        // Initialize game
+        function initGame() {
+            // Set player position
+            player.style.left = `${playerX}px`;
+            
+            // Start game loop
+            requestAnimationFrame(gameLoop);
+            
+            // Set up keyboard controls
+            document.addEventListener('keydown', handleKeyDown);
+            
+            // Set up mouse/touch controls
+            gameArea.addEventListener('mousemove', handleMouseMove);
+            gameArea.addEventListener('click', shootBullet);
+        }
+        
+        // Game loop
+        function gameLoop(timestamp) {
+            if (!gameRunning) return;
+            
+            // Spawn enemies
+            if (timestamp - lastEnemySpawn > enemySpawnRate) {
+                spawnEnemy();
+                lastEnemySpawn = timestamp;
+            }
+            
+            // Move enemies
+            moveEnemies();
+            
+            // Move bullets
+            moveBullets();
+            
+            // Check collisions
+            checkCollisions();
+            
+            // Continue game loop
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // Handle keyboard input
+        function handleKeyDown(e) {
+            if (!gameRunning) return;
+            
+            const gameAreaRect = gameArea.getBoundingClientRect();
+            
+            switch (e.key) {
+                case 'ArrowLeft':
+                    playerX = Math.max(20, playerX - playerSpeed);
+                    break;
+                case 'ArrowRight':
+                    playerX = Math.min(gameAreaRect.width - 20, playerX + playerSpeed);
+                    break;
+                case ' ':
+                    shootBullet();
+                    break;
+                case 'p':
+                    pauseGame();
+                    break;
+            }
+            
+            player.style.left = `${playerX}px`;
+        }
+        
+        // Handle mouse/touch movement
+        function handleMouseMove(e) {
+            if (!gameRunning) return;
+            
+            const gameAreaRect = gameArea.getBoundingClientRect();
+            playerX = Math.max(20, Math.min(gameAreaRect.width - 20, e.clientX - gameAreaRect.left));
+            player.style.left = `${playerX}px`;
+        }
+        
+        // Shoot bullet
+        function shootBullet() {
+            if (!gameRunning) return;
+            
+            const currentTime = Date.now();
+            if (currentTime - lastBulletTime < bulletCooldown) return;
+            
+            lastBulletTime = currentTime;
+            
+            const bullet = document.createElement('div');
+            bullet.className = 'bullet';
+            bullet.style.left = `${playerX - 2}px`;
+            bullet.style.bottom = '60px';
+            
+            gameArea.appendChild(bullet);
+            bullets.push({
+                element: bullet,
+                x: playerX,
+                y: gameArea.clientHeight - 60
+            });
+        }
+        
+        // Spawn enemy
+        function spawnEnemy() {
+            const enemy = document.createElement('div');
+            enemy.className = 'enemy';
+            
+            const x = Math.random() * (gameArea.clientWidth - 30);
+            enemy.style.left = `${x}px`;
+            enemy.style.top = '0px';
+            
+            gameArea.appendChild(enemy);
+            enemies.push({
+                element: enemy,
+                x: x,
+                y: 0
+            });
+        }
+        
+        // Move enemies
+        function moveEnemies() {
+            const gameAreaHeight = gameArea.clientHeight;
+            
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                const enemy = enemies[i];
+                enemy.y += enemySpeed;
+                enemy.element.style.top = `${enemy.y}px`;
+                
+                // Remove enemies that go off screen
+                if (enemy.y > gameAreaHeight) {
+                    enemy.element.remove();
+                    enemies.splice(i, 1);
+                }
+            }
+        }
+        
+        // Move bullets
+        function moveBullets() {
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                const bullet = bullets[i];
+                bullet.y -= 10;
+                bullet.element.style.top = `${bullet.y}px`;
+                
+                // Remove bullets that go off screen
+                if (bullet.y < 0) {
+                    bullet.element.remove();
+                    bullets.splice(i, 1);
+                }
+            }
+        }
+        
+        // Check collisions
+        function checkCollisions() {
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                const enemy = enemies[i];
+                const enemyRect = enemy.element.getBoundingClientRect();
+                
+                // Check collision with player
+                const playerRect = player.getBoundingClientRect();
+                if (isColliding(playerRect, enemyRect)) {
+                    gameOver();
+                    return;
+                }
+                
+                // Check collision with bullets
+                for (let j = bullets.length - 1; j >= 0; j--) {
+                    const bullet = bullets[j];
+                    const bulletRect = bullet.element.getBoundingClientRect();
+                    
+                    if (isColliding(bulletRect, enemyRect)) {
+                        // Create explosion effect
+                        createExplosion(enemy.x, enemy.y);
+                        
+                        // Remove enemy and bullet
+                        enemy.element.remove();
+                        enemies.splice(i, 1);
+                        
+                        bullet.element.remove();
+                        bullets.splice(j, 1);
+                        
+                        // Increase score
+                        score += 10;
+                        scoreElement.textContent = score;
+                        
+                        break;
+                    }
+                }
+            }
+        }
+        
+        // Check if two rectangles are colliding
+        function isColliding(rect1, rect2) {
+            return !(
+                rect1.right < rect2.left || 
+                rect1.left > rect2.right || 
+                rect1.bottom < rect2.top || 
+                rect1.top > rect2.bottom
+            );
+        }
+        
+        // Create explosion effect
+        function createExplosion(x, y) {
+            const explosion = document.createElement('div');
+            explosion.className = 'explosion';
+            explosion.style.left = `${x}px`;
+            explosion.style.top = `${y}px`;
+            explosion.innerHTML = '<i class="fas fa-bomb"></i>';
+            
+            gameArea.appendChild(explosion);
+            
+            // Remove explosion after animation
+            setTimeout(() => {
+                explosion.remove();
+            }, 500);
+        }
+        
+        // Pause game
+        function pauseGame() {
+            gameRunning = !gameRunning;
+            
+            if (gameRunning) {
+                requestAnimationFrame(gameLoop);
+            }
+        }
+        
+        // Game over
+        function gameOver() {
+            gameRunning = false;
+            finalScoreElement.textContent = score;
+            gameMessage.style.display = 'block';
+        }
+        
+        // Restart game
+        function restartGame() {
+            // Clear all enemies and bullets
+            enemies.forEach(enemy => enemy.element.remove());
+            bullets.forEach(bullet => bullet.element.remove());
+            enemies = [];
+            bullets = [];
+            
+            // Reset score
+            score = 0;
+            scoreElement.textContent = score;
+            
+            // Hide game over message
+            gameMessage.style.display = 'none';
+            
+            // Resume game
+            gameRunning = true;
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // Initialize game when window loads
+        window.onload = initGame;
+    </script>
+</body>
+</html>

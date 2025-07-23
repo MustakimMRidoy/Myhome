@@ -1618,8 +1618,8 @@
             `;
             const titlebar = windowEl.querySelector('.window-titlebar');
             titlebar.ondblclick = () => maximizeWindow(windowId);
-           // titlebar.onmousedown = (e) => startDrag(e, windowId);
-           // windowEl.querySelector('.window-resize-handle').onmousedown = (e) => startResize(e, windowId);
+            titlebar.onmousedown = (e) => startDrag(e, windowId);
+            windowEl.querySelector('.window-resize-handle').onmousedown = (e) => startResize(e, windowId);
             return windowEl;
         }
         function positionWindow(windowEl) {
@@ -1980,63 +1980,6 @@ window.addEventListener('popstate', (event) => {
 
   history.pushState({ panel: null }, '');
 });
-//--------------------------------------------
-
-       // --- Remove these old lines ---
-// titlebar.onmousedown = (e) => startDrag(e, windowId);
-// windowEl.querySelector('.window-resize-handle').onmousedown = (e) => startResize(e, windowId);
-
-// --- Add this instead right after creating the windowElement ---
-function makePointerDraggable(el, windowId) {
-  el.addEventListener('pointerdown', (e) => {
-    if (e.pointerType === 'mouse' && e.button !== 0) return;
-    if (windows[windowId].maximized) return;
-    e.preventDefault();
-    focusWindow(windowId);
-    isDragging = (el.classList.contains('window-titlebar'));
-    isResizing = (el.classList.contains('window-resize-handle'));
-    dragWindow = windows[windowId];
-    const rect = dragWindow.element.getBoundingClientRect();
-    dragStartX = e.clientX;
-    dragStartY = e.clientY;
-    dragStartLeft = rect.left;
-    dragStartTop  = rect.top;
-    dragStartWidth = rect.width;
-    dragStartHeight = rect.height;
-    // Capture events outside the element
-    el.setPointerCapture(e.pointerId);
-  });
-
-  el.addEventListener('pointermove', (e) => {
-    if (!dragWindow) return;
-    e.preventDefault();
-    const dx = e.clientX - dragStartX;
-    const dy = e.clientY - dragStartY;
-    const winEl = dragWindow.element;
-
-    if (isDragging) {
-      winEl.style.left = `${dragStartLeft + dx}px`;
-      winEl.style.top  = `${dragStartTop  + dy}px`;
-    } else if (isResizing) {
-      winEl.style.width  = `${Math.max(320, dragStartWidth  + dx)}px`;
-      winEl.style.height = `${Math.max(240, dragStartHeight + dy)}px`;
-    }
-  });
-
-  el.addEventListener('pointerup', (e) => {
-    if (!dragWindow) return;
-    // release capture
-    el.releasePointerCapture(e.pointerId);
-    isDragging = isResizing = false;
-    dragWindow = null;
-  });
-}
-
-// After you create your windowEl in createWindow():
-const titlebar = windowEl.querySelector('.window-titlebar');
-const handle    = windowEl.querySelector('.window-resize-handle');
-makePointerDraggable(titlebar, windowId);
-makePointerDraggable(handle, windowId);
 
     </script>
 </body>

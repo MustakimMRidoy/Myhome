@@ -1350,6 +1350,7 @@
             startBackgroundRotation();
             
             // Set initial background
+            backgrounds.sort(() => Math.random() - 0.5);
             desktopBackground.style.backgroundImage = `url('${backgrounds[0]}')`;
             
             // Show welcome notification

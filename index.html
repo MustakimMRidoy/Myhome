@@ -707,6 +707,10 @@
         }
         
         .window {
+            touch-action: none;
+            -webkit-user-select: none;
+            user-select: none;
+            cursor: move; /* Desktop এ cursor স্টাইল */
             position: absolute;
             background: var(--bg-secondary);
             border: 1px solid var(--glass-border);
@@ -818,10 +822,12 @@
             position: absolute;
             bottom: 0;
             right: 0;
-            width: 12px;
-            height: 12px;
+            width: 20px;
+            height: 20px;
+            background: rgba(255,255,255,0.1);
             cursor: se-resize;
-            z-index: 5;
+            z-index: 1000;
+            touch-action: none;
         }
         .window-resize-handle:hover {
             background: linear-gradient(135deg, transparent 40%, var(--glass-border) 50%, transparent 60%);
@@ -1980,7 +1986,94 @@ window.addEventListener('popstate', (event) => {
 
   history.pushState({ panel: null }, '');
 });
+//-----------------------------------
+        function initializeWindowControls(window) {
+    let isDragging = false;
+    let isResizing = false;
+    let currentX;
+    let currentY;
+    let initialWidth;
+    let initialHeight;
+    
+    // Touch events for mobile
+    window.addEventListener('touchstart', startDragging);
+    window.addEventListener('touchmove', drag);
+    window.addEventListener('touchend', stopDragging);
+    
+    // Mouse events for desktop 
+    window.addEventListener('mousedown', startDragging);
+    window.addEventListener('mousemove', drag);
+    window.addEventListener('mouseup', stopDragging);
+    
+    // Resize handle events
+    const resizeHandle = window.querySelector('.window-resize-handle');
+    resizeHandle.addEventListener('touchstart', startResizing);
+    resizeHandle.addEventListener('mousedown', startResizing);
+    
+    function startDragging(e) {
+        if (e.target.classList.contains('window-resize-handle')) return;
+        
+        isDragging = true;
+        const touch = e.touches ? e.touches[0] : e;
+        currentX = touch.clientX - window.offsetLeft;
+        currentY = touch.clientY - window.offsetTop;
+        
+        window.style.cursor = 'move';
+    }
+    
+    function startResizing(e) {
+        e.stopPropagation();
+        isResizing = true;
+        
+        const touch = e.touches ? e.touches[0] : e;
+        currentX = touch.clientX;
+        currentY = touch.clientY;
+        initialWidth = window.offsetWidth;
+        initialHeight = window.offsetHeight;
+        
+        window.style.cursor = 'se-resize';
+    }
+    
+    function drag(e) {
+        if (!isDragging && !isResizing) return;
+        e.preventDefault();
+        
+        const touch = e.touches ? e.touches[0] : e;
+        
+        if (isDragging) {
+            // Handle dragging
+            const newX = touch.clientX - currentX;
+            const newY = touch.clientY - currentY;
+            
+            // Check boundaries
+            const maxX = document.documentElement.clientWidth - window.offsetWidth;
+            const maxY = document.documentElement.clientHeight - window.offsetHeight;
+            
+            window.style.left = `${Math.min(Math.max(0, newX), maxX)}px`;
+            window.style.top = `${Math.min(Math.max(0, newY), maxY)}px`;
+            
+        } else if (isResizing) {
+            // Handle resizing
+            const deltaX = touch.clientX - currentX;
+            const deltaY = touch.clientY - currentY;
+            
+            const newWidth = Math.max(320, initialWidth + deltaX);  // Min width
+            const newHeight = Math.max(240, initialHeight + deltaY); // Min height
+            
+            window.style.width = `${newWidth}px`;
+            window.style.height = `${newHeight}px`;
+        }
+    }
+    
+    function stopDragging() {
+        isDragging = false;
+        isResizing = false;
+        window.style.cursor = '';
+    }
+}
 
+// Initialize for all windows
+document.querySelectorAll('.window').forEach(initializeWindowControls);
     </script>
 </body>
 </html>

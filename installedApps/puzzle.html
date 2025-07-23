@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puzzle Game</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            overflow: hidden;
+        }
+        
+        .game-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .game-header {
+            background-color: #0078d7;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .game-title {
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        
+        .game-title i {
+            margin-right: 10px;
+            color: #FFD700;
+        }
+        
+        .game-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .game-controls button {
+            background-color: #444;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        
+        .game-controls button:hover {
+            background-color: #555;
+        }
+        
+        .game-content {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .puzzle-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-gap: 10px;
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 20px;
+        }
+        
+        .puzzle-piece {
+            aspect-ratio: 1;
+            background-color: #e9ecef;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .puzzle-piece:hover {
+            transform: scale(1.05);
+            background-color: #d1e7ff;
+        }
+        
+        .puzzle-piece.active {
+            background-color: #0078d7;
+            color: white;
+        }
+        
+        .puzzle-piece.correct {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 15px;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            background-color: #f8f9fa;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        
+        .info-item i {
+            margin-right: 8px;
+            color: #0078d7;
+        }
+        
+        .game-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+            z-index: 1000;
+        }
+        
+        .game-message h2 {
+            margin-top: 0;
+            color: #FFD700;
+        }
+        
+        .game-message button {
+            background-color: #0078d7;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 15px;
+            transition: all 0.2s;
+        }
+        
+        .game-message button:hover {
+            background-color: #005baa;
+        }
+        
+        .puzzle-image {
+            width: 100%;
+            max-width: 300px;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <div class="game-title">
+                <i class="fas fa-puzzle-piece"></i>
+                Puzzle Game
+            </div>
+            <div class="game-controls">
+                <button onclick="newGame()">
+                    <i class="fas fa-redo"></i> New Game
+                </button>
+                <button onclick="showImage()">
+                    <i class="fas fa-image"></i> Show Image
+                </button>
+            </div>
+        </div>
+        
+        <div class="game-content">
+            <div class="game-info">
+                <div class="info-item">
+                    <i class="fas fa-stopwatch"></i>
+                    Time: <span id="timer">00:00</span>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-trophy"></i>
+                    Score: <span id="score">0</span>
+                </div>
+            </div>
+            
+            <img src="https://picsum.photos/seed/puzzle-image/300/300.jpg" alt="Puzzle Image" class="puzzle-image" id="puzzleImage">
+            
+            <div class="puzzle-board" id="puzzleBoard"></div>
+        </div>
+    </div>
+    
+    <div class="game-message" id="gameMessage">
+        <h2>Puzzle Completed!</h2>
+        <p>Congratulations! You completed the puzzle in <span id="completionTime">00:00</span></p>
+        <p>Your score: <span id="finalScore">0</span></p>
+        <button onclick="newGame()">Play Again</button>
+    </div>
+
+    <script>
+        // Game variables
+        let timerInterval;
+        let seconds = 0;
+        let score = 0;
+        let gameActive = false;
+        let puzzleSize = 4; // 4x4 puzzle
+        let puzzlePieces = [];
+        let correctOrder = [];
+        
+        // DOM elements
+        const puzzleBoard = document.getElementById('puzzleBoard');
+        const timerElement = document.getElementById('timer');
+        const scoreElement = document.getElementById('score');
+        const gameMessage = document.getElementById('gameMessage');
+        const completionTimeElement = document.getElementById('completionTime');
+        const finalScoreElement = document.getElementById('finalScore');
+        const puzzleImage = document.getElementById('puzzleImage');
+        
+        // Initialize game
+        function initGame() {
+            createPuzzle();
+            startTimer();
+        }
+        
+        // Create puzzle pieces
+        function createPuzzle() {
+            puzzleBoard.innerHTML = '';
+            puzzlePieces = [];
+            correctOrder = [];
+            
+            // Create pieces in correct order first
+            for (let i = 1; i <= puzzleSize * puzzleSize; i++) {
+                correctOrder.push(i);
+            }
+            
+            // Shuffle pieces
+            puzzlePieces = [...correctOrder];
+            shuffleArray(puzzlePieces);
+            
+            // Create puzzle pieces
+            puzzlePieces.forEach((number, index) => {
+                const piece = document.createElement('div');
+                piece.className = 'puzzle-piece';
+                piece.textContent = number;
+                piece.dataset.number = number;
+                piece.dataset.index = index;
+                
+                piece.addEventListener('click', () => {
+                    if (!gameActive) return;
+                    selectPiece(piece);
+                });
+                
+                puzzleBoard.appendChild(piece);
+            });
+        }
+        
+        // Shuffle array
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+        
+        // Select piece
+        function selectPiece(piece) {
+            const activePiece = document.querySelector('.puzzle-piece.active');
+            
+            if (activePiece) {
+                // Swap pieces
+                const temp = activePiece.textContent;
+                activePiece.textContent = piece.textContent;
+                piece.textContent = temp;
+                
+                // Update data attributes
+                const tempNumber = activePiece.dataset.number;
+                activePiece.dataset.number = piece.dataset.number;
+                piece.dataset.number = tempNumber;
+                
+                // Check if puzzle is solved
+                checkPuzzle();
+                
+                // Remove active class
+                activePiece.classList.remove('active');
+            } else {
+                // Add active class
+                piece.classList.add('active');
+            }
+        }
+        
+        // Check if puzzle is solved
+        function checkPuzzle() {
+            let solved = true;
+            
+            // Get current order
+            const currentOrder = [];
+            document.querySelectorAll('.puzzle-piece').forEach(piece => {
+                currentOrder.push(parseInt(piece.dataset.number));
+            });
+            
+            // Check if current order matches correct order
+            for (let i = 0; i < currentOrder.length; i++) {
+                if (currentOrder[i] !== correctOrder[i]) {
+                    solved = false;
+                    break;
+                }
+            }
+            
+            if (solved) {
+                puzzleCompleted();
+            }
+        }
+        
+        // Start timer
+        function startTimer() {
+            clearInterval(timerInterval);
+            seconds = 0;
+            updateTimer();
+            
+            timerInterval = setInterval(() => {
+                seconds++;
+                updateTimer();
+            }, 1000);
+            
+            gameActive = true;
+        }
+        
+        // Update timer display
+        function updateTimer() {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            
+            timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+        
+        // Puzzle completed
+        function puzzleCompleted() {
+            gameActive = false;
+            clearInterval(timerInterval);
+            
+            // Calculate score based on time
+            const timeBonus = Math.max(0, 300 - seconds) * 2;
+            const finalScore = score + timeBonus;
+            
+            // Update UI
+            completionTimeElement.textContent = timerElement.textContent;
+            finalScoreElement.textContent = finalScore;
+            gameMessage.style.display = 'block';
+            
+            // Mark pieces as correct
+            document.querySelectorAll('.puzzle-piece').forEach(piece => {
+                piece.classList.add('correct');
+            });
+        }
+        
+        // New game
+        function newGame() {
+            gameMessage.style.display = 'none';
+            createPuzzle();
+            startTimer();
+        }
+        
+        // Show/hide image
+        function showImage() {
+            if (puzzleImage.style.display === 'block') {
+                puzzleImage.style.display = 'none';
+            } else {
+                puzzleImage.style.display = 'block';
+            }
+        }
+        
+        // Initialize game when window loads
+        window.onload = initGame;
+    </script>
+</body>
+</html>

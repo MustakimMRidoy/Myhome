@@ -710,8 +710,7 @@
             touch-action: none;
             -webkit-user-select: none;
             user-select: none;
-            cursor: move;
-            max-height: calc(100vh - var(--taskbar-height) - 40px);
+            cursor: move; /* Desktop এ cursor স্টাইল */
             position: absolute;
             background: var(--bg-secondary);
             border: 1px solid var(--glass-border);
@@ -727,24 +726,7 @@
             /* Removed resize: both and using specific transitions for performance */
             transition: transform 0.3s ease, opacity 0.3s ease, width 0.2s ease, height 0.2s ease, top 0.2s ease, left 0.2s ease;
         }
-
-      .window-content::-webkit-scrollbar {
-    width: 8px;
-}
-
-.window-content::-webkit-scrollbar-track {
-    background: var(--bg-primary);
-}
-
-.window-content::-webkit-scrollbar-thumb {
-    background: var(--glass-border);
-    border-radius: 4px;
-}
-
-.window-content::-webkit-scrollbar-thumb:hover {
-    background: var(--glass-hover);
-}
-      
+        
         .window.maximized {
             border-radius: 0;
             top: 0 !important;
@@ -828,7 +810,12 @@
             background: var(--bg-primary);
             overflow: auto;
             position: relative;
-            height: calc(100% - var(--titlebar-height));
+            scrollbar-width: thin;
+            scrollbar-color: var(--bg-tertiary) var(--bg-primary);
+            scroll-behavior: smooth;
+    overflow-x: auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
         }
         
         .window-content iframe {
@@ -837,6 +824,12 @@
             border: none;
             background: var(--bg-primary);
         }
+
+        /* Prevent Content Overflow */
+.window-content > * {
+    max-width: 100%;
+    box-sizing: border-box;
+}
         .window-resize-handle {
             position: absolute;
             bottom: 0;
@@ -994,6 +987,19 @@
             padding: 24px;
             overflow-y: auto;
         }
+
+        /* Custom Scroll for Small Windows */
+@media (max-height: 600px) {
+    .window-content::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+    
+    .window-content::-webkit-scrollbar-thumb {
+        background: var(--accent-color);
+        opacity: 0.8;
+    }
+}
         
         /* Responsive Design */
         @media (max-width: 768px) {
@@ -1054,14 +1060,20 @@
             width: 8px;
             height: 8px;
         }
-        
+        /*
         ::-webkit-scrollbar-track {
             background: transparent;
         }
+        */
+        ::-webkit-scrollbar-track {
+             background: var(--bg-primary);
+             border-radius: 4px;
+         }
         
         ::-webkit-scrollbar-thumb {
             background: var(--glass-border);
             border-radius: 4px;
+            transition: all 0.3s ease;
         }
         
         ::-webkit-scrollbar-thumb:hover {

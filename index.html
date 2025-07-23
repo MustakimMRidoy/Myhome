@@ -1954,6 +1954,11 @@
         }
         // Initialize when page loads
        // document.addEventListener('DOMContentLoaded', initializeSystem);
+        window.addEventListener('DOMContentLoaded', () => {
+  history.replaceState({ panel: null }, '');  // একটি “খালি” স্টেট
+  initializeSystem();
+});
+        
 window.addEventListener('popstate', (event) => {
   // যদি Start Menu খোলা থাকে, সেটি বন্ধ করে দিলেই হবে
   if (startMenu.style.display === 'flex') {

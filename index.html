@@ -1960,21 +1960,24 @@
 });
         
 window.addEventListener('popstate', (event) => {
-  // যদি Start Menu খোলা থাকে, সেটি বন্ধ করে দিলেই হবে
+  // ১. Start Menu open থাকলে সেটা বন্ধ করো
   if (startMenu.style.display === 'flex') {
     startMenu.style.display = 'none';
     startButton.classList.remove('active');
-    return;  // আর power options দেখাবে না
-  } else
-  // যদি Quick Settings (notificationPanel) খোলা থাকে, সেটিও বন্ধ
+    return;
+  }
+  // ২. Notification Panel open থাকলে সেটা বন্ধ করো
   if (notificationPanel.classList.contains('open')) {
     notificationPanel.classList.remove('open');
     return;
-  } else {
-  // অন্য কোন panel open নেই—তখনই Show Power Options
+  }
+  // ৩. Power Options modal open থাকলে সেটি close করো
+  if (modalOverlay.style.display === 'flex') {
+    closeModal();
+    return;
+  }
+  // ৪. আর যদি কোনটা open না থাকে, তখনই Power Options দেখাবে
   showPowerMenu();
-  } 
-
 });
 
     </script>

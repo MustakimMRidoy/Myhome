@@ -26,10 +26,84 @@
           `<a href="https://beta.publishers.adsterra.com/referral/QdnQT7GTLa" rel="nofollow"><img alt="banner" src="https://landings-cdn.adsterratech.com/referralBanners/png/300%20x%20250%20px.png" /></a>`,
           `<a href="https://beta.publishers.adsterra.com/referral/QdnQT7GTLa" rel="nofollow"><img alt="banner" src="https://landings-cdn.adsterratech.com/referralBanners/png/600%20x%20250%20px.png" /></a>`,
           `<a href="https://beta.publishers.adsterra.com/referral/QdnQT7GTLa" rel="nofollow"><img alt="banner" src="https://landings-cdn.adsterratech.com/referralBanners/png/300%20x%20425.png" /></a>`,
+          `<script type="text/javascript">
+	atOptions = {
+		'key' : '0ac4fbd843cf0e8de1726ccc4e310cab',
+		'format' : 'iframe',
+		'height' : 60,
+		'width' : 468,
+		'params' : {}
+	};
+</script>
+<script type="text/javascript" src="//www.highperformanceformat.com/0ac4fbd843cf0e8de1726ccc4e310cab/invoke.js"></script>`,
+ `<script type="text/javascript">
+	atOptions = {
+		'key' : 'f52ec01056cf3a29e5a53b2316b7e034',
+		'format' : 'iframe',
+		'height' : 300,
+		'width' : 160,
+		'params' : {}
+	};
+</script>
+<script type="text/javascript" src="//www.highperformanceformat.com/f52ec01056cf3a29e5a53b2316b7e034/invoke.js"></script>`,
+  `<script type="text/javascript">
+	atOptions = {
+		'key' : '376d745de946193113b16464bb2bc352',
+		'format' : 'iframe',
+		'height' : 50,
+		'width' : 320,
+		'params' : {}
+	};
+</script>
+<script type="text/javascript" src="//www.highperformanceformat.com/376d745de946193113b16464bb2bc352/invoke.js"></script>`,
+ `<script type="text/javascript">
+	atOptions = {
+		'key' : '8b44820f94d6f5607f8bd8636c2198c5',
+		'format' : 'iframe',
+		'height' : 250,
+		'width' : 300,
+		'params' : {}
+	};
+</script>
+<script type="text/javascript" src="//www.highperformanceformat.com/8b44820f94d6f5607f8bd8636c2198c5/invoke.js"></script>`,
+ `<script type="text/javascript">
+	atOptions = {
+		'key' : '8b3b9b425d5ab6befdf35f0e9d6603d6',
+		'format' : 'iframe',
+		'height' : 600,
+		'width' : 160,
+		'params' : {}
+	};
+</script>
+<script type="text/javascript" src="//www.highperformanceformat.com/8b3b9b425d5ab6befdf35f0e9d6603d6/invoke.js"></script>`,
+ `<script type="text/javascript">
+	atOptions = {
+		'key' : '75fced16ed8059f6b7e4ef61f0db1139',
+		'format' : 'iframe',
+		'height' : 90,
+		'width' : 728,
+		'params' : {}
+	};
+</script>
+<script type="text/javascript" src="//www.highperformanceformat.com/75fced16ed8059f6b7e4ef61f0db1139/invoke.js"></script>`,
  //`   `,
+                  //`   `,
  //`   `,
-  //`   `,
+                  //`   `,
  //`   `,
+                  //`   `,
+ //`   `,
+                  //`   `,
+ //`   `,
+                  //`   `,
+ //`   `,
+                  //`   `,
+ //`   `,
+                  //`   `,
+ //`   `,
+                  //`   `,
+ //`   `,
+                  //`   `,
  //`   `,
   // ... আরো ad HTML যোগ করুন: `   `,
            ];

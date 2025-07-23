@@ -692,7 +692,39 @@ notifAudio.play().catch(e => {
     notification.classList.remove('show');
     setTimeout(() => notification.remove(), 400);
   }, duration);
+
+  // ২) Panel list view এ জমা
+  const list = document.getElementById('notificationList');
+  const item = document.createElement('div');
+  item.className = 'notification-list-item';
+
+  // small icon
+  const icon = document.createElement('i');
+  icon.className = title === 'ads' ? 'fas fa-ad notification-icon' : 'fas fa-bell notification-icon';
+  item.appendChild(icon);
+
+  // content wrapper
+  const content = document.createElement('div');
+  content.className = 'notification-content';
+  if (title === 'ads') {
+    content.innerHTML = htmlContent;  // raw HTML banner or script
+  } else {
+    content.innerHTML = `<strong>${title}</strong><br>${htmlContent}`;
+  }
+  item.appendChild(content);
+
+  // optionally click to close item
+  item.onclick = () => item.remove();
+
+  list.prepend(item);  // newest on top
+
+  // keep panel open/update scrolling
+  if (!notificationPanel.classList.contains('open')) {
+    // আপনি চাইলে এখানে panel খুলে দিতে পারেন:
+    // notificationPanel.classList.add('open');
+  }
 }
+
 
  function scheduleAdNotification() {
   // একটা random banner pick

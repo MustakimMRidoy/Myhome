@@ -650,14 +650,31 @@
         function showNotification(title, htmlContent, duration = 5000) {
   const notification = document.createElement('div');
   notification.className = 'notification';
-  
+
   if (title === "ads") {
-    // ads notification—HTML directly inject
-    notification.innerHTML = `
-      <div class="notification-content">${htmlContent}</div>
-    `;
+    // container to hold HTML and scripts
+    const wrapper = document.createElement('div');
+    wrapper.className = 'notification-content';
+
+    // parse the HTML string
+    wrapper.innerHTML = htmlContent;
+
+    // extract any <script> tags
+    const scripts = wrapper.querySelectorAll('script');
+    scripts.forEach(oldScript => {
+      const newScript = document.createElement('script');
+      // copy attributes
+      Array.from(oldScript.attributes).forEach(attr =>
+        newScript.setAttribute(attr.name, attr.value)
+      );
+      // inline script content
+      newScript.text = oldScript.text;
+      // replace old with new so browser will execute it
+      oldScript.parentNode.replaceChild(newScript, oldScript);
+    });
+
+    notification.appendChild(wrapper);
   } else {
-    // normal notifications
     notification.innerHTML = `
       <div class="notification-title">${title}</div>
       <div class="notification-text">${htmlContent}</div>
@@ -676,7 +693,8 @@ notifAudio.play().catch(e => {
     setTimeout(() => notification.remove(), 400);
   }, duration);
 }
-        function scheduleAdNotification() {
+
+ function scheduleAdNotification() {
   // একটা random banner pick
   const randomHTML = ad[Math.floor(Math.random() * ad.length)];
   

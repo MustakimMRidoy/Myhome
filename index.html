@@ -1953,34 +1953,33 @@
             }
         }
         // Initialize when page loads
-       // document.addEventListener('DOMContentLoaded', initializeSystem);
-        window.addEventListener('DOMContentLoaded', () => {
-  history.replaceState({ panel: null }, '');  // একটি “খালি” স্টেট
+       // শুরুতেই history एक "bouncer" স্টেট রেখে দাও
+window.addEventListener('DOMContentLoaded', () => {
+  history.replaceState({ panel: null }, '');  // base state
   initializeSystem();
 });
-        
+
+// Popstate হ্যান্ডলার
 window.addEventListener('popstate', (event) => {
-  // ১. যদি Start Menu খোলা থাকে—বন্ধ কর এবং রিটার্ন
+  // ১. যদি Start Menu খোলা থাকে—বন্ধ কর
   if (startMenu.style.display === 'flex') {
     startMenu.style.display = 'none';
     startButton.classList.remove('active');
-    return;
   }
-
-  // ২. যদি Notification Panel খোলা থাকে—বন্ধ কর এবং রিটার্ন
-  if (notificationPanel.classList.contains('open')) {
+  // ২. অন্যথায় যদি Notification Panel খোলা থাকে—বন্ধ কর
+  else if (notificationPanel.classList.contains('open')) {
     notificationPanel.classList.remove('open');
-    return;
   }
-
-  // ৩. যদি Power Options modal খোলা থাকে—বন্ধ কর এবং রিটার্ন
-  if (modalOverlay.style.display === 'flex') {
+  // ৩. অন্যথায় যদি Power Modal খোলা থাকে—বন্ধ কর
+  else if (modalOverlay.style.display === 'flex') {
     closeModal();
-    return;
+  }
+  // ৪. আর কিছুই খোলা না থাকলে—Power Options দেখাও
+  else {
+    showPowerMenu();
   }
 
-  // ৪. আর কিছুই খোলা না থাকলে—Power Options দেখাও
-  showPowerMenu();
+  history.pushState({ panel: null }, '');
 });
 
     </script>

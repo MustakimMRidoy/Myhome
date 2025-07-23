@@ -54,7 +54,24 @@
             user-select: none;
             transition: all 0.3s ease;
         }
-        
+
+        /* Add to your existing <style> */
+.watermark {
+  position: fixed;
+  /* নিচে taskbar এর height এর ঠিক উপরে */
+  bottom: calc(var(--taskbar-height) + 4px);
+  right: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.5);
+  pointer-events: none; /* পরের ইনটের্যাকশন এর মধ্যে বাধা না দেবে */
+  user-select: none;
+  z-index: 1100; /* taskbar এর উপরে দেখাবে */
+}
+[data-theme="light"] .watermark {
+  color: rgba(0,0,0,0.4);
+}
+
         /* Desktop Container */
         .desktop {
             width: 100%;
@@ -1181,7 +1198,19 @@
             </div>
         </div>
     </div>
-    
+
+  <!-- Watermark div -->
+  <div class="watermark">
+      <!--Ads-->
+      <div>
+          <a href="https://beta.publishers.adsterra.com/referral/QdnQT7GTLa" rel="nofollow"><img alt="banner" src="https://landings-cdn.adsterratech.com/referralBanners/png/300%20x%20250%20px.png" /></a>
+      </div>
+      <div>
+      <h2>© RidoyKhan</h2>
+      <p>MR Mustakim</p>
+      </div>
+  </div>
+
     <!-- Notification Panel -->
     <div class="notification-panel" id="notificationPanel">
         <div class="notification-panel-header">

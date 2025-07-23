@@ -432,7 +432,7 @@
                     </div>
                 </div>
                 <div class="window-content">
-                    <iframe src="${page}" scrolling="yes" loading="lazy" onload="handleIframeLoad(this, '${windowId}', '${title}')" onerror="handleIframeError(this, '${windowId}', '${title}')" style="width:100%; height:100%; border:none;" sandbox="allow-scripts allow-same-origin"></iframe>
+                    <iframe src="${page}" scrolling="yes" loading="lazy" onload="handleIframeLoad(this, '${windowId}', '${title}')" onerror="handleIframeError(this, '${windowId}', '${title}')" style="width:100%; height:100%; border:none;" sandbox="allow-scripts allow-forms"></iframe>
                 </div>
                 <div class="window-resize-handle"></div>
             `;

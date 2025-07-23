@@ -72,6 +72,41 @@
   color: rgba(0,0,0,0.4);
 }
 
+  .ad-container {
+ /* position: fixed;*/
+ display: inline-block;
+ position: relative;
+  bottom: calc(var(--taskbar-height) + 60px); /* watermark এর উপরের দিকে */
+  right: 12px;
+  width: 300px;
+  height: 250px;
+  z-index: 1100;
+  max-width: 300px;
+  margin: 20px;
+}
+        
+.ad-container img {
+  width: 100%;
+  height: auto;
+  cursor: pointer;
+}
+
+.close-btn {
+  position: absolute;
+  top: 3px;
+  right: 5px;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 14px;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  text-align: center;
+  line-height: 20px;
+  z-index: 99;
+}
         /* Desktop Container */
         .desktop {
             width: 100%;
@@ -1199,17 +1234,14 @@
         </div>
     </div>
 
-  <!-- Watermark div -->
-  <div class="watermark">
-      <!--Ads-->
-      <div>
-          <a href="https://beta.publishers.adsterra.com/referral/QdnQT7GTLa" rel="nofollow"><img alt="banner" src="https://landings-cdn.adsterratech.com/referralBanners/png/300%20x%20250%20px.png" /></a>
-      </div>
-      <div>
-      <h2>© RidoyKhan</h2>
-      <p>MR Mustakim</p>
-      </div>
-  </div>
+  <!-- Ads Container -->
+<div id="adContainer" class="ad-container"></div>
+
+<!-- Watermark div -->
+<div class="watermark">
+  <h2>© RidoyKhan</h2>
+  <p>MR Mustakim</p>
+</div>
 
     <!-- Notification Panel -->
     <div class="notification-panel" id="notificationPanel">
@@ -1377,6 +1409,7 @@
             updateDateTime();
             setInterval(updateDateTime, 1000);
             startBackgroundRotation();
+            showRandomAd();
             
             // Set initial background
             shuffleArray(backgrounds);
@@ -2152,6 +2185,47 @@ function shuffleArray(arr) {
     [arr[i], arr[j]] = [arr[j], arr[i]];
   }
 }
+//------------------------
+  const ad = [
+  `<a href="https://beta.publishers.adsterra.com/referral/QdnQT7GTLa" rel="nofollow"><img alt="banner" src="https://landings-cdn.adsterratech.com/referralBanners/png/300%20x%20250%20px.png" /></a>`,
+  `<a href="https://beta.publishers.adsterra.com/referral/QdnQT7GTLa" rel="nofollow"><img alt="banner" src="https://landings-cdn.adsterratech.com/referralBanners/png/600%20x%20250%20px.png" /></a>`,
+  `<a href="https://beta.publishers.adsterra.com/referral/QdnQT7GTLa" rel="nofollow"><img alt="banner" src="https://landings-cdn.adsterratech.com/referralBanners/png/300%20x%20425.png" /></a>`,
+ //`   `,
+ //`   `,
+  //`   `,
+ //`   `,
+ //`   `,
+  // ... আরো ad HTML যোগ করুন: `   `,
+];
+
+const adContainer = document.getElementById('adContainer');
+
+function showRandomAd() {
+  const randomIndex = Math.floor(Math.random() * ad.length);
+  adContainer.innerHTML = `
+    <div style="position: relative;">
+      <button class="close-btn" onclick="closeAd()">×</button>
+      ${ad[randomIndex]}
+    </div>
+  `;
+  scheduleNextAd();
+}
+
+function closeAd() {
+  adContainer.innerHTML = '';
+}
+
+function scheduleNextAd() {
+  const min = 3 * 60 * 1000;
+  const max = 10 * 60 * 1000;
+  const timeout = Math.random() * (max - min) + min;
+  setTimeout(showRandomAd, timeout);
+}
+
+ function closeAd() {
+  adContainer.innerHTML = '';
+}
+
     </script>
 </body>
 </html>

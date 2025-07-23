@@ -1492,7 +1492,18 @@
             
             if (isWindow && windowId) {
                 item.setAttribute('data-window-id', windowId);
-                item.onclick = () => focusWindow(windowId);
+                //item.onclick = () => focusWindow(windowId);
+                item.onclick = () => {
+      focusWindow(windowId);
+      // মাঝখানে আনতে:
+      const winEl = windows[windowId].element;
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const ww = winEl.offsetWidth;
+      const wh = winEl.offsetHeight;
+      winEl.style.left = `${(vw - ww) / 2}px`;
+      winEl.style.top  = `${(vh - wh - 48) / 2}px`; // 48px taskbar বাদ
+    };
             } else {
                 item.onclick = () => openApp(app.page, app.name, app.icon);
             }

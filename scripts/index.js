@@ -1202,3 +1202,73 @@ function scheduleNextAd() {
   const timeout = Math.random() * (max - min) + min;
   setTimeout(showRandomAd, timeout);
 }
+
+//------------------------------------
+// Function to enter fullscreen
+function enterFullscreen() {
+  const elem = document.documentElement;
+  if (elem.requestFullscreen) {
+    elem.requestFullscreen();
+  } else if (elem.mozRequestFullScreen) { // Firefox
+    elem.mozRequestFullScreen();
+  } else if (elem.webkitRequestFullscreen) { // Chrome, Safari and Opera
+    elem.webkitRequestFullscreen();
+  } else if (elem.msRequestFullscreen) { // IE/Edge
+    elem.msRequestFullscreen();
+  }
+}
+
+// Function to exit fullscreen
+function exitFullscreen() {
+  if (document.exitFullscreen) {
+    document.exitFullscreen();
+  } else if (document.mozCancelFullScreen) { // Firefox
+    document.mozCancelFullScreen();
+  } else if (document.webkitExitFullscreen) { // Chrome, Safari and Opera
+    document.webkitExitFullscreen();
+  } else if (document.msExitFullscreen) { // IE/Edge
+    document.msExitFullscreen();
+  }
+}
+
+// Function to check if the page is in fullscreen mode
+function isFullscreen() {
+  return document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+}
+
+// Function to toggle fullscreen
+function toggleFullscreen() {
+  if (isFullscreen()) {
+    exitFullscreen();
+  } else {
+    enterFullscreen();
+  }
+}
+
+// Add a "Toggle Fullscreen" option to the context menu
+const contextMenu = document.getElementById('contextMenu');
+const fullscreenContextItem = document.createElement('div');
+fullscreenContextItem.className = 'context-item';
+fullscreenContextItem.onclick = toggleFullscreen;
+contextMenu.appendChild(fullscreenContextItem);
+
+// Update the context menu text based on the fullscreen state
+function updateFullscreenContextItem() {
+  if (isFullscreen()) {
+    fullscreenContextItem.innerHTML = '<i class="fas fa-compress"></i> Exit Fullscreen';
+  } else {
+    fullscreenContextItem.innerHTML = '<i class="fas fa-expand"></i> Enter Fullscreen';
+  }
+}
+
+// Enter fullscreen when the page loads
+window.addEventListener('load', () => {
+  enterFullscreen();
+  updateFullscreenContextItem();
+});
+
+// Update the context menu when the fullscreen state changes
+document.addEventListener('fullscreenchange', updateFullscreenContextItem);
+document.addEventListener('webkitfullscreenchange', updateFullscreenContextItem);
+document.addEventListener('mozfullscreenchange', updateFullscreenContextItem);
+document.addEventListener('MSFullscreenChange', updateFullscreenContextItem);

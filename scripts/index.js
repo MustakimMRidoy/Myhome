@@ -466,17 +466,10 @@
                         referrerpolicy="strict-origin-when-cross-origin">
                     </iframe> -->
 */
-         // iframe ব্যবহার করে सुरक्षित উইন্ডো তৈরির জন্য উন্নত ফাংশন
-        function createWindow(windowId, title, icon, page) {
+         function createWindow(windowId, title, icon, page) {
             const windowEl = document.createElement('div');
             windowEl.className = 'window animate-slide-up';
             windowEl.id = windowId;
-
-            // `sandbox` অ্যাট্রিবিউট খুবই গুরুত্বপূর্ণ। এটি iframe এর ক্ষমতা সীমিত করে।
-            // allow-scripts, allow-forms, allow-same-origin ইত্যাদি নির্দিষ্ট কাজের জন্য প্রয়োজন অনুযায়ী যোগ করতে হবে।
-            // allow-popups and allow-modals যোগ করা হয়েছে যাতে কিছু অ্যাপ্লিকেশন সঠিকভাবে কাজ করে।
-            const sandboxRules = "allow-scripts allow-forms allow-same-origin allow-popups allow-modals allow-downloads";
-
             windowEl.innerHTML = `
                 <div class="window-titlebar">
                     <div class="window-title"><i class="${icon}"></i>${title}</div>
@@ -487,50 +480,162 @@
                     </div>
                 </div>
                 <div class="window-content">
-                    <iframe src="${page}"
-                            sandbox="${sandboxRules}"
-                            loading="lazy"
-                            allowfullscreen="true"
-                            referrerpolicy="no-referrer"
-                            onload="handleIframeLoad(this, '${windowId}', '${title}')"
-                            onerror="handleIframeError(this, '${windowId}', '${title}')">
-                    </iframe>
+                    <div class="loading-indicator">Loading ${title}…</div>
                 </div>
                 <div class="window-resize-handle"></div>
             `;
-            
+            loadContentIntoWindow(windowEl, page, windowId, title);
+           
             const titlebar = windowEl.querySelector('.window-titlebar');
             titlebar.ondblclick = () => maximizeWindow(windowId);
             titlebar.onmousedown = (e) => startDrag(e, windowId);
-            
             windowEl.querySelector('.window-resize-handle').onmousedown = (e) => startResize(e, windowId);
             
-            // ফুলস্ক্রিন রিকোয়েস্ট আটকে দিয়ে উইন্ডোর মধ্যে সীমাবদ্ধ রাখা
-            const iframe = windowEl.querySelector('iframe');
-            iframe.addEventListener('load', () => {
-                try {
-                    const contentDoc = iframe.contentDocument || iframe.contentWindow.document;
-                    // এলিমেন্টের ফুলস্ক্রিন এপিআই ওভাররাইড করা
-                    contentDoc.documentElement.requestFullscreen = () => {
-                        console.log("Fullscreen request captured and contained within the window.");
-                        maximizeWindow(windowId); // সাধারণ ম্যাক্সিমাইজ ফাংশনকে কল করা
-                    };
-                } catch (e) {
-                    // Cross-origin iframe এর জন্য এটি কাজ করবে না, যা একটি নিরাপত্তা ফিচার
-                    console.warn('Cannot override requestFullscreen for cross-origin iframe:', page);
-                }
-            });
-
             return windowEl;
         }
 
-        function handleIframeLoad(iframe, windowId, title) {
-            console.log(`Page '${title}' loaded successfully in iframe.`);
-            const win = windows[windowId];
-            if(win) {
-                 win.element.querySelector('.window-title').innerHTML = `<i class="${win.app.icon}"></i> ${iframe.contentDocument.title || title}`;
-            }
-             // এখানে কনটেন্ট লিক হওয়ার কোনো সুযোগ নেই কারণ এটি একটি sandboxed iframe-এ চলছে
+async function loadContentIntoWindow(windowEl, page, windowId, title) {
+    const contentArea = windowEl.querySelector('.window-content');
+    try {
+      const res = await fetch(page);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      let html = await res.text();
+      html = processHTMLForWindow(html, windowId);
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'content-wrapper';
+      wrapper.innerHTML = `<div class="sandboxed-content" id="content-${windowId}">${html}</div>`;
+
+      contentArea.innerHTML = '';
+      contentArea.appendChild(wrapper);
+
+      executeScriptsInWindow(wrapper, windowId);
+      applyWindowOverrides(wrapper, windowId);
+
+    } catch (err) {
+      console.error(err);
+      showErrorInWindow(contentArea, title);
+    }
+  }
+
+       function processHTMLForWindow(html, windowId) {
+    html = html.replace(/<\/?(?:html|head|body)[^>]*>/gi, '');
+    html = html.replace(/position:\s*fixed/gi, 'position: absolute');
+    html = html.replace(/100vh/g, '100%').replace(/100vw/g, '100%');
+    html = html.replace(/class="ad-container"/gi, `class="ad-container window-${windowId}-ad"`);
+    return html;
+  }
+
+        function executeScriptsInWindow(wrapper, windowId) {
+    wrapper.querySelectorAll('script').forEach(old => {
+      const nw = document.createElement('script');
+      Array.from(old.attributes).forEach(a => nw.setAttribute(a.name, a.value));
+      if (old.textContent) nw.textContent = wrapScriptForWindow(old.textContent, windowId);
+      old.replaceWith(nw);
+    });
+  }
+
+        // Wrap script to work within window context
+        function wrapScriptForWindow(scriptContent, windowId) {
+            // Create a window-scoped execution context
+            return `
+                (function() {
+                    // Override global references to work within window
+                    const windowElement = document.getElementById('${windowId}');
+                    const contentArea = windowElement.querySelector('.sandboxed-content');
+                    
+                    // Override document references for this window
+                    const originalCreateElement = document.createElement;
+                    document.createElement = function(tagName) {
+                        const element = originalCreateElement.call(document, tagName);
+                        // Ensure elements stay within window bounds
+                        if (element.style && (tagName.toLowerCase() === 'div' || tagName.toLowerCase() === 'iframe')) {
+                            element.style.maxWidth = '100%';
+                        }
+                        return element;
+                    };
+                    
+                    // Override appendChild to contain within window
+                    const originalAppendChild = Element.prototype.appendChild;
+                    Element.prototype.appendChild = function(child) {
+                        // Check if trying to append to body - redirect to window content
+                        if (this === document.body || this === document.documentElement) {
+                            return contentArea.appendChild(child);
+                        }
+                        return originalAppendChild.call(this, child);
+                    };
+                    
+                    // Override fullscreen and positioning
+                    const originalStyle = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'style');
+                    Object.defineProperty(HTMLElement.prototype, 'style', {
+                        get: function() {
+                            const style = originalStyle.get.call(this);
+                            const originalSetProperty = style.setProperty;
+                            style.setProperty = function(property, value, priority) {
+                                // Contain fixed elements within window
+                                if (property === 'position' && value === 'fixed') {
+                                    value = 'absolute';
+                                }
+                                // Limit z-index to prevent breaking out of window
+                                if (property === 'z-index' && parseInt(value) > 1000) {
+                                    value = '999';
+                                }
+                                return originalSetProperty.call(this, property, value, priority);
+                            };
+                            return style;
+                        },
+                        set: originalStyle.set
+                    });
+                    
+                    try {
+                        // Execute the original script
+                        ${scriptContent}
+                    } catch (e) {
+                        console.warn('Script execution error in window ${windowId}:', e);
+                    }
+                    
+                    // Cleanup overrides after execution
+                    setTimeout(() => {
+                        document.createElement = originalCreateElement;
+                        Element.prototype.appendChild = originalAppendChild;
+                    }, 1000);
+                })();
+            `;
+        }
+
+        // Apply window-specific CSS overrides
+        function applyWindowOverrides(wrapper, windowId) {
+            const style = document.createElement('style');
+            style.textContent = `
+                #content-${windowId} {
+                    position: relative;
+                    width: 100%;
+                    height: 100%;
+                    overflow: hidden;
+                }
+                
+                #content-${windowId} * {
+                    max-width: 100% !important;
+                }
+                
+                #content-${windowId} .ad-container,
+                #content-${windowId} [style*="position: fixed"],
+                #content-${windowId} [style*="position:fixed"] {
+                    position: absolute !important;
+                    top: auto !important;
+                    bottom: 10px !important;
+                    right: 10px !important;
+                    left: auto !important;
+                    max-width: calc(100% - 20px) !important;
+                    z-index: 999 !important;
+                }
+                
+                #content-${windowId} iframe {
+                    max-width: 100% !important;
+                    max-height: 100% !important;
+                }
+            `;
+            wrapper.appendChild(style);
         }
 
         function positionWindow(windowEl) {

@@ -253,6 +253,12 @@
             });
             selectedIcon = null;
         }
+
+        function clearNotificationsBadge() {
+         notificationCount = 0;
+         updateBadge();
+          }
+
         function addShortcut() {
             const availableApps = apps.filter(app => !shortcuts.includes(app.id));
             if (availableApps.length === 0) {
@@ -662,6 +668,7 @@
   if (!isOpen) {
     notificationPanel.classList.add('open');
     updateDateTime();
+    clearNotificationsBadge();
     history.pushState({ panel: 'quick' }, '');
   } else {
     notificationPanel.classList.remove('open');
@@ -685,6 +692,7 @@
         }
         
         const notifAudio = document.getElementById('notifSound');
+        let notificationCount = 0;
         // Notification System
         function showNotification(title, htmlContent, duration = 5000) {
   const notification = document.createElement('div');
@@ -724,6 +732,8 @@ notifAudio.currentTime = 0; // যাতে প্রতি বার শুর�
 notifAudio.play().catch(e => {
   console.warn("Notification sound play blocked:", e);
 });
+		notificationCount++;
+    updateBadge();
 
   notificationContainer.appendChild(notification);
   setTimeout(() => notification.classList.add('show'), 100);
@@ -764,6 +774,15 @@ notifAudio.play().catch(e => {
   }
 }
 
+function updateBadge() {
+    const badge = document.getElementById('notifBadge');
+    if (notificationCount >= 20) {
+        badge.textContent = notificationCount;
+        badge.style.display = 'flex';
+    } else {
+        badge.style.display = 'none';
+    }
+}
 
  function scheduleAdNotification() {
   // একটা random banner pick

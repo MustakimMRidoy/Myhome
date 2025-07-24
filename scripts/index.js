@@ -475,6 +475,25 @@
             windowEl.className = 'window animate-slide-up';
             windowEl.id = windowId;
 
+		 const isExternal = (url) => {
+                try {
+                    // page-এর URL এবং বর্তমান সাইটের URL-এর origin তুলনা করা হয়
+                    // new URL(url, window.location.origin) ব্যবহার করায় ریلیٹو পাথ (e.g., 'systemApps/..') ঠিকমতো কাজ করবে
+                    return new URL(url, window.location.origin).origin !== window.location.origin;
+                } catch (e) {
+                    // ভুল URL হলে false রিটার্ন করবে
+                    return false;
+                }
+            };
+		 let externalLinkButtonHTML = '';
+            // যদি পেজটি এক্সটার্নাল হয়, তাহলে নতুন বাটন তৈরি করো
+            if (isExternal(page)) {
+                externalLinkButtonHTML = `
+                    <div class="window-control" title="Open in new tab" onclick="window.open('${page}', '_blank', 'noopener,noreferrer')">
+                        <i class="fas fa-external-link-alt"></i>
+                    </div>
+                `;
+            }
             // sandbox অ্যাট্রিবিউট iframe-এর ক্ষমতা সীমাবদ্ধ করে নিরাপত্তা নিশ্চিত করে।
             // allow-fullscreen ছাড়া অন্য কোনো fullscreen অ্যাট্রিবিউট নেই, তাই এটি ব্রাউজার fullscreen API কল করতে পারবে না।
             const sandboxRules = "allow-scripts allow-forms allow-popups allow-modals allow-downloads";
@@ -483,6 +502,7 @@
                 <div class="window-titlebar">
                     <div class="window-title"><i class="${icon}"></i> <span>${title}</span></div>
                     <div class="window-controls">
+		    ${externalLinkButtonHTML}  <!-- নতুন বাটনটি এখানে যুক্ত হবে -->
                         <div class="window-control window-minimize" onclick="minimizeWindow('${windowId}')"><i class="fas fa-window-minimize"></i></div>
                         <div class="window-control window-maximize" onclick="maximizeWindow('${windowId}')"><i class="far fa-square"></i></div>
                         <div class="window-control window-close" onclick="closeWindow('${windowId}')"><i class="fas fa-times"></i></div>

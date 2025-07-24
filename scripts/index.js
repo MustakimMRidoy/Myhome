@@ -1245,13 +1245,6 @@ function toggleFullscreen() {
   }
 }
 
-// Add a "Toggle Fullscreen" option to the context menu
-const contextMenu = document.getElementById('contextMenu');
-const fullscreenContextItem = document.createElement('div');
-fullscreenContextItem.className = 'context-item';
-fullscreenContextItem.onclick = toggleFullscreen;
-contextMenu.appendChild(fullscreenContextItem);
-
 // Update the context menu text based on the fullscreen state
 function updateFullscreenContextItem() {
   if (isFullscreen()) {

@@ -418,6 +418,7 @@
             positionWindow(windowEl);
             showNotification('App Opened', `${title} is now running`);
         }
+/*
         function createWindow(windowId, title, icon, page) {
             const windowEl = document.createElement('div');
             windowEl.className = 'window animate-slide-up';
@@ -442,6 +443,44 @@
             windowEl.querySelector('.window-resize-handle').onmousedown = (e) => startResize(e, windowId);
             return windowEl;
         }
+*/
+         function createWindow(windowId, title, icon, page) {
+            const windowEl = document.createElement('div');
+            windowEl.className = 'window animate-slide-up';
+            windowEl.id = windowId;
+            windowEl.innerHTML = `
+                <div class="window-titlebar">
+                    <div class="window-title"><i class="${icon}"></i>${title}</div>
+                    <div class="window-controls">
+                        <div class="window-control window-minimize" onclick="minimizeWindow('${windowId}')"><i class="fas fa-window-minimize"></i></div>
+                        <div class="window-control window-maximize" onclick="maximizeWindow('${windowId}')"><i class="far fa-square"></i></div>
+                        <div class="window-control window-close" onclick="closeWindow('${windowId}')"><i class="fas fa-times"></i></div>
+                    </div>
+                </div>
+                <div class="window-content">
+                    <iframe 
+                        src="${page}" 
+                        scrolling="yes" 
+                        loading="lazy" 
+                        onload="handleIframeLoad(this, '${windowId}', '${title}')" 
+                        onerror="handleIframeError(this, '${windowId}', '${title}')" 
+                        style="width:100%; height:100%; border:none;" 
+                        sandbox="allow-scripts allow-forms allow-popups allow-modals"
+                        allow="clipboard-write"
+                        referrerpolicy="strict-origin-when-cross-origin">
+                    </iframe>
+                </div>
+                <div class="window-resize-handle"></div>
+            `;
+            
+            const titlebar = windowEl.querySelector('.window-titlebar');
+            titlebar.ondblclick = () => maximizeWindow(windowId);
+            titlebar.onmousedown = (e) => startDrag(e, windowId);
+            windowEl.querySelector('.window-resize-handle').onmousedown = (e) => startResize(e, windowId);
+            
+            return windowEl;
+        }
+
         function positionWindow(windowEl) {
             const width = 800;
             const height = 600;

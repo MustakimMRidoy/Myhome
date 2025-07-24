@@ -55,9 +55,14 @@
             height: 100vh;
             user-select: none;
             transition: all 0.3s ease;
+            cursor: inherit !important;
         }
 
-        /* Add to your existing <style> */
+        /* Ensure mouse cursor consistency across the site */
+        *, *::before, *::after {
+            cursor: auto;
+        }
+
 .watermark {
   position: fixed;
   /* নিচে taskbar এর height এর ঠিক উপরে */
@@ -890,10 +895,55 @@
             background: var(--bg-primary);
             /*overflow: auto;*/
             overflow-x: auto;
-  overflow-y: auto;
+            overflow-y: auto;
             position: relative;
             -webkit-overflow-scrolling: touch;
+            contain: layout style paint;
+            isolation: isolate;
+            cursor: default !important; /* Reset cursor for content */
         }
+
+        .content-wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background: white;
+  all: initial;
+  font-family: Arial, sans-serif;
+  cursor: default !important; /* Ensure content has default cursor */
+}
+
+.sandboxed-content {
+  position: relative;
+  width: 100%;
+  min-height: 100%;
+  overflow: hidden;
+  z-index: 0;
+}
+        /* Strict isolation for window content - prevent cursor interference */
+        .sandboxed-content * {
+            cursor: inherit !important;
+        }
+
+        .sandboxed-content a, .sandboxed-content button, 
+        .sandboxed-content input[type="button"], .sandboxed-content input[type="submit"] {
+            cursor: pointer !important;
+        }
+
+        .sandboxed-content input, .sandboxed-content textarea {
+            cursor: text !important;
+        }
+
+/* Ensure ads stay inside window */
+.window-content .ad-container {
+  position: absolute !important;
+  bottom: 10px !important;
+  right: 10px !important;
+  width: 250px !important;
+  max-width: calc(100% - 20px) !important;
+  z-index: 999 !important;
+  contain: layout style paint;
+}
         
         .window-content iframe {
             display: block;

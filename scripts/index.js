@@ -496,6 +496,7 @@
                             onload="handleIframeLoad(this, '${windowId}', '${title}')"
                             onerror="handleIframeError(this, '${windowId}')">
                     </iframe>
+		    <div id="adContainer" class="ad-container"></div>
                 </div>
                 <div class="window-resize-handle"></div>
             `;

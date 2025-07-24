@@ -494,7 +494,53 @@
             return windowEl;
         }
 
-         async function loadContentIntoWindow(windowEl, page, windowId, title) {
+async function loadContentIntoWindow(windowEl, page, windowId, title) {
+  const contentArea = windowEl.querySelector('.window-content');
+
+  try {
+    const res = await fetch(page);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    let html = await res.text();
+    html = processHTMLForWindow(html, windowId);
+
+    // === Shadow host & root তৈরি ===
+    const shadowHost = document.createElement('div');
+    shadowHost.className = 'shadow-host';
+    const shadow = shadowHost.attachShadow({ mode: 'open' });
+
+    // === Shadow DOM-এ স্টাইল ইনজেক্ট করুন ===
+    shadow.innerHTML = `
+      <style>
+        :host { all: initial; display: block; width:100%; height:100%; overflow:hidden; }
+        .sandboxed-content { position: relative; width:100%; height:100%; overflow:hidden; }
+        .sandboxed-content .ad-container {
+          position: absolute !important;
+          bottom: 10px !important;
+          right: 10px !important;
+          max-width: calc(100% - 20px) !important;
+          z-index: 999 !important;
+        }
+      </style>
+      <div class="sandboxed-content" id="content-${windowId}">
+        ${html}
+      </div>
+    `;
+
+    // replace loading indicator with the shadow host
+    contentArea.innerHTML = '';
+    contentArea.appendChild(shadowHost);
+
+    // এখন scripts উদ্ধার করে Shadow DOM-এ রান করান
+    executeScriptsInWindow(shadow, windowId);
+
+  } catch (err) {
+    console.error(err);
+    showErrorInWindow(contentArea, title);
+  }
+}
+
+
+      /*   async function loadContentIntoWindow(windowEl, page, windowId, title) {
     const contentArea = windowEl.querySelector('.window-content');
     try {
       const res = await fetch(page);
@@ -517,7 +563,7 @@
       showErrorInWindow(contentArea, title);
     }
   }
-
+*/
        function processHTMLForWindow(html, windowId) {
     html = html.replace(/<\/?(?:html|head|body)[^>]*>/gi, '');
     html = html.replace(/position:\s*fixed/gi, 'position: absolute');

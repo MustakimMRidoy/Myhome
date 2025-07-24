@@ -495,48 +495,6 @@
         }
 
 async function loadContentIntoWindow(windowEl, page, windowId, title) {
-  const contentArea = windowEl.querySelector('.window-content');
-  const shadow     = contentArea.attachShadow({mode: 'open'});
-
-  try {
-    const res  = await fetch(page);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    let html   = await res.text();
-    html       = processHTMLForWindow(html, windowId);
-
-    // 1) inject your style into shadow
-    const style = document.createElement('style');
-    style.textContent = `
-      :host { display:block; width:100%; height:100%; overflow:hidden; position:relative; }
-      .content-wrapper { width:100%; height:100%; all: initial; font-family:Arial; }
-      .sandboxed-content { position:relative; width:100%; height:100%; overflow:hidden; }
-      .ad-container { position:absolute !important; bottom:10px !important; right:10px !important; z-index:999; }
-    `;
-    shadow.appendChild(style);
-
-    // 2) build your wrapper and sandbox
-    const wrapper = document.createElement('div');
-    wrapper.className = 'content-wrapper';
-    wrapper.innerHTML = `<div class="sandboxed-content" id="content-${windowId}">${html}</div>`;
-    shadow.appendChild(wrapper);      // ← append *into* shadow, not contentArea
-
-    // 3) lock the pointer inside this window
-    wrapper.addEventListener('pointerdown', e => {
-      wrapper.setPointerCapture(e.pointerId);
-    });
-
-    // 4) now run your scripts & overrides
-    executeScriptsInWindow(wrapper, windowId);
-    applyWindowOverrides(wrapper, windowId);
-
-  } catch (err) {
-    console.error(err);
-    showErrorInWindow(contentArea, title);
-  }
-}
-
-
-      /*   async function loadContentIntoWindow(windowEl, page, windowId, title) {
     const contentArea = windowEl.querySelector('.window-content');
     try {
       const res = await fetch(page);
@@ -559,7 +517,7 @@ async function loadContentIntoWindow(windowEl, page, windowId, title) {
       showErrorInWindow(contentArea, title);
     }
   }
-*/
+
        function processHTMLForWindow(html, windowId) {
     html = html.replace(/<\/?(?:html|head|body)[^>]*>/gi, '');
     html = html.replace(/position:\s*fixed/gi, 'position: absolute');

@@ -109,6 +109,30 @@
   line-height: 20px;
   z-index: 99;
 }
+
+        .datetime-container {
+  position: relative; /* badge absolute positioning এর জন্য */
+}
+
+.notif-badge {
+  position: absolute;
+  top: -4px;       /* date এর উপর একটু উপরে */
+  left: -4px;      /* বামে সামান্য স্থান */
+  background: #e81123;  /* লাল */
+  color: white;
+  border-radius: 50%;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 18px;
+  text-align: center;
+  display: none;     /* ডিফল্টে লুকিয়ে থাকবে */
+  box-shadow: 0 0 2px rgba(0,0,0,0.5);
+  z-index: 1002;
+}
+
         /* Desktop Container */
         .desktop {
             width: 100%;
@@ -1266,6 +1290,7 @@
             <div class="datetime-container" onclick="toggleNotificationPanel()">
                 <div class="clock" id="clock">12:00 PM</div>
                 <div class="date" id="date">1/1/2024</div>
+                <span id="notifBadge" class="notif-badge"></span>
             </div>
         </div>
     </div>

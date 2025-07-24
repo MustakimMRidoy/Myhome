@@ -495,80 +495,90 @@
         }
 
 async function loadContentIntoWindow(windowEl, page, windowId, title) {
-    const contentArea = windowEl.querySelector('.window-content');
-    try {
-      const res = await fetch(page);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      let html = await res.text();
-      html = processHTMLForWindow(html, windowId);
+  const contentArea = windowEl.querySelector('.window-content');
+  try {
+    const res = await fetch(page);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    let rawHTML = await res.text();
+    const { content, scripts, styles } = processHTMLForWindow(rawHTML, windowId);
 
-      const wrapper = document.createElement('div');
-      wrapper.className = 'content-wrapper';
-      wrapper.innerHTML = `<div class="sandboxed-content" id="content-${windowId}">${html}</div>`;
+    const wrapper = document.createElement('div');
+    wrapper.className = 'content-wrapper';
+    wrapper.innerHTML = `<div class="sandboxed-content">${content}</div>`;
 
-      contentArea.innerHTML = '';
-      contentArea.appendChild(wrapper);
+    // Inject styles
+    styles.forEach(style => {
+      const cloned = style.cloneNode(true);
+      wrapper.appendChild(cloned);
+    });
 
-      executeScriptsInWindow(wrapper, windowId);
-      applyWindowOverrides(wrapper, windowId);
+    contentArea.innerHTML = '';
+    contentArea.appendChild(wrapper);
 
-    } catch (err) {
-      console.error(err);
-      showErrorInWindow(contentArea, title);
+    // Inject scripts safely
+    executeScriptNodes(wrapper, scripts);
+
+    applyWindowOverrides(wrapper, windowId);
+
+  } catch (err) {
+    console.error(err);
+    showErrorInWindow(contentArea, title);
+  }
+}
+
+function executeScriptNodes(wrapper, scripts) {
+  scripts.forEach(script => {
+    const newScript = document.createElement('script');
+    if (script.src) {
+      newScript.src = script.src;
+    } else {
+      newScript.textContent = script.textContent;
     }
-  }
+    // Preserve attributes like type, async, defer
+    Array.from(script.attributes).forEach(attr => {
+      newScript.setAttribute(attr.name, attr.value);
+    });
+    wrapper.appendChild(newScript);
+  });
+}
 
-   function processHTMLForWindow(html, windowId, pageUrl) {
-  // ১) Parse HTML into DOM
+  function processHTMLForWindow(rawHTML, windowId) {
   const parser = new DOMParser();
-  const doc = parser.parseFromString(html, 'text/html');
+  const doc = parser.parseFromString(rawHTML, 'text/html');
 
-  // ২) Inject <base> so that relative URLs resolve against the original page
-  let base = doc.querySelector('base');
-  if (!base) {
-    base = doc.createElement('base');
-    doc.head.insertBefore(base, doc.head.firstChild);
-  }
-  base.setAttribute('href', pageUrl);
+  // ১. <script>, <style>, <link> রাখি পরে handle করার জন্য
+  const scripts = Array.from(doc.querySelectorAll('script'));
+  const styles = Array.from(doc.querySelectorAll('style, link[rel="stylesheet"]'));
 
-  // ৩) Rewrite all <link> CSS & <script src> & <img> URLs to absolute (DOM does it automatically once base is set)
-  //    তাই শুধু copy করে নিব head এর সব <link> আর <style>
-  const headFrag = document.createDocumentFragment();
-  // Copy stylesheets
-  doc.querySelectorAll('link[rel="stylesheet"]').forEach(link => {
-    headFrag.appendChild(link.cloneNode(true));
+  // ২. <body> বা <main> এর content খুঁজি (না পেলে fallback)
+  let bodyContent = doc.body || doc.documentElement;
+  const contentDiv = document.createElement('div');
+  contentDiv.className = `sandboxed-content window-${windowId}`;
+  contentDiv.innerHTML = bodyContent.innerHTML;
+
+  // ৩. সব inline style ঠিক করা (fixed → absolute, vh/vw → %)
+  contentDiv.querySelectorAll('*').forEach(el => {
+    const style = el.getAttribute('style');
+    if (style) {
+      let newStyle = style
+        .replace(/position:\s*fixed/gi, 'position: absolute')
+        .replace(/100vh/gi, '100%')
+        .replace(/100vw/gi, '100%');
+      el.setAttribute('style', newStyle);
+    }
   });
-  // Copy inline <style>
-  doc.querySelectorAll('style').forEach(style => {
-    headFrag.appendChild(style.cloneNode(true));
+
+  // ৪. ad-container class গুলো rename
+  contentDiv.querySelectorAll('.ad-container').forEach(el => {
+    el.classList.add(`window-${windowId}-ad`);
   });
 
-  // ৪) Extract body’s innerHTML, sanitize positioning & viewport units
-  let bodyHtml = doc.body.innerHTML;
-  bodyHtml = bodyHtml
-    .replace(/position\s*:\s*fixed/gi, 'position:absolute')
-    .replace(/100vh/gi, '100%')
-    .replace(/100vw/gi, '100%')
-    // Ad-container ক্লাস রি-নেম করে উইন্ডোস্কোপেড ক্লাস
-    .replace(
-      /class=["']([^"']*ad-container[^"']*)["']/gi,
-      `class="$1 window-${windowId}-ad"`
-    );
-
-  // ৫) Wrap into our sandboxed container
-  const sandboxHtml = `
-    <div class="content-wrapper">
-      <!-- Inject copied <head> stylesheets & inline styles -->
-      <div style="display:none">
-        ${new XMLSerializer().serializeToString(headFrag)}
-      </div>
-      <div class="sandboxed-content" id="content-${windowId}">
-        ${bodyHtml}
-      </div>
-    </div>
-  `;
-
-  return sandboxHtml;
+  // ৫. Final HTML + script/style আলাদা করে return করি
+  return {
+    content: contentDiv.innerHTML,
+    scripts,
+    styles
+  };
 }
 
         function executeScriptsInWindow(wrapper, windowId) {

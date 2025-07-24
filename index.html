@@ -55,9 +55,24 @@
             height: 100vh;
             user-select: none;
             transition: all 0.3s ease;
+            cursor: default !important; /* Force default cursor for entire page */
         }
 
-        /* Add to your existing <style> */
+         /* Ensure mouse cursor consistency across the site */
+        *, *::before, *::after {
+            cursor: inherit !important;
+        }
+
+        /* Specific cursor styles for interactive elements */
+        button, .taskbar-item, .desktop-icon, .app-tile, .context-item, 
+        .quick-action, .notification, .system-tray-item, .start-button {
+            cursor: pointer !important;
+        }
+
+        input, textarea {
+            cursor: text !important;
+        }
+
 .watermark {
   position: fixed;
   /* নিচে taskbar এর height এর ঠিক উপরে */
@@ -895,6 +910,7 @@
             -webkit-overflow-scrolling: touch;
             contain: layout style paint;
             isolation: isolate;
+            cursor: default !important; /* Reset cursor for content */
         }
 
         .content-wrapper {
@@ -904,6 +920,7 @@
   background: white;
   all: initial;
   font-family: Arial, sans-serif;
+  cursor: default !important; /* Ensure content has default cursor */
 }
 
 .sandboxed-content {
@@ -913,6 +930,19 @@
   overflow: hidden;
   z-index: 0;
 }
+        /* Strict isolation for window content - prevent cursor interference */
+        .sandboxed-content * {
+            cursor: inherit !important;
+        }
+
+        .sandboxed-content a, .sandboxed-content button, 
+        .sandboxed-content input[type="button"], .sandboxed-content input[type="submit"] {
+            cursor: pointer !important;
+        }
+
+        .sandboxed-content input, .sandboxed-content textarea {
+            cursor: text !important;
+        }
 
 /* Ensure ads stay inside window */
 .window-content .ad-container {

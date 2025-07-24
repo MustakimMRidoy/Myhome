@@ -475,16 +475,13 @@
             windowEl.className = 'window animate-slide-up';
             windowEl.id = windowId;
 
-		 const isExternal = (url) => {
-                try {
-                    // page-এর URL এবং বর্তমান সাইটের URL-এর origin তুলনা করা হয়
-                    // new URL(url, window.location.origin) ব্যবহার করায় ریلیٹو পাথ (e.g., 'systemApps/..') ঠিকমতো কাজ করবে
-                    return new URL(url, window.location.origin).origin !== window.location.origin;
-                } catch (e) {
-                    // ভুল URL হলে false রিটার্ন করবে
-                    return false;
-                }
-            };
+ const isExternal = (url) => {
+    try {
+        return url.startsWith("https://"); 
+    } catch (e) {
+        return false;
+    }
+};
 		 let externalLinkButtonHTML = '';
             // যদি পেজটি এক্সটার্নাল হয়, তাহলে নতুন বাটন তৈরি করো
             if (isExternal(page)) {
@@ -516,7 +513,7 @@
                             onload="handleIframeLoad(this, '${windowId}', '${title}')"
                             onerror="handleIframeError(this, '${windowId}')">
                     </iframe>
-		    <div id="adContainer" class="ad-container"></div>
+		    <div id="bannerAd" class="ad-container"></div>
                 </div>
                 <div class="window-resize-handle"></div>
             `;

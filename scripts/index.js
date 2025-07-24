@@ -482,12 +482,31 @@
         return false;
     }
 };
+		 const shortcutExists = (url) => {
+                // 'apps' অ্যারেতে চেক করা হচ্ছে এই পেজটি আছে কিনা এবং সেটি 'shortcuts' অ্যারেতেও আছে কিনা
+                const appExists = apps.find(app => app.page === url);
+                if (!appExists) return false;
+                return shortcuts.includes(appExists.id);
+            };
+		 
 		 let externalLinkButtonHTML = '';
             // যদি পেজটি এক্সটার্নাল হয়, তাহলে নতুন বাটন তৈরি করো
             if (isExternal(page)) {
                 externalLinkButtonHTML = `
                     <div class="window-control" title="Open in new tab" onclick="window.open('${page}', '_blank', 'noopener,noreferrer')">
                         <i class="fas fa-external-link-alt"></i>
+                    </div>
+                `;
+            }
+		 let addShortcutButtonHTML = '';
+            // যদি পেজটি এক্সটার্নাল হয় এবং শর্টকাট আগে থেকে না থাকে
+            if (isExternal(page) && !shortcutExists(page)) {
+                addShortcutButtonHTML = `
+                    <div class="window-control" 
+                         id="add-shortcut-btn-${windowId}" 
+                         title="Add shortcut to desktop" 
+                         onclick="addExternalShortcut('${windowId}', '${page}', '${title}')">
+                        <i class="fas fa-plus-square"></i>
                     </div>
                 `;
             }
@@ -499,6 +518,7 @@
                 <div class="window-titlebar">
                     <div class="window-title"><i class="${icon}"></i> <span>${title}</span></div>
                     <div class="window-controls">
+		    ${addShortcutButtonHTML}    <!-- নতুন শর্টকাট বাটন -->
 		    ${externalLinkButtonHTML}  <!-- নতুন বাটনটি এখানে যুক্ত হবে -->
                         <div class="window-control window-minimize" onclick="minimizeWindow('${windowId}')"><i class="fas fa-window-minimize"></i></div>
                         <div class="window-control window-maximize" onclick="maximizeWindow('${windowId}')"><i class="far fa-square"></i></div>
@@ -1286,3 +1306,49 @@ document.addEventListener('fullscreenchange', () => {
     }
   }
 });
+
+function addExternalShortcut(windowId, url, title) {
+            // ১. চেক করা হচ্ছে এই URL এর অ্যাপ আগে থেকেই আছে কিনা
+            let existingApp = apps.find(app => app.page === url);
+
+            if (existingApp && shortcuts.includes(existingApp.id)) {
+                showNotification('Already Exists', 'This shortcut is already on your desktop.');
+                return;
+            }
+
+            let newAppId;
+
+            // ২. যদি অ্যাপ না থাকে, তাহলে নতুন একটি অ্যাপ অবজেক্ট তৈরি করা হচ্ছে
+            if (!existingApp) {
+                // URL থেকে একটি ইউনিক আইডি তৈরি করা হচ্ছে
+                newAppId = 'shortcut_' + url.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50);
+
+                const newApp = {
+                    id: newAppId,
+                    name: title || 'Web Shortcut',
+                    icon: 'fas fa-link', // একটি সাধারণ আইকন
+                    color: '#3498db',    // একটি সাধারণ রঙ
+                    page: url,
+                    type: 'Web Shortcut',
+                    pinned: false
+                };
+                apps.push(newApp); // মূল অ্যাপ লিস্টে যোগ করা
+            } else {
+                newAppId = existingApp.id;
+            }
+
+            // ৩. ডেস্কটপ শর্টকাট লিস্টে যোগ করা
+            if (!shortcuts.includes(newAppId)) {
+                shortcuts.push(newAppId);
+            }
+
+            // ৪. ডেস্কটপ আইকন রিফ্রেশ করা
+            createDesktopIcons();
+            showNotification('Shortcut Added', `'${title}' has been added to your desktop.`);
+
+            // ৫. বাটনটি লুকিয়ে ফেলা, কারণ শর্টকাট এখন তৈরি হয়ে গেছে
+            const button = document.getElementById(`add-shortcut-btn-${windowId}`);
+            if (button) {
+                button.style.display = 'none';
+            }
+        }

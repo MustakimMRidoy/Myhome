@@ -518,13 +518,58 @@ async function loadContentIntoWindow(windowEl, page, windowId, title) {
     }
   }
 
-       function processHTMLForWindow(html, windowId) {
-    html = html.replace(/<\/?(?:html|head|body)[^>]*>/gi, '');
-    html = html.replace(/position:\s*fixed/gi, 'position: absolute');
-    html = html.replace(/100vh/g, '100%').replace(/100vw/g, '100%');
-    html = html.replace(/class="ad-container"/gi, `class="ad-container window-${windowId}-ad"`);
-    return html;
+   function processHTMLForWindow(html, windowId, pageUrl) {
+  // ১) Parse HTML into DOM
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+
+  // ২) Inject <base> so that relative URLs resolve against the original page
+  let base = doc.querySelector('base');
+  if (!base) {
+    base = doc.createElement('base');
+    doc.head.insertBefore(base, doc.head.firstChild);
   }
+  base.setAttribute('href', pageUrl);
+
+  // ৩) Rewrite all <link> CSS & <script src> & <img> URLs to absolute (DOM does it automatically once base is set)
+  //    তাই শুধু copy করে নিব head এর সব <link> আর <style>
+  const headFrag = document.createDocumentFragment();
+  // Copy stylesheets
+  doc.querySelectorAll('link[rel="stylesheet"]').forEach(link => {
+    headFrag.appendChild(link.cloneNode(true));
+  });
+  // Copy inline <style>
+  doc.querySelectorAll('style').forEach(style => {
+    headFrag.appendChild(style.cloneNode(true));
+  });
+
+  // ৪) Extract body’s innerHTML, sanitize positioning & viewport units
+  let bodyHtml = doc.body.innerHTML;
+  bodyHtml = bodyHtml
+    .replace(/position\s*:\s*fixed/gi, 'position:absolute')
+    .replace(/100vh/gi, '100%')
+    .replace(/100vw/gi, '100%')
+    // Ad-container ক্লাস রি-নেম করে উইন্ডোস্কোপেড ক্লাস
+    .replace(
+      /class=["']([^"']*ad-container[^"']*)["']/gi,
+      `class="$1 window-${windowId}-ad"`
+    );
+
+  // ৫) Wrap into our sandboxed container
+  const sandboxHtml = `
+    <div class="content-wrapper">
+      <!-- Inject copied <head> stylesheets & inline styles -->
+      <div style="display:none">
+        ${new XMLSerializer().serializeToString(headFrag)}
+      </div>
+      <div class="sandboxed-content" id="content-${windowId}">
+        ${bodyHtml}
+      </div>
+    </div>
+  `;
+
+  return sandboxHtml;
+}
 
         function executeScriptsInWindow(wrapper, windowId) {
     wrapper.querySelectorAll('script').forEach(old => {

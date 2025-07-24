@@ -55,23 +55,8 @@
             height: 100vh;
             user-select: none;
             transition: all 0.3s ease;
-            cursor: default !important; /* Force default cursor for entire page */
         }
 
-         /* Ensure mouse cursor consistency across the site */
-        *, *::before, *::after {
-            cursor: inherit !important;
-        }
-
-        /* Specific cursor styles for interactive elements */
-        button, .taskbar-item, .desktop-icon, .app-tile, .context-item, 
-        .quick-action, .notification, .system-tray-item, .start-button {
-            cursor: pointer !important;
-        }
-
-        input, textarea {
-            cursor: text !important;
-        }
 
 .watermark {
   position: fixed;

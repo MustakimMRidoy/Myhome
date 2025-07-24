@@ -1,4 +1,4 @@
-        // Enhanced App Database
+// Enhanced App Database
         const apps = [
             { id: 'settings', name: 'Settings', icon: 'fas fa-cog', color: '#0078d4', page: 'systemApps/settings.html', type: 'System', pinned: true },
             { id: 'security', name: 'Security', icon: 'fas fa-shield-alt', color: '#d4006f', page: 'systemApps/security.html', type: 'System', pinned: false },
@@ -495,91 +495,36 @@
         }
 
 async function loadContentIntoWindow(windowEl, page, windowId, title) {
-  const contentArea = windowEl.querySelector('.window-content');
-  try {
-    const res = await fetch(page);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    let rawHTML = await res.text();
-    const { content, scripts, styles } = processHTMLForWindow(rawHTML, windowId);
+    const contentArea = windowEl.querySelector('.window-content');
+    try {
+      const res = await fetch(page);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      let html = await res.text();
+      html = processHTMLForWindow(html, windowId);
 
-    const wrapper = document.createElement('div');
-    wrapper.className = 'content-wrapper';
-    wrapper.innerHTML = `<div class="sandboxed-content">${content}</div>`;
+      const wrapper = document.createElement('div');
+      wrapper.className = 'content-wrapper';
+      wrapper.innerHTML = `<div class="sandboxed-content" id="content-${windowId}">${html}</div>`;
 
-    // Inject styles
-    styles.forEach(style => {
-      const cloned = style.cloneNode(true);
-      wrapper.appendChild(cloned);
-    });
+      contentArea.innerHTML = '';
+      contentArea.appendChild(wrapper);
 
-    contentArea.innerHTML = '';
-    contentArea.appendChild(wrapper);
+      executeScriptsInWindow(wrapper, windowId);
+      applyWindowOverrides(wrapper, windowId);
 
-    // Inject scripts safely
-    executeScriptNodes(wrapper, scripts);
-
-    applyWindowOverrides(wrapper, windowId);
-
-  } catch (err) {
-    console.error(err);
-    showErrorInWindow(contentArea, title);
+    } catch (err) {
+      console.error(err);
+      showErrorInWindow(contentArea, title);
+    }
   }
-}
 
-function executeScriptNodes(wrapper, scripts) {
-  scripts.forEach(script => {
-    const newScript = document.createElement('script');
-    if (script.src) {
-      newScript.src = script.src;
-    } else {
-      newScript.textContent = script.textContent;
-    }
-    // Preserve attributes like type, async, defer
-    Array.from(script.attributes).forEach(attr => {
-      newScript.setAttribute(attr.name, attr.value);
-    });
-    wrapper.appendChild(newScript);
-  });
-}
-
-  function processHTMLForWindow(rawHTML, windowId) {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(rawHTML, 'text/html');
-
-  // ১. <script>, <style>, <link> রাখি পরে handle করার জন্য
-  const scripts = Array.from(doc.querySelectorAll('script'));
-  const styles = Array.from(doc.querySelectorAll('style, link[rel="stylesheet"]'));
-
-  // ২. <body> বা <main> এর content খুঁজি (না পেলে fallback)
-  let bodyContent = doc.body || doc.documentElement;
-  const contentDiv = document.createElement('div');
-  contentDiv.className = `sandboxed-content window-${windowId}`;
-  contentDiv.innerHTML = bodyContent.innerHTML;
-
-  // ৩. সব inline style ঠিক করা (fixed → absolute, vh/vw → %)
-  contentDiv.querySelectorAll('*').forEach(el => {
-    const style = el.getAttribute('style');
-    if (style) {
-      let newStyle = style
-        .replace(/position:\s*fixed/gi, 'position: absolute')
-        .replace(/100vh/gi, '100%')
-        .replace(/100vw/gi, '100%');
-      el.setAttribute('style', newStyle);
-    }
-  });
-
-  // ৪. ad-container class গুলো rename
-  contentDiv.querySelectorAll('.ad-container').forEach(el => {
-    el.classList.add(`window-${windowId}-ad`);
-  });
-
-  // ৫. Final HTML + script/style আলাদা করে return করি
-  return {
-    content: contentDiv.innerHTML,
-    scripts,
-    styles
-  };
-}
+       function processHTMLForWindow(html, windowId) {
+    html = html.replace(/<\/?(?:html|head|body)[^>]*>/gi, '');
+    html = html.replace(/position:\s*fixed/gi, 'position: absolute');
+    html = html.replace(/100vh/g, '100%').replace(/100vw/g, '100%');
+    html = html.replace(/class="ad-container"/gi, `class="ad-container window-${windowId}-ad"`);
+    return html;
+  }
 
         function executeScriptsInWindow(wrapper, windowId) {
     wrapper.querySelectorAll('script').forEach(old => {

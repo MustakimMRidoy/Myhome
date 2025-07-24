@@ -496,42 +496,38 @@
 
 async function loadContentIntoWindow(windowEl, page, windowId, title) {
   const contentArea = windowEl.querySelector('.window-content');
+  const shadow     = contentArea.attachShadow({mode: 'open'});
 
   try {
-    const res = await fetch(page);
+    const res  = await fetch(page);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    let html = await res.text();
-    html = processHTMLForWindow(html, windowId);
+    let html   = await res.text();
+    html       = processHTMLForWindow(html, windowId);
 
-    // === Shadow host & root তৈরি ===
-    const shadowHost = document.createElement('div');
-    shadowHost.className = 'shadow-host';
-    const shadow = shadowHost.attachShadow({ mode: 'open' });
-
-    // === Shadow DOM-এ স্টাইল ইনজেক্ট করুন ===
-    shadow.innerHTML = `
-      <style>
-        :host { all: initial; display: block; width:100%; height:100%; overflow:hidden; }
-        .sandboxed-content { position: relative; width:100%; height:100%; overflow:hidden; }
-        .sandboxed-content .ad-container {
-          position: absolute !important;
-          bottom: 10px !important;
-          right: 10px !important;
-          max-width: calc(100% - 20px) !important;
-          z-index: 999 !important;
-        }
-      </style>
-      <div class="sandboxed-content" id="content-${windowId}">
-        ${html}
-      </div>
+    // 1) inject your style into shadow
+    const style = document.createElement('style');
+    style.textContent = `
+      :host { display:block; width:100%; height:100%; overflow:hidden; position:relative; }
+      .content-wrapper { width:100%; height:100%; all: initial; font-family:Arial; }
+      .sandboxed-content { position:relative; width:100%; height:100%; overflow:hidden; }
+      .ad-container { position:absolute !important; bottom:10px !important; right:10px !important; z-index:999; }
     `;
+    shadow.appendChild(style);
 
-    // replace loading indicator with the shadow host
-    contentArea.innerHTML = '';
-    contentArea.appendChild(shadowHost);
+    // 2) build your wrapper and sandbox
+    const wrapper = document.createElement('div');
+    wrapper.className = 'content-wrapper';
+    wrapper.innerHTML = `<div class="sandboxed-content" id="content-${windowId}">${html}</div>`;
+    shadow.appendChild(wrapper);      // ← append *into* shadow, not contentArea
 
-    // এখন scripts উদ্ধার করে Shadow DOM-এ রান করান
-    executeScriptsInWindow(shadow, windowId);
+    // 3) lock the pointer inside this window
+    wrapper.addEventListener('pointerdown', e => {
+      wrapper.setPointerCapture(e.pointerId);
+    });
+
+    // 4) now run your scripts & overrides
+    executeScriptsInWindow(wrapper, windowId);
+    applyWindowOverrides(wrapper, windowId);
 
   } catch (err) {
     console.error(err);

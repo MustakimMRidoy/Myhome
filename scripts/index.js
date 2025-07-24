@@ -1200,23 +1200,14 @@ function shuffleArray(arr) {
 //------------------------
 
 const adContainer = document.getElementById('adContainer');
-const bannerAd = document.getElementById('bannerAd');
 
 function showRandomAd() {
   const randomIndex = Math.floor(Math.random() * ad.length);
   const html = ad[randomIndex];
 
-  // প্রথমে container খালি করো
   adContainer.innerHTML = `
     <div id="adInner" style="position: relative;">
       <button class="close-btn" onclick="closeAd()">×</button>
-      <div id="adContent"></div>
-    </div>
-  `;
-
-	bannerAd.innerHTML = `
-    <div id="adInner" style="position: relative;">
-      <button class="close-btn" onclick="closebannerAd()">×</button>
       <div id="adContent"></div>
     </div>
   `;
@@ -1254,10 +1245,6 @@ function showRandomAd() {
 
 function closeAd() {
   adContainer.innerHTML = '';
-}
-
-function closebannerAd() {
-  bannerAd.innerHTML = '';
 }
 
 function scheduleNextAd() {

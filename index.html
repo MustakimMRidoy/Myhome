@@ -55,7 +55,12 @@
             height: 100vh;
             user-select: none;
             transition: all 0.3s ease;
-            cursor: default;
+            cursor: inherit !important;
+        }
+
+        /* Ensure mouse cursor consistency across the site */
+        *, *::before, *::after {
+            cursor: auto;
         }
 
 .watermark {

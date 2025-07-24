@@ -466,10 +466,17 @@
                         referrerpolicy="strict-origin-when-cross-origin">
                     </iframe> -->
 */
-         function createWindow(windowId, title, icon, page) {
+         // iframe ব্যবহার করে सुरक्षित উইন্ডো তৈরির জন্য উন্নত ফাংশন
+        function createWindow(windowId, title, icon, page) {
             const windowEl = document.createElement('div');
             windowEl.className = 'window animate-slide-up';
             windowEl.id = windowId;
+
+            // `sandbox` অ্যাট্রিবিউট খুবই গুরুত্বপূর্ণ। এটি iframe এর ক্ষমতা সীমিত করে।
+            // allow-scripts, allow-forms, allow-same-origin ইত্যাদি নির্দিষ্ট কাজের জন্য প্রয়োজন অনুযায়ী যোগ করতে হবে।
+            // allow-popups and allow-modals যোগ করা হয়েছে যাতে কিছু অ্যাপ্লিকেশন সঠিকভাবে কাজ করে।
+            const sandboxRules = "allow-scripts allow-forms allow-same-origin allow-popups allow-modals allow-downloads";
+
             windowEl.innerHTML = `
                 <div class="window-titlebar">
                     <div class="window-title"><i class="${icon}"></i>${title}</div>
@@ -480,168 +487,50 @@
                     </div>
                 </div>
                 <div class="window-content">
-                    <div class="loading-indicator">Loading ${title}…</div>
+                    <iframe src="${page}"
+                            sandbox="${sandboxRules}"
+                            loading="lazy"
+                            allowfullscreen="true"
+                            referrerpolicy="no-referrer"
+                            onload="handleIframeLoad(this, '${windowId}', '${title}')"
+                            onerror="handleIframeError(this, '${windowId}', '${title}')">
+                    </iframe>
                 </div>
                 <div class="window-resize-handle"></div>
             `;
-            loadContentIntoWindow(windowEl, page, windowId, title);
-           
+            
             const titlebar = windowEl.querySelector('.window-titlebar');
             titlebar.ondblclick = () => maximizeWindow(windowId);
             titlebar.onmousedown = (e) => startDrag(e, windowId);
+            
             windowEl.querySelector('.window-resize-handle').onmousedown = (e) => startResize(e, windowId);
             
+            // ফুলস্ক্রিন রিকোয়েস্ট আটকে দিয়ে উইন্ডোর মধ্যে সীমাবদ্ধ রাখা
+            const iframe = windowEl.querySelector('iframe');
+            iframe.addEventListener('load', () => {
+                try {
+                    const contentDoc = iframe.contentDocument || iframe.contentWindow.document;
+                    // এলিমেন্টের ফুলস্ক্রিন এপিআই ওভাররাইড করা
+                    contentDoc.documentElement.requestFullscreen = () => {
+                        console.log("Fullscreen request captured and contained within the window.");
+                        maximizeWindow(windowId); // সাধারণ ম্যাক্সিমাইজ ফাংশনকে কল করা
+                    };
+                } catch (e) {
+                    // Cross-origin iframe এর জন্য এটি কাজ করবে না, যা একটি নিরাপত্তা ফিচার
+                    console.warn('Cannot override requestFullscreen for cross-origin iframe:', page);
+                }
+            });
+
             return windowEl;
         }
 
-        // Enhanced Window Content Loading with Better Isolation
-async function loadContentIntoWindow(windowEl, page, windowId, title) {
-    const contentArea = windowEl.querySelector('.window-content');
-    try {
-        const res = await fetch(page);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        let html = await res.text();
-        html = processHTMLForWindow(html, windowId);
-
-        // Create isolated iframe for complete sandboxing
-        const iframe = document.createElement('iframe');
-        iframe.style.cssText = 'width:100%;height:100%;border:none;background:white;display:block;';
-        iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups');
-        iframe.setAttribute('data-window-id', windowId);
-        iframe.setAttribute('loading', 'lazy');
-        
-        contentArea.innerHTML = '';
-        contentArea.appendChild(iframe);
-        
-        // Write processed content to iframe with complete isolation
-        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-        iframeDoc.open();
-        iframeDoc.write(`
-            <!DOCTYPE html>
-            <html><head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <style>
-                    * { box-sizing: border-box; }
-                    html, body { 
-                        margin: 0; padding: 0; 
-                        font-family: 'Segoe UI', sans-serif; 
-                        overflow: auto;
-                        width: 100%; height: 100%;
-                    }
-                    .isolated-container { 
-                        position: relative; 
-                        width: 100%; 
-                        min-height: 100vh;
-                        contain: layout style paint;
-                        isolation: isolate;
-                        overflow: hidden;
-                    }
-                    /* Prevent breaking out of container */
-                    * { max-width: 100% !important; }
-                    [style*="position: fixed"], 
-                    [style*="position:fixed"] { 
-                        position: absolute !important; 
-                    }
-                </style>
-            </head><body>
-                <div class="isolated-container">${html}</div>
-            </body></html>
-        `);
-        iframeDoc.close();
-
-        // Add error handling for iframe content
-        iframe.onerror = () => showErrorInWindow(contentArea, title);
-        iframe.onload = () => {
-            try {
-                // Apply additional security restrictions to iframe content
-                const iframeWindow = iframe.contentWindow;
-                if (iframeWindow) {
-                    // Prevent parent access
-                    Object.defineProperty(iframeWindow, 'parent', { value: null, writable: false });
-                    Object.defineProperty(iframeWindow, 'top', { value: iframeWindow, writable: false });
-                }
-            } catch (e) {
-                // Cross-origin restrictions are good for security
-                console.log('Security restrictions applied successfully');
+        function handleIframeLoad(iframe, windowId, title) {
+            console.log(`Page '${title}' loaded successfully in iframe.`);
+            const win = windows[windowId];
+            if(win) {
+                 win.element.querySelector('.window-title').innerHTML = `<i class="${win.app.icon}"></i> ${iframe.contentDocument.title || title}`;
             }
-        };
-
-    } catch (err) {
-        console.error(err);
-        showErrorInWindow(contentArea, title);
-    }
-}
-
-function processHTMLForWindow(html, windowId) {
-    // Remove document structure tags
-    html = html.replace(/<!DOCTYPE[^>]*>/gi, '');
-    html = html.replace(/<\/?(?:html|head|body)[^>]*>/gi, '');
-    
-    // Force containment and prevent breakout
-    html = html.replace(/position:\s*fixed/gi, 'position: absolute');
-    html = html.replace(/position:\s*sticky/gi, 'position: relative');
-    html = html.replace(/100vh/g, '100%').replace(/100vw/g, '100%');
-    html = html.replace(/z-index:\s*\d{4,}/gi, 'z-index: 999');
-    
-    // Remove any script tags that might interfere with parent
-    html = html.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, (match) => {
-        // Only allow safe scripts (no parent/top references)
-        if (match.includes('parent.') || match.includes('top.') || match.includes('window.parent')) {
-            return '<!-- Script blocked for security -->';
-        }
-        return match;
-    });
-    
-    return html;
-}
-
-function showErrorInWindow(contentArea, title) {
-    contentArea.innerHTML = `
-        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background: var(--bg-primary); color: var(--text-primary); padding: 40px; text-align: center; font-family: 'Segoe UI', sans-serif;">
-            <i class="fas fa-exclamation-circle" style="font-size: 48px; color: #e74c3c; margin-bottom: 24px;"></i>
-            <p style="margin-bottom: 24px; font-size: 16px;">The <strong>${title}</strong> app could not be loaded</p>
-            <button onclick="this.closest('.window').querySelector('.window-close').click()" 
-                   style="background: var(--accent-color); color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">
-                Close Window
-            </button>
-        </div>
-    `;
-}
-
-        // Apply window-specific CSS overrides
-        function applyWindowOverrides(wrapper, windowId) {
-            const style = document.createElement('style');
-            style.textContent = `
-                #content-${windowId} {
-                    position: relative;
-                    width: 100%;
-                    height: 100%;
-                    overflow: hidden;
-                }
-                
-                #content-${windowId} * {
-                    max-width: 100% !important;
-                }
-                
-                #content-${windowId} .ad-container,
-                #content-${windowId} [style*="position: fixed"],
-                #content-${windowId} [style*="position:fixed"] {
-                    position: absolute !important;
-                    top: auto !important;
-                    bottom: 10px !important;
-                    right: 10px !important;
-                    left: auto !important;
-                    max-width: calc(100% - 20px) !important;
-                    z-index: 999 !important;
-                }
-                
-                #content-${windowId} iframe {
-                    max-width: 100% !important;
-                    max-height: 100% !important;
-                }
-            `;
-            wrapper.appendChild(style);
+             // এখানে কনটেন্ট লিক হওয়ার কোনো সুযোগ নেই কারণ এটি একটি sandboxed iframe-এ চলছে
         }
 
         function positionWindow(windowEl) {

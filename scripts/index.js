@@ -494,6 +494,30 @@
             return windowEl;
         }
 
+         async function loadContentIntoWindow(windowEl, page, windowId, title) {
+            const contentArea = windowEl.querySelector('.window-content');
+            try {
+                const res = await fetch(page);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                let html = await res.text();
+                html = processHTMLForWindow(html, windowId);
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'content-wrapper';
+                wrapper.innerHTML = `<div class="sandboxed-content" id="content-${windowId}">${html}</div>`;
+
+                contentArea.innerHTML = '';
+                contentArea.appendChild(wrapper);
+
+                executeScriptsInWindow(wrapper, windowId);
+                applyWindowOverrides(wrapper, windowId);
+
+            } catch (err) {
+                console.error(err);
+                showErrorInWindow(contentArea, title);
+            }
+        }
+/*
 async function loadContentIntoWindow(windowEl, page, windowId, title) {
     const contentArea = windowEl.querySelector('.window-content');
     try {
@@ -517,7 +541,7 @@ async function loadContentIntoWindow(windowEl, page, windowId, title) {
       showErrorInWindow(contentArea, title);
     }
   }
-
+*/
        function processHTMLForWindow(html, windowId) {
     html = html.replace(/<\/?(?:html|head|body)[^>]*>/gi, '');
     html = html.replace(/position:\s*fixed/gi, 'position: absolute');
@@ -537,68 +561,79 @@ async function loadContentIntoWindow(windowEl, page, windowId, title) {
 
         // Wrap script to work within window context
         function wrapScriptForWindow(scriptContent, windowId) {
-            // Create a window-scoped execution context
             return `
                 (function() {
-                    // Override global references to work within window
-                    const windowElement = document.getElementById('${windowId}');
-                    const contentArea = windowElement.querySelector('.sandboxed-content');
-                    
-                    // Override document references for this window
-                    const originalCreateElement = document.createElement;
-                    document.createElement = function(tagName) {
-                        const element = originalCreateElement.call(document, tagName);
-                        // Ensure elements stay within window bounds
-                        if (element.style && (tagName.toLowerCase() === 'div' || tagName.toLowerCase() === 'iframe')) {
-                            element.style.maxWidth = '100%';
-                        }
-                        return element;
+                    // Create isolated context for this window
+                    const windowScope = {
+                        windowId: '${windowId}',
+                        element: document.getElementById('${windowId}'),
+                        contentArea: null
                     };
                     
-                    // Override appendChild to contain within window
-                    const originalAppendChild = Element.prototype.appendChild;
-                    Element.prototype.appendChild = function(child) {
-                        // Check if trying to append to body - redirect to window content
-                        if (this === document.body || this === document.documentElement) {
-                            return contentArea.appendChild(child);
-                        }
-                        return originalAppendChild.call(this, child);
-                    };
-                    
-                    // Override fullscreen and positioning
-                    const originalStyle = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'style');
-                    Object.defineProperty(HTMLElement.prototype, 'style', {
-                        get: function() {
-                            const style = originalStyle.get.call(this);
-                            const originalSetProperty = style.setProperty;
-                            style.setProperty = function(property, value, priority) {
-                                // Contain fixed elements within window
-                                if (property === 'position' && value === 'fixed') {
-                                    value = 'absolute';
-                                }
-                                // Limit z-index to prevent breaking out of window
-                                if (property === 'z-index' && parseInt(value) > 1000) {
-                                    value = '999';
-                                }
-                                return originalSetProperty.call(this, property, value, priority);
-                            };
-                            return style;
-                        },
-                        set: originalStyle.set
-                    });
-                    
-                    try {
-                        // Execute the original script
-                        ${scriptContent}
-                    } catch (e) {
-                        console.warn('Script execution error in window ${windowId}:', e);
+                    if (windowScope.element) {
+                        windowScope.contentArea = windowScope.element.querySelector('.sandboxed-content');
                     }
                     
-                    // Cleanup overrides after execution
-                    setTimeout(() => {
+                    // Isolated context variables that don't affect parent
+                    let localDocument = document;
+                    let localWindow = window;
+                    
+                    // Override only for elements within this window's scope
+                    const originalCreateElement = document.createElement;
+                    
+                    // Scoped createElement that prevents cursor leaking
+                    function scopedCreateElement(tagName) {
+                        const element = originalCreateElement.call(document, tagName);
+                        
+                        // Prevent style changes from affecting parent context
+                        if (element.style) {
+                            const originalSetProperty = element.style.setProperty;
+                            element.style.setProperty = function(property, value, priority) {
+                                // Check if this element belongs to our window
+                                const isInWindow = windowScope.contentArea && 
+                                    (windowScope.contentArea.contains(this) || this === windowScope.contentArea);
+                                
+                                if (isInWindow) {
+                                    // Only allow cursor changes within window
+                                    if (property === 'cursor') {
+                                        return originalSetProperty.call(this, property, value, priority);
+                                    }
+                                    // Convert fixed positioning to absolute within window
+                                    if (property === 'position' && value === 'fixed') {
+                                        value = 'absolute';
+                                    }
+                                    // Limit z-index to prevent breaking window boundaries
+                                    if (property === 'z-index' && parseInt(value) > 999) {
+                                        value = '999';
+                                    }
+                                }
+                                
+                                return originalSetProperty.call(this, property, value, priority);
+                            };
+                        }
+                        
+                        return element;
+                    }
+                    
+                    // Apply scoped overrides only during script execution
+                    const restoreOriginal = () => {
                         document.createElement = originalCreateElement;
-                        Element.prototype.appendChild = originalAppendChild;
-                    }, 1000);
+                    };
+                    
+                    // Set scoped functions
+                    document.createElement = scopedCreateElement;
+                    
+                    try {
+                        // Execute script in controlled environment
+                        (function() {
+                            ${scriptContent}
+                        })();
+                    } catch (e) {
+                        console.warn('Script execution error in window ${windowId}:', e);
+                    } finally {
+                        // Always restore original methods
+                        restoreOriginal();
+                    }
                 })();
             `;
         }
@@ -612,10 +647,24 @@ async function loadContentIntoWindow(windowEl, page, windowId, title) {
                     width: 100%;
                     height: 100%;
                     overflow: hidden;
+                    cursor: default !important;
                 }
                 
                 #content-${windowId} * {
                     max-width: 100% !important;
+                    cursor: inherit !important;
+                }
+                
+                #content-${windowId} a, 
+                #content-${windowId} button,
+                #content-${windowId} input[type="button"],
+                #content-${windowId} input[type="submit"] {
+                    cursor: pointer !important;
+                }
+                
+                #content-${windowId} input,
+                #content-${windowId} textarea {
+                    cursor: text !important;
                 }
                 
                 #content-${windowId} .ad-container,
@@ -636,6 +685,24 @@ async function loadContentIntoWindow(windowEl, page, windowId, title) {
                 }
             `;
             wrapper.appendChild(style);
+        }
+
+        function showErrorInWindow(contentArea, title) {
+            const errorMessage = `
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background: var(--bg-primary); color: var(--text-primary); padding: 40px; text-align: center; font-family: 'Segoe UI', sans-serif;">
+                    <i class="fas fa-exclamation-circle" style="font-size: 48px; color: #e74c3c; margin-bottom: 24px;"></i>
+                    <p style="margin-bottom: 24px; font-size: 16px;">this <strong>${title}</strong> app is not installed</p>
+                    <a href="https://mustakimridoymr.github.io" 
+                       target="_blank" 
+                       style="background: var(--accent-color); color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 500; transition: all 0.2s ease;"
+                       onmouseover="this.style.background='var(--accent-hover)'" onmouseout="this.style.background='var(--accent-color)'">
+                        install now
+                    </a>
+                </div>
+            `;
+            if(contentArea) {
+                contentArea.innerHTML = errorMessage;
+            }
         }
 
         function positionWindow(windowEl) {

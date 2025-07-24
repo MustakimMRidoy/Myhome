@@ -1410,6 +1410,10 @@
             Refresh
         </div>
         <div class="context-divider"></div>
+        <div class="context-item" onclick="toggleFullscreen()" id="fullscreenOption">
+            <i class="fas fa-expand"></i>
+            <span>${isFullscreen() ? 'Exit Fullscreen' : 'Enter Fullscreen'}</span>
+        </div>
         <div class="context-item" onclick="openDisplay()">
             <i class="fas fa-desktop"></i>
             Display settings

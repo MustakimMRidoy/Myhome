@@ -116,8 +116,8 @@
 
 .notif-badge {
   position: absolute;
-  top: -4px;       /* date এর উপর একটু উপরে */
-  left: -4px;      /* বামে সামান্য স্থান */
+  top: -3px;       /* date এর উপর একটু উপরে */
+  left: -2px;      /* বামে সামান্য স্থান */
   background: #e81123;  /* লাল */
   color: white;
   border-radius: 50%;
@@ -1288,9 +1288,9 @@
                 <i class="fas fa-wifi"></i>
             </div>
             <div class="datetime-container" onclick="toggleNotificationPanel()">
+                <span id="notifBadge" class="notif-badge"></span>
                 <div class="clock" id="clock">12:00 PM</div>
                 <div class="date" id="date">1/1/2024</div>
-                <span id="notifBadge" class="notif-badge"></span>
             </div>
         </div>
     </div>

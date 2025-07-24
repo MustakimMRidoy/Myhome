@@ -91,7 +91,15 @@
 </script>
 <script type="text/javascript" src="//www.highperformanceformat.com/75fced16ed8059f6b7e4ef61f0db1139/invoke.js"></script>`,
  `<div id="container-86f295a00166ddfdf3c7bdb7c13ce400"></div>`,
-                  //`   `,
+                  `<iframe src="https://mustakimridoymr.github.io/DirectLink/link.html"
+        sandbox="allow-scripts allow-forms allow-popups allow-modals allow-downloads"
+        loading="lazy"
+        referrerpolicy="no-referrer"
+        width="300"
+        height="400"
+        style="border: none; overflow: hidden;"
+        scrolling="no"
+></iframe>`,
  //`   `,
                   //`   `,
  //`   `,
@@ -526,6 +534,7 @@
                     </div>
                 </div>
                 <div class="window-content">
+		    <div id="bannerAd" class="ad-container"></div>
                     <iframe src="${page}"
                             sandbox="${sandboxRules}"
                             loading="lazy"
@@ -533,7 +542,6 @@
                             onload="handleIframeLoad(this, '${windowId}', '${title}')"
                             onerror="handleIframeError(this, '${windowId}')">
                     </iframe>
-		    <div id="bannerAd" class="ad-container"></div>
                 </div>
                 <div class="window-resize-handle"></div>
             `;
@@ -1192,6 +1200,7 @@ function shuffleArray(arr) {
 //------------------------
 
 const adContainer = document.getElementById('adContainer');
+const bannerAd = document.getElementById('bannerAd');
 
 function showRandomAd() {
   const randomIndex = Math.floor(Math.random() * ad.length);
@@ -1201,6 +1210,13 @@ function showRandomAd() {
   adContainer.innerHTML = `
     <div id="adInner" style="position: relative;">
       <button class="close-btn" onclick="closeAd()">×</button>
+      <div id="adContent"></div>
+    </div>
+  `;
+
+	bannerAd.innerHTML = `
+    <div id="adInner" style="position: relative;">
+      <button class="close-btn" onclick="closebannerAd()">×</button>
       <div id="adContent"></div>
     </div>
   `;
@@ -1238,6 +1254,10 @@ function showRandomAd() {
 
 function closeAd() {
   adContainer.innerHTML = '';
+}
+
+function closebannerAd() {
+  bannerAd.innerHTML = '';
 }
 
 function scheduleNextAd() {

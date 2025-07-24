@@ -410,9 +410,13 @@
             }
             windowCounter++;
             const windowId = `window_${windowCounter}`;
+            
+            // উন্নত createWindow ফাংশনকে কল করা হবে
             const windowEl = createWindow(windowId, title, icon, page);
             windowContainer.appendChild(windowEl);
-            const app = apps.find(a => a.page === page) || { name: title, icon: icon, color: '#0078d4' };
+            
+            const app = apps.find(a => a.page === page) || { name: title, icon: icon, color: '#0078d4', page: page };
+            
             windows[windowId] = {
                 id: windowId,
                 element: windowEl,
@@ -423,10 +427,10 @@
                 originalStyle: {},
                 zIndex: zIndexCounter++
             };
+            
             addWindowToTaskbar(windowId, app);
             focusWindow(windowId);
             positionWindow(windowEl);
-            showNotification('App Opened', `${title} is now running`);
         }
 /*
         function createWindow(windowId, title, icon, page) {
@@ -470,9 +474,14 @@
             const windowEl = document.createElement('div');
             windowEl.className = 'window animate-slide-up';
             windowEl.id = windowId;
+
+            // sandbox অ্যাট্রিবিউট iframe-এর ক্ষমতা সীমাবদ্ধ করে নিরাপত্তা নিশ্চিত করে।
+            // allow-fullscreen ছাড়া অন্য কোনো fullscreen অ্যাট্রিবিউট নেই, তাই এটি ব্রাউজার fullscreen API কল করতে পারবে না।
+            const sandboxRules = "allow-scripts allow-forms allow-popups allow-modals allow-downloads";
+
             windowEl.innerHTML = `
                 <div class="window-titlebar">
-                    <div class="window-title"><i class="${icon}"></i>${title}</div>
+                    <div class="window-title"><i class="${icon}"></i> <span>${title}</span></div>
                     <div class="window-controls">
                         <div class="window-control window-minimize" onclick="minimizeWindow('${windowId}')"><i class="fas fa-window-minimize"></i></div>
                         <div class="window-control window-maximize" onclick="maximizeWindow('${windowId}')"><i class="far fa-square"></i></div>
@@ -480,51 +489,25 @@
                     </div>
                 </div>
                 <div class="window-content">
-                    <div class="loading-indicator">Loading ${title}…</div>
+                    <iframe src="${page}"
+                            sandbox="${sandboxRules}"
+                            loading="lazy"
+                            referrerpolicy="no-referrer"
+                            onload="handleIframeLoad(this, '${windowId}', '${title}')"
+                            onerror="handleIframeError(this, '${windowId}')">
+                    </iframe>
                 </div>
                 <div class="window-resize-handle"></div>
             `;
-            loadContentIntoWindow(windowEl, page, windowId, title);
-           
+            
+            // উইন্ডো ড্র্যাগ ও রিসাইজ করার ইভেন্ট যুক্ত করা
             const titlebar = windowEl.querySelector('.window-titlebar');
             titlebar.ondblclick = () => maximizeWindow(windowId);
             titlebar.onmousedown = (e) => startDrag(e, windowId);
             windowEl.querySelector('.window-resize-handle').onmousedown = (e) => startResize(e, windowId);
-            
+
             return windowEl;
         }
-
-async function loadContentIntoWindow(windowEl, page, windowId, title) {
-    const contentArea = windowEl.querySelector('.window-content');
-    try {
-      const res = await fetch(page);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      let html = await res.text();
-      html = processHTMLForWindow(html, windowId);
-
-      const wrapper = document.createElement('div');
-      wrapper.className = 'content-wrapper';
-      wrapper.innerHTML = `<div class="sandboxed-content" id="content-${windowId}">${html}</div>`;
-
-      contentArea.innerHTML = '';
-      contentArea.appendChild(wrapper);
-
-      executeScriptsInWindow(wrapper, windowId);
-      applyWindowOverrides(wrapper, windowId);
-
-    } catch (err) {
-      console.error(err);
-      showErrorInWindow(contentArea, title);
-    }
-  }
-
-       function processHTMLForWindow(html, windowId) {
-    html = html.replace(/<\/?(?:html|head|body)[^>]*>/gi, '');
-    html = html.replace(/position:\s*fixed/gi, 'position: absolute');
-    html = html.replace(/100vh/g, '100%').replace(/100vw/g, '100%');
-    html = html.replace(/class="ad-container"/gi, `class="ad-container window-${windowId}-ad"`);
-    return html;
-  }
 
         function executeScriptsInWindow(wrapper, windowId) {
     wrapper.querySelectorAll('script').forEach(old => {
@@ -535,107 +518,31 @@ async function loadContentIntoWindow(windowEl, page, windowId, title) {
     });
   }
 
-        // Wrap script to work within window context
-        function wrapScriptForWindow(scriptContent, windowId) {
-            // Create a window-scoped execution context
-            return `
-                (function() {
-                    // Override global references to work within window
-                    const windowElement = document.getElementById('${windowId}');
-                    const contentArea = windowElement.querySelector('.sandboxed-content');
-                    
-                    // Override document references for this window
-                    const originalCreateElement = document.createElement;
-                    document.createElement = function(tagName) {
-                        const element = originalCreateElement.call(document, tagName);
-                        // Ensure elements stay within window bounds
-                        if (element.style && (tagName.toLowerCase() === 'div' || tagName.toLowerCase() === 'iframe')) {
-                            element.style.maxWidth = '100%';
-                        }
-                        return element;
-                    };
-                    
-                    // Override appendChild to contain within window
-                    const originalAppendChild = Element.prototype.appendChild;
-                    Element.prototype.appendChild = function(child) {
-                        // Check if trying to append to body - redirect to window content
-                        if (this === document.body || this === document.documentElement) {
-                            return contentArea.appendChild(child);
-                        }
-                        return originalAppendChild.call(this, child);
-                    };
-                    
-                    // Override fullscreen and positioning
-                    const originalStyle = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'style');
-                    Object.defineProperty(HTMLElement.prototype, 'style', {
-                        get: function() {
-                            const style = originalStyle.get.call(this);
-                            const originalSetProperty = style.setProperty;
-                            style.setProperty = function(property, value, priority) {
-                                // Contain fixed elements within window
-                                if (property === 'position' && value === 'fixed') {
-                                    value = 'absolute';
-                                }
-                                // Limit z-index to prevent breaking out of window
-                                if (property === 'z-index' && parseInt(value) > 1000) {
-                                    value = '999';
-                                }
-                                return originalSetProperty.call(this, property, value, priority);
-                            };
-                            return style;
-                        },
-                        set: originalStyle.set
-                    });
-                    
-                    try {
-                        // Execute the original script
-                        ${scriptContent}
-                    } catch (e) {
-                        console.warn('Script execution error in window ${windowId}:', e);
-                    }
-                    
-                    // Cleanup overrides after execution
-                    setTimeout(() => {
-                        document.createElement = originalCreateElement;
-                        Element.prototype.appendChild = originalAppendChild;
-                    }, 1000);
-                })();
-            `;
+    function handleIframeLoad(iframe, windowId, defaultTitle) {
+            try {
+                // iframe-এর টাইটেল অনুযায়ী উইন্ডোর টাইটেল আপডেট করার চেষ্টা
+                const newTitle = iframe.contentDocument.title;
+                if (newTitle && windows[windowId]) {
+                    windows[windowId].element.querySelector('.window-title span').textContent = newTitle;
+                }
+            } catch (e) {
+                 // Cross-origin iframe-এর ক্ষেত্রে contentDocument অ্যাক্সেস করা যায় না, যা একটি স্বাভাবিক নিরাপত্তা ব্যবস্থা।
+                console.warn("Could not access iframe title due to cross-origin policy.");
+            }
         }
 
-        // Apply window-specific CSS overrides
-        function applyWindowOverrides(wrapper, windowId) {
-            const style = document.createElement('style');
-            style.textContent = `
-                #content-${windowId} {
-                    position: relative;
-                    width: 100%;
-                    height: 100%;
-                    overflow: hidden;
-                }
-                
-                #content-${windowId} * {
-                    max-width: 100% !important;
-                }
-                
-                #content-${windowId} .ad-container,
-                #content-${windowId} [style*="position: fixed"],
-                #content-${windowId} [style*="position:fixed"] {
-                    position: absolute !important;
-                    top: auto !important;
-                    bottom: 10px !important;
-                    right: 10px !important;
-                    left: auto !important;
-                    max-width: calc(100% - 20px) !important;
-                    z-index: 999 !important;
-                }
-                
-                #content-${windowId} iframe {
-                    max-width: 100% !important;
-                    max-height: 100% !important;
-                }
-            `;
-            wrapper.appendChild(style);
+          function handleIframeError(iframe, windowId) {
+            const contentArea = iframe.parentNode;
+            if(contentArea) {
+                contentArea.innerHTML = `
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-primary); padding: 20px; text-align: center;">
+                    <i class="fas fa-shield-alt" style="font-size: 3rem; color: #e74c3c; margin-bottom: 1rem;"></i>
+                    <h4>Content Blocked</h4>
+                    <p style="font-size: 0.8rem; max-width: 80%;">
+                        এই কনটেন্টটি লোড করা যায়নি। অনেক ওয়েবসাইট (যেমন Google, Facebook) নিরাপত্তার কারণে নিজেদেরকে অন্য সাইটে এমবেড করার অনুমতি দেয় না।
+                    </p>
+                </div>`;
+            }
         }
 
         function positionWindow(windowEl) {
@@ -664,8 +571,11 @@ async function loadContentIntoWindow(windowEl, page, windowId, title) {
             const win = windows[windowId];
             const winEl = win.element;
             const icon = winEl.querySelector('.window-maximize i');
+            
             if (!win.maximized) {
-                win.originalStyle = { left: winEl.style.left, top: winEl.style.top, width: winEl.style.width, height: winEl.style.height };
+                if(!winEl.classList.contains('maximized')) {
+                     win.originalStyle = { left: winEl.style.left, top: winEl.style.top, width: winEl.style.width, height: winEl.style.height };
+                }
                 winEl.classList.add('maximized');
                 icon.className = 'fas fa-window-restore';
                 win.maximized = true;

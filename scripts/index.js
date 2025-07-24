@@ -10,7 +10,11 @@
             { id: 'tools', name: 'System Tools', icon: 'fas fa-tools', color: '#795548', page: 'installedApps/tools.html', type: 'Utility', pinned: false },
             { id: 'imageEditor', name: 'Paint', icon: 'fas fa-paint-brush', color: '#e3008c', page: 'installedApps/imageEditor.html', type: 'Creative', pinned: true },
             { id: 'networkStatus', name: 'Network Status', icon: 'fas fa-network-wired', color: '#0078d4', page: 'systemApps/networkStatus.html', type: 'System', pinned: false },
-            { id: 'browser', name: 'Browser', icon: 'fas fa-globe', color: '#ff6b35', page: 'installedApps/browser.html', type: 'Internet', pinned: true }
+            { id: 'browser', name: 'Browser', icon: 'fas fa-globe', color: '#ff6b35', page: 'installedApps/browser.html', type: 'Internet', pinned: true },
+	    { id: 'ridoysPortifolio', name: 'Ridoy,s Portifolio', icon: 'fab fa-github', color: '#000050', page: 'https://mustakimridoymr.github.io', type: 'System', pinned: false },
+	    { id: 'ColorMaster', name: 'Color Master', icon: 'fas fa-eye-dropper', color: '#26E974', page: 'https://mustakimridoymr.github.io/ColorMaster.html', type: 'Utility', pinned: false },
+	    { id: 'MRBot', name: 'MR Bot', icon: 'fab fa-android', color: '#00FF00', page: 'https://mustakimridoymr.github.io/MR-Bot/', type: 'System', pinned: false },
+	    { id: 'ColorMaster', name: 'Color Master', icon: 'fas fa-eye-dropper', color: '#26E974', page: 'https://mustakimridoymr.github.io/ColorMaster.html', type: 'Utility', pinned: false }
         ];
         // Background Images
         const backgrounds = [

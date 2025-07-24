@@ -990,13 +990,13 @@ window.addEventListener('DOMContentLoaded', () => {
 
   const startFullscreen = () => {
     enterFullscreen();
+    history.pushState({ panel: null }, '');
     document.removeEventListener('click', startFullscreen);
   };
   document.addEventListener('click', startFullscreen);
 	
     setTimeout(() => {
       scheduleAdNotification();
-      history.pushState({ panel: null }, '');
     }, 4000);
 });
 

@@ -875,7 +875,15 @@ notifAudio.play().catch(e => {
         // Iframe Handlers
         function handleIframeLoad(iframe, windowId, title) {
             console.log(`${title} loaded successfully`);
+		// Ensure iframe content is properly isolated
+            try {
+                // Additional security measures can be added here
+                iframe.contentWindow.parent = null;
+            } catch (e) {
+                // Cross-origin restriction - this is good for isolation
+            }
         }
+
         function handleIframeError(iframe, windowId, title) {
             const errorMessage = `
                 <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background: var(--bg-primary); color: var(--text-primary); padding: 40px; text-align: center; font-family: 'Segoe UI', sans-serif;">

@@ -90,7 +90,7 @@
 	};
 </script>
 <script type="text/javascript" src="//www.highperformanceformat.com/75fced16ed8059f6b7e4ef61f0db1139/invoke.js"></script>`,
- //`   `,
+ `<div id="adContainer" class="ad-container"></div>`,
                   //`   `,
  //`   `,
                   //`   `,

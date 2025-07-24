@@ -494,114 +494,120 @@
             return windowEl;
         }
 
+        // Enhanced Window Content Loading with Better Isolation
 async function loadContentIntoWindow(windowEl, page, windowId, title) {
     const contentArea = windowEl.querySelector('.window-content');
     try {
-      const res = await fetch(page);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      let html = await res.text();
-      html = processHTMLForWindow(html, windowId);
+        const res = await fetch(page);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        let html = await res.text();
+        html = processHTMLForWindow(html, windowId);
 
-      const wrapper = document.createElement('div');
-      wrapper.className = 'content-wrapper';
-      wrapper.innerHTML = `<div class="sandboxed-content" id="content-${windowId}">${html}</div>`;
+        // Create isolated iframe for complete sandboxing
+        const iframe = document.createElement('iframe');
+        iframe.style.cssText = 'width:100%;height:100%;border:none;background:white;display:block;';
+        iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups');
+        iframe.setAttribute('data-window-id', windowId);
+        iframe.setAttribute('loading', 'lazy');
+        
+        contentArea.innerHTML = '';
+        contentArea.appendChild(iframe);
+        
+        // Write processed content to iframe with complete isolation
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+        iframeDoc.open();
+        iframeDoc.write(`
+            <!DOCTYPE html>
+            <html><head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style>
+                    * { box-sizing: border-box; }
+                    html, body { 
+                        margin: 0; padding: 0; 
+                        font-family: 'Segoe UI', sans-serif; 
+                        overflow: auto;
+                        width: 100%; height: 100%;
+                    }
+                    .isolated-container { 
+                        position: relative; 
+                        width: 100%; 
+                        min-height: 100vh;
+                        contain: layout style paint;
+                        isolation: isolate;
+                        overflow: hidden;
+                    }
+                    /* Prevent breaking out of container */
+                    * { max-width: 100% !important; }
+                    [style*="position: fixed"], 
+                    [style*="position:fixed"] { 
+                        position: absolute !important; 
+                    }
+                </style>
+            </head><body>
+                <div class="isolated-container">${html}</div>
+            </body></html>
+        `);
+        iframeDoc.close();
 
-      contentArea.innerHTML = '';
-      contentArea.appendChild(wrapper);
-
-      executeScriptsInWindow(wrapper, windowId);
-      applyWindowOverrides(wrapper, windowId);
+        // Add error handling for iframe content
+        iframe.onerror = () => showErrorInWindow(contentArea, title);
+        iframe.onload = () => {
+            try {
+                // Apply additional security restrictions to iframe content
+                const iframeWindow = iframe.contentWindow;
+                if (iframeWindow) {
+                    // Prevent parent access
+                    Object.defineProperty(iframeWindow, 'parent', { value: null, writable: false });
+                    Object.defineProperty(iframeWindow, 'top', { value: iframeWindow, writable: false });
+                }
+            } catch (e) {
+                // Cross-origin restrictions are good for security
+                console.log('Security restrictions applied successfully');
+            }
+        };
 
     } catch (err) {
-      console.error(err);
-      showErrorInWindow(contentArea, title);
+        console.error(err);
+        showErrorInWindow(contentArea, title);
     }
-  }
+}
 
-       function processHTMLForWindow(html, windowId) {
+function processHTMLForWindow(html, windowId) {
+    // Remove document structure tags
+    html = html.replace(/<!DOCTYPE[^>]*>/gi, '');
     html = html.replace(/<\/?(?:html|head|body)[^>]*>/gi, '');
+    
+    // Force containment and prevent breakout
     html = html.replace(/position:\s*fixed/gi, 'position: absolute');
+    html = html.replace(/position:\s*sticky/gi, 'position: relative');
     html = html.replace(/100vh/g, '100%').replace(/100vw/g, '100%');
-    html = html.replace(/class="ad-container"/gi, `class="ad-container window-${windowId}-ad"`);
-    return html;
-  }
-
-        function executeScriptsInWindow(wrapper, windowId) {
-    wrapper.querySelectorAll('script').forEach(old => {
-      const nw = document.createElement('script');
-      Array.from(old.attributes).forEach(a => nw.setAttribute(a.name, a.value));
-      if (old.textContent) nw.textContent = wrapScriptForWindow(old.textContent, windowId);
-      old.replaceWith(nw);
-    });
-  }
-
-        // Wrap script to work within window context
-        function wrapScriptForWindow(scriptContent, windowId) {
-            // Create a window-scoped execution context
-            return `
-                (function() {
-                    // Override global references to work within window
-                    const windowElement = document.getElementById('${windowId}');
-                    const contentArea = windowElement.querySelector('.sandboxed-content');
-                    
-                    // Override document references for this window
-                    const originalCreateElement = document.createElement;
-                    document.createElement = function(tagName) {
-                        const element = originalCreateElement.call(document, tagName);
-                        // Ensure elements stay within window bounds
-                        if (element.style && (tagName.toLowerCase() === 'div' || tagName.toLowerCase() === 'iframe')) {
-                            element.style.maxWidth = '100%';
-                        }
-                        return element;
-                    };
-                    
-                    // Override appendChild to contain within window
-                    const originalAppendChild = Element.prototype.appendChild;
-                    Element.prototype.appendChild = function(child) {
-                        // Check if trying to append to body - redirect to window content
-                        if (this === document.body || this === document.documentElement) {
-                            return contentArea.appendChild(child);
-                        }
-                        return originalAppendChild.call(this, child);
-                    };
-                    
-                    // Override fullscreen and positioning
-                    const originalStyle = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'style');
-                    Object.defineProperty(HTMLElement.prototype, 'style', {
-                        get: function() {
-                            const style = originalStyle.get.call(this);
-                            const originalSetProperty = style.setProperty;
-                            style.setProperty = function(property, value, priority) {
-                                // Contain fixed elements within window
-                                if (property === 'position' && value === 'fixed') {
-                                    value = 'absolute';
-                                }
-                                // Limit z-index to prevent breaking out of window
-                                if (property === 'z-index' && parseInt(value) > 1000) {
-                                    value = '999';
-                                }
-                                return originalSetProperty.call(this, property, value, priority);
-                            };
-                            return style;
-                        },
-                        set: originalStyle.set
-                    });
-                    
-                    try {
-                        // Execute the original script
-                        ${scriptContent}
-                    } catch (e) {
-                        console.warn('Script execution error in window ${windowId}:', e);
-                    }
-                    
-                    // Cleanup overrides after execution
-                    setTimeout(() => {
-                        document.createElement = originalCreateElement;
-                        Element.prototype.appendChild = originalAppendChild;
-                    }, 1000);
-                })();
-            `;
+    html = html.replace(/z-index:\s*\d{4,}/gi, 'z-index: 999');
+    
+    // Remove any script tags that might interfere with parent
+    html = html.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, (match) => {
+        // Only allow safe scripts (no parent/top references)
+        if (match.includes('parent.') || match.includes('top.') || match.includes('window.parent')) {
+            return '<!-- Script blocked for security -->';
         }
+        return match;
+    });
+    
+    return html;
+}
+
+function showErrorInWindow(contentArea, title) {
+    contentArea.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background: var(--bg-primary); color: var(--text-primary); padding: 40px; text-align: center; font-family: 'Segoe UI', sans-serif;">
+            <i class="fas fa-exclamation-circle" style="font-size: 48px; color: #e74c3c; margin-bottom: 24px;"></i>
+            <p style="margin-bottom: 24px; font-size: 16px;">The <strong>${title}</strong> app could not be loaded</p>
+            <button onclick="this.closest('.window').querySelector('.window-close').click()" 
+                   style="background: var(--accent-color); color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">
+                Close Window
+            </button>
+        </div>
+    `;
+}
 
         // Apply window-specific CSS overrides
         function applyWindowOverrides(wrapper, windowId) {

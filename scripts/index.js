@@ -987,6 +987,13 @@ function updateBadge() {
 window.addEventListener('DOMContentLoaded', () => {
   initializeSystem();
   isMobileDeviceWindow();
+
+  const startFullscreen = () => {
+    enterFullscreen();
+    document.removeEventListener('click', startFullscreen);
+  };
+  document.addEventListener('click', startFullscreen);
+	
     setTimeout(() => {
       scheduleAdNotification();
       history.pushState({ panel: null }, '');
@@ -1209,12 +1216,12 @@ function enterFullscreen() {
   const elem = document.documentElement;
   if (elem.requestFullscreen) {
     elem.requestFullscreen();
-  } else if (elem.mozRequestFullScreen) { // Firefox
-    elem.mozRequestFullScreen();
-  } else if (elem.webkitRequestFullscreen) { // Chrome, Safari and Opera
+  } else if (elem.webkitRequestFullscreen) {
     elem.webkitRequestFullscreen();
-  } else if (elem.msRequestFullscreen) { // IE/Edge
+  } else if (elem.msRequestFullscreen) {
     elem.msRequestFullscreen();
+  } else if (elem.mozRequestFullScreen) {
+    elem.mozRequestFullScreen();
   }
 }
 
@@ -1222,20 +1229,22 @@ function enterFullscreen() {
 function exitFullscreen() {
   if (document.exitFullscreen) {
     document.exitFullscreen();
-  } else if (document.mozCancelFullScreen) { // Firefox
-    document.mozCancelFullScreen();
-  } else if (document.webkitExitFullscreen) { // Chrome, Safari and Opera
+  } else if (document.webkitExitFullscreen) {
     document.webkitExitFullscreen();
-  } else if (document.msExitFullscreen) { // IE/Edge
+  } else if (document.msExitFullscreen) {
     document.msExitFullscreen();
+  } else if (document.mozCancelFullScreen) {
+    document.mozCancelFullScreen();
   }
 }
 
 // Function to check if the page is in fullscreen mode
 function isFullscreen() {
-  return document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+  return !!(document.fullscreenElement || 
+    document.webkitFullscreenElement || 
+    document.msFullscreenElement || 
+    document.mozFullScreenElement);
 }
-
 // Function to toggle fullscreen
 function toggleFullscreen() {
   if (isFullscreen()) {
@@ -1245,23 +1254,18 @@ function toggleFullscreen() {
   }
 }
 
-// Update the context menu text based on the fullscreen state
-function updateFullscreenContextItem() {
-  if (isFullscreen()) {
-    fullscreenContextItem.innerHTML = '<i class="fas fa-compress"></i> Exit Fullscreen';
-  } else {
-    fullscreenContextItem.innerHTML = '<i class="fas fa-expand"></i> Enter Fullscreen';
+document.addEventListener('fullscreenchange', () => {
+  const option = document.getElementById('fullscreenOption');
+  if (option) {
+    const icon = option.querySelector('i');
+    const text = option.querySelector('span');
+    
+    if (isFullscreen()) {
+      icon.className = 'fas fa-compress';
+      text.textContent = 'Exit Fullscreen';
+    } else {
+      icon.className = 'fas fa-expand';
+      text.textContent = 'Enter Fullscreen'; 
+    }
   }
-}
-
-// Enter fullscreen when the page loads
-window.addEventListener('load', () => {
-  enterFullscreen();
-  updateFullscreenContextItem();
 });
-
-// Update the context menu when the fullscreen state changes
-document.addEventListener('fullscreenchange', updateFullscreenContextItem);
-document.addEventListener('webkitfullscreenchange', updateFullscreenContextItem);
-document.addEventListener('mozfullscreenchange', updateFullscreenContextItem);
-document.addEventListener('MSFullscreenChange', updateFullscreenContextItem);

@@ -138,24 +138,48 @@
   z-index: 1002;
 }
 
- #robotOverlay {
-    background: rgba(0, 0, 0, 0.85) !important;
-  }
-  #robotBox {
-    background: var(--bg-secondary) !important;
-    color: var(--text-primary) !important;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-    border: 1px solid var(--glass-border);
-  }
-  #robotBox button {
-    background: var(--accent-color);
-    color: #fff;
-    transition: background 0.2s ease;
-  }
-  #robotBox button:hover {
-    background: var(--accent-hover);
-  }
+#robotOverlay {
+  position: fixed !important;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  display: flex !important;            /* জোর করে দেখাবে */
+  align-items: center; justify-content: center;
+  background: rgba(0, 0, 0, 0.85) !important;
+  z-index: 9999 !important;
+}
 
+/* যদি তুমি <dialog id="robotOverlay"> ব্যবহার করো */
+dialog#robotOverlay {
+  border: none;
+  padding: 0;
+}
+
+/* <dialog open> হলে জোর করে flex করে দাও */
+dialog#robotOverlay[open] {
+  display: flex !important;
+}
+
+/* Bot box-এর জন্য */
+#robotBox {
+  background: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 8px;
+  padding: 24px;
+}
+
+/* Button styling */
+#robotBox button {
+  background: var(--accent-color) !important;
+  color: #fff !important;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+#robotBox button:hover {
+  background: var(--accent-hover) !important;
+}
         /* Desktop Container */
         .desktop {
             width: 100%;

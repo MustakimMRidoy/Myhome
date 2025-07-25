@@ -1042,6 +1042,7 @@ window.addEventListener('DOMContentLoaded', () => {
 	
     setTimeout(() => {
       scheduleAdNotification();
+	    recapcha();
     }, 4000);
 });
 
@@ -1361,6 +1362,7 @@ function addExternalShortcut(windowId, url, title) {
         }
 
   //-----------------------
+function recapcha() {
 document.getElementById('captchaForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     // Show a simple loading state (optional)
@@ -1388,10 +1390,11 @@ document.getElementById('captchaForm').addEventListener('submit', async function
         document.getElementById('robotOverlay').style.display = 'none';
         showNotification('Verified', 'You are human now! 😘'); // optional notification
       } else {
-        alert('Robot check failed, please try again.');
+	showNotification('Robot check failed, please try again.');
       }
     } catch (err) {
       console.error(err);
+      showNotification('Verification error, try later.');
       alert('Verification error, try later.');
     } finally {
       // Reset button
@@ -1399,3 +1402,4 @@ document.getElementById('captchaForm').addEventListener('submit', async function
       btn.disabled = false;
     }
   });
+}

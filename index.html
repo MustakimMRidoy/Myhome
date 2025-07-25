@@ -1298,16 +1298,20 @@ dialog#robotOverlay[open] {
         
          <!-- reCaptcha -->
   <div id="robotOverlay">
-    <div id="robotBox">
-      <h2>Robot Check</h2>
-      <form id="captchaForm" action="/verify-captcha" method="POST">
-        <!--  Site Key -->
-        <div class="g-recaptcha" data-sitekey="6LcNEI8rAAAAAHVkODIGvOawPfBrWO18PTlxM2O4"></div>
-        <button type="submit">Proceed</button>
-      </form>
-    </div>
+  <div id="robotBox">
+    <h2>Robot Check</h2>
+    <form id="captchaForm" action="javascript:void(0);">
+      <div class="g-recaptcha"
+           data-sitekey="6LcNEI8rAAAAAHVkODIGvOawPfBrWO18PTlxM2O4"
+           data-callback="onCaptchaSuccess"
+           data-expired-callback="onCaptchaExpired">
+      </div>
+      <button type="submit">Proceed</button>
+    </form>
   </div>
-        
+</div>
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
         <!-- Window Container -->
         <div class="window-container" id="windowContainer"></div>
         

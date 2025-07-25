@@ -1363,65 +1363,34 @@ function addExternalShortcut(windowId, url, title) {
 
   //-----------------------
 function recapcha() {
-   const overlay = document.getElementById('robotOverlay');
-    const lastPassDate = localStorage.getItem('captchaPassedDate');
-    const today = getToday();
-
-    // যদি আজকের দিনে পাস না করে থাকো, overlay দেখাবে
-    if (lastPassDate === today) {
-      overlay.style.display = 'none';
-    } else {
-      overlay.style.display = 'flex';
-    }
-    setupRecaptchaHandler();
+	  const overlay = document.getElementById('robotOverlay');
+  const lastPass = localStorage.getItem('captchaPassedDate');
+  if (lastPass === getToday()) {
+    overlay.style.display = 'none';
+  } else {
+    overlay.style.display = 'flex';
+  }
+}
+ // আজকের তারিখ নেওয়ার হেল্পার
+function getToday() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
 
-  // Helper: আজকের তারিখ 'YYYY-MM-DD' ফর্ম্যাটে
-  function getToday() {
-    const d = new Date();
-    return d.getFullYear() + '-' +
-           String(d.getMonth()+1).padStart(2,'0') + '-' +
-           String(d.getDate()).padStart(2,'0');
-  }
+// যখন checkbox সফলভাবে চেক হবে, এই ফাংশন ট্রিগার হবে
+function onCaptchaSuccess(token) {
+  // 1) localStorage-এ আজকের তারিখ সেভ
+  const today = getToday();
+  localStorage.setItem('captchaPassedDate', today);
 
-  function setupRecaptchaHandler() {
-    const form = document.getElementById('captchaForm');
-    form.addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const btn = this.querySelector('button');
-      btn.textContent = 'Verifying…';
-      btn.disabled = true;
+  // 2) overlay hide
+  document.getElementById('robotOverlay').style.display = 'none';
 
-      const token = grecaptcha.getResponse();
-      if (!token) {
-        alert('Please complete the CAPTCHA');
-        btn.textContent = 'Proceed';
-        btn.disabled = false;
-        return;
-      }
+  // 3) optional notification
+  showNotification('Verified', 'You are human now! 😘');
+}
 
-      try {
-        const resp = await fetch('/scripts/verify-captcha.js', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams({ 'g-recaptcha-response': token })
-        });
-        const result = await resp.json();
-        if (result.success) {
-          // সফল হলে overlay hide, আজকের তারিখ সেভ
-          const today = getToday();
-          localStorage.setItem('captchaPassedDate', today);
-          document.getElementById('robotOverlay').style.display = 'none';
-          showNotification('Verified', 'You are human now! 😘');
-        } else {
-          showNotification('Robot check failed, please try again.');
-        }
-      } catch (err) {
-        console.error(err);
-        showNotification('Verification error, try later.');
-      } finally {
-        btn.textContent = 'Proceed';
-        btn.disabled = false;
-      }
-    });
-  }
+// যদি token expire হয়, আবার চেকবক্স দেখাবে
+function onCaptchaExpired() {
+  grecaptcha.reset(); // checkbox রিসেট
+}

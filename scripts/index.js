@@ -1363,43 +1363,65 @@ function addExternalShortcut(windowId, url, title) {
 
   //-----------------------
 function recapcha() {
-document.getElementById('captchaForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    // Show a simple loading state (optional)
-    const btn = this.querySelector('button');
-    btn.textContent = 'Verifying…';
-    btn.disabled = true;
+   const overlay = document.getElementById('robotOverlay');
+    const lastPassDate = localStorage.getItem('captchaPassedDate');
+    const today = getToday();
 
-    const token = grecaptcha.getResponse();
-    if (!token) {
-      alert('Please complete the CAPTCHA');
-      btn.textContent = 'Proceed';
-      btn.disabled = false;
-      return;
+    // যদি আজকের দিনে পাস না করে থাকো, overlay দেখাবে
+    if (lastPassDate === today) {
+      overlay.style.display = 'none';
+    } else {
+      overlay.style.display = 'flex';
     }
-
-    try {
-      const resp = await fetch('/scripts/verify-captcha.js', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ 'g-recaptcha-response': token })
-      });
-      const result = await resp.json();
-      if (result.success) {
-        // এখানে overlay এবং form-টা hide করে দাও
-        document.getElementById('robotOverlay').style.display = 'none';
-        showNotification('Verified', 'You are human now! 😘'); // optional notification
-      } else {
-	showNotification('Robot check failed, please try again.');
-      }
-    } catch (err) {
-      console.error(err);
-      showNotification('Verification error, try later.');
-      alert('Verification error, try later.');
-    } finally {
-      // Reset button
-      btn.textContent = 'Proceed';
-      btn.disabled = false;
-    }
-  });
+    setupRecaptchaHandler();
 }
+
+  // Helper: আজকের তারিখ 'YYYY-MM-DD' ফর্ম্যাটে
+  function getToday() {
+    const d = new Date();
+    return d.getFullYear() + '-' +
+           String(d.getMonth()+1).padStart(2,'0') + '-' +
+           String(d.getDate()).padStart(2,'0');
+  }
+
+  function setupRecaptchaHandler() {
+    const form = document.getElementById('captchaForm');
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const btn = this.querySelector('button');
+      btn.textContent = 'Verifying…';
+      btn.disabled = true;
+
+      const token = grecaptcha.getResponse();
+      if (!token) {
+        alert('Please complete the CAPTCHA');
+        btn.textContent = 'Proceed';
+        btn.disabled = false;
+        return;
+      }
+
+      try {
+        const resp = await fetch('/scripts/verify-captcha.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ 'g-recaptcha-response': token })
+        });
+        const result = await resp.json();
+        if (result.success) {
+          // সফল হলে overlay hide, আজকের তারিখ সেভ
+          const today = getToday();
+          localStorage.setItem('captchaPassedDate', today);
+          document.getElementById('robotOverlay').style.display = 'none';
+          showNotification('Verified', 'You are human now! 😘');
+        } else {
+          showNotification('Robot check failed, please try again.');
+        }
+      } catch (err) {
+        console.error(err);
+        showNotification('Verification error, try later.');
+      } finally {
+        btn.textContent = 'Proceed';
+        btn.disabled = false;
+      }
+    });
+  }

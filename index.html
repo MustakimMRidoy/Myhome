@@ -141,24 +141,21 @@
 #robotOverlay {
   position: fixed !important;
   top: 0; left: 0; width: 100vw; height: 100vh;
-  display: flex !important;            /* জোর করে দেখাবে */
+  display: flex;  
   align-items: center; justify-content: center;
   background: rgba(0, 0, 0, 0.85) !important;
-  z-index: 9999 !important;
+  z-index: 9999 ;
 }
-
-/* যদি তুমি <dialog id="robotOverlay"> ব্যবহার করো */
+        
 dialog#robotOverlay {
   border: none;
   padding: 0;
 }
 
-/* <dialog open> হলে জোর করে flex করে দাও */
 dialog#robotOverlay[open] {
-  display: flex !important;
+  display: flex ;
 }
 
-/* Bot box-এর জন্য */
 #robotBox {
   background: var(--bg-secondary) !important;
   color: var(--text-primary) !important;
@@ -170,7 +167,7 @@ dialog#robotOverlay[open] {
 
 /* Button styling */
 #robotBox button {
-  background: var(--accent-color) !important;
+  background: var(--green-color) !important;
   color: #fff !important;
   border: none;
   padding: 8px 16px;

@@ -1359,3 +1359,19 @@ function addExternalShortcut(windowId, url, title) {
                 button.style.display = 'none';
             }
         }
+
+       document.getElementById('captchaForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const token = grecaptcha.getResponse();
+    if (!token) return alert('Please complete the CAPTCHA');
+    const resp = await fetch('/.scripts/verify-captcha', {
+      method: 'POST',
+      body: new URLSearchParams({ 'g-recaptcha-response': token })
+    });
+    const result = await resp.json();
+    if (result.success) {
+      document.getElementById('robotOverlay').style.display = 'none';
+    } else {
+      alert('Robot check failed');
+    }
+  });

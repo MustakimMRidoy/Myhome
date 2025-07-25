@@ -1360,18 +1360,42 @@ function addExternalShortcut(windowId, url, title) {
             }
         }
 
-       document.getElementById('captchaForm').addEventListener('submit', async (e) => {
+  //-----------------------
+document.getElementById('captchaForm').addEventListener('submit', async function(e) {
     e.preventDefault();
+    // Show a simple loading state (optional)
+    const btn = this.querySelector('button');
+    btn.textContent = 'Verifying…';
+    btn.disabled = true;
+
     const token = grecaptcha.getResponse();
-    if (!token) return alert('Please complete the CAPTCHA');
-    const resp = await fetch('/scripts/verify-captcha.js', {
-      method: 'POST',
-      body: new URLSearchParams({ 'g-recaptcha-response': token })
-    });
-    const result = await resp.json();
-    if (result.success) {
-      document.getElementById('robotOverlay').style.display = 'none';
-    } else {
-      alert('Robot check failed');
+    if (!token) {
+      alert('Please complete the CAPTCHA');
+      btn.textContent = 'Proceed';
+      btn.disabled = false;
+      return;
+    }
+
+    try {
+      const resp = await fetch('/scripts/verify-captcha.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ 'g-recaptcha-response': token })
+      });
+      const result = await resp.json();
+      if (result.success) {
+        // এখানে overlay এবং form-টা hide করে দাও
+        document.getElementById('robotOverlay').style.display = 'none';
+        showNotification('Verified', 'You are human now! 😘'); // optional notification
+      } else {
+        alert('Robot check failed, please try again.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Verification error, try later.');
+    } finally {
+      // Reset button
+      btn.textContent = 'Proceed';
+      btn.disabled = false;
     }
   });

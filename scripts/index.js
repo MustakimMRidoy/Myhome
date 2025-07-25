@@ -1364,7 +1364,7 @@ function addExternalShortcut(windowId, url, title) {
     e.preventDefault();
     const token = grecaptcha.getResponse();
     if (!token) return alert('Please complete the CAPTCHA');
-    const resp = await fetch('/.scripts/verify-captcha', {
+    const resp = await fetch('/scripts/verify-captcha.js', {
       method: 'POST',
       body: new URLSearchParams({ 'g-recaptcha-response': token })
     });

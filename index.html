@@ -138,6 +138,21 @@
   z-index: 1002;
 }
 
+        #robotOverlay {
+      position: fixed; top:0; left:0; width:100vw; height:100vh;
+      background: rgba(0,0,0,0.8);
+      display:flex; align-items:center; justify-content:center;
+      z-index:9999;
+    }
+    #robotBox {
+      background:#fff; padding:30px; border-radius:8px; text-align:center;
+      font-family:'Segoe UI', sans-serif; max-width:320px; width:90%;
+    }
+    #robotBox button {
+      margin-top:20px; padding:10px 20px; border:none;
+      border-radius:4px; background:#0078d4; color:#fff; cursor:pointer;
+    }
+
         /* Desktop Container */
         .desktop {
             width: 100%;
@@ -1254,6 +1269,18 @@
         <!-- Desktop Icons -->
         <div class="desktop-icons" id="desktopIcons"></div>
         
+         <!-- reCaptcha -->
+  <div id="robotOverlay">
+    <div id="robotBox">
+      <h2>Robot Check</h2>
+      <form id="captchaForm" action="/verify-captcha" method="POST">
+        <!--  Site Key -->
+        <div class="g-recaptcha" data-sitekey="6LcNEI8rAAAAAHVkODIGvOawPfBrWO18PTlxM2O4"></div>
+        <button type="submit">Proceed</button>
+      </form>
+    </div>
+  </div>
+        
         <!-- Window Container -->
         <div class="window-container" id="windowContainer"></div>
         
@@ -1457,6 +1484,7 @@
             </div>
         </div>
     </div>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <script src="scripts/index.js"></script>
     <script async="async" data-cfasync="false" src="//pl27246921.profitableratecpm.com/86f295a00166ddfdf3c7bdb7c13ce400/invoke.js"></script>
 </body>

@@ -1,20 +1,20 @@
 // Enhanced App Database
         const apps = [
-            { id: 'settings', name: 'Settings', icon: 'fas fa-cog', color: '#0078d4', page: 'systemApps/settings.html', type: 'System', pinned: true },
-            { id: 'security', name: 'Security', icon: 'fas fa-shield-alt', color: '#d4006f', page: 'systemApps/security.html', type: 'System', pinned: false },
+            { id: 'settings', name: 'Settings', icon: 'fas fa-cog', color: '#0078d4', page: 'systemApps/settings.html(pending)', type: 'System', pinned: false },
+            { id: 'security', name: 'Security', icon: 'fas fa-shield-alt', color: '#d4006f', page: 'systemApps/security.html(pending)', type: 'System', pinned: false },
             { id: 'documents', name: 'File Explorer', icon: 'fas fa-folder', color: '#ffb900', page: 'systemApps/documents.html', type: 'System', pinned: true },
-            { id: 'calculator', name: 'Calculator', icon: 'fas fa-calculator', color: '#5c2d91', page: 'systemApps/calculator.html', type: 'System', pinned: true },
-            { id: 'notes', name: 'Notepad', icon: 'fas fa-sticky-note', color: '#00bcf2', page: 'systemApps/notes.html', type: 'System', pinned: false },
+            { id: 'calculator', name: 'Calculator', icon: 'fas fa-calculator', color: '#5c2d91', page: 'systemApps/calculator.html', type: 'System', pinned: false },
+            { id: 'notes', name: 'Notepad', icon: 'fas fa-sticky-note', color: '#00bcf2', page: 'systemApps/note.html', type: 'System', pinned: false },
             { id: 'blasterGame', name: 'Blaster Game', icon: 'fas fa-gamepad', color: '#107c10', page: 'installedApps/blasterGame.html', type: 'Game', pinned: false },
             { id: 'puzzle', name: 'Puzzle Game', icon: 'fas fa-puzzle-piece', color: '#ff4b4b', page: 'installedApps/puzzle.html', type: 'Game', pinned: false },
             { id: 'tools', name: 'System Tools', icon: 'fas fa-tools', color: '#795548', page: 'installedApps/tools.html', type: 'Utility', pinned: false },
-            { id: 'imageEditor', name: 'Paint', icon: 'fas fa-paint-brush', color: '#e3008c', page: 'installedApps/imageEditor.html', type: 'Creative', pinned: true },
+            { id: 'imageEditor', name: 'Paint', icon: 'fas fa-paint-brush', color: '#e3008c', page: 'installedApps/imageEditor.html', type: 'Creative', pinned: false },
             { id: 'networkStatus', name: 'Network Status', icon: 'fas fa-network-wired', color: '#0078d4', page: 'systemApps/networkStatus.html', type: 'System', pinned: false },
             { id: 'browser', name: 'Browser', icon: 'fas fa-globe', color: '#ff6b35', page: 'installedApps/browser.html', type: 'Internet', pinned: true },
-	    { id: 'ridoysPortifolio', name: 'Ridoy,s Portifolio', icon: 'fab fa-github', color: '#000050', page: 'https://mustakimridoymr.github.io', type: 'System', pinned: false },
+	    { id: 'ridoysPortifolio', name: 'Ridoy,s Portifolio', icon: 'fab fa-github', color: '#000050', page: 'https://mustakimridoymr.github.io', type: 'System', pinned: true },
 	    { id: 'ColorMaster', name: 'Color Master', icon: 'fas fa-eye-dropper', color: '#26E974', page: 'https://mustakimridoymr.github.io/ColorMaster.html', type: 'Utility', pinned: false },
-	    { id: 'MRBot', name: 'MR Bot', icon: 'fab fa-android', color: '#00FF00', page: 'https://mustakimridoymr.github.io/MR-Bot/', type: 'System', pinned: false },
-	    { id: 'ColorMaster', name: 'Color Master', icon: 'fas fa-eye-dropper', color: '#26E974', page: 'https://mustakimridoymr.github.io/ColorMaster.html', type: 'Utility', pinned: false }
+	    { id: 'MRBot', name: 'MR Bot', icon: 'fab fa-android', color: '#00FF00', page: 'https://mustakimridoymr.github.io/MR-Bot/', type: 'System', pinned: true },
+	    { id: 'Products', name: 'Products', icon: 'fas fa-shopping-bag', color: '#FF4100', page: 'https://mustakimridoymr.github.io/Products.html', type: 'Internet', pinned: true }
         ];
         // Background Images
         const backgrounds = [

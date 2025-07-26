@@ -1348,6 +1348,7 @@ function addExternalShortcut(windowId, url, title) {
 function recapcha() {
  const overlay = document.getElementById('robotOverlay');
  const capcha = document.getElementById('robotBox');
+ const wa = document.getElementById('watermarkAnim');
 
   const lastPass = localStorage.getItem('captchaPassedDate');
   if (lastPass === getToday()) {
@@ -1355,6 +1356,7 @@ function recapcha() {
   } else {
     overlay.style.display = 'flex';
     capcha.style.display = 'flex';
+    wa.style.display = 'none';
   }
 }
  // আজকের তারিখ নেওয়ার হেল্পার

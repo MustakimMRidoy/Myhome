@@ -7,6 +7,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Windows 11 Desktop System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+     <!-- Tailwind and React Dependencies -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="importmap">
+    {
+      "imports": {
+        "react/": "https://esm.sh/react@^19.1.0/",
+        "react": "https://esm.sh/react@^19.1.0",
+        "react-dom/": "https://esm.sh/react-dom@^19.1.0/"
+      }
+    }
+    </script>
+
     <style>
         :root {
             --accent-color: #0078d4;
@@ -1336,8 +1348,7 @@ dialog#robotOverlay[open] {
 
         <!-- Watermark Animated -->
   <div id="root" class="WatermarkAnim"></div>
-    <script type="module" src="/index.tsx"></script>
-    
+  
          <!--dialog-->
   <div id="robotOverlay">
       <!-- reCaptcha -->
@@ -1558,16 +1569,7 @@ dialog#robotOverlay[open] {
             </div>
         </div>
     </div>
-    <script src="https://cdn.tailwindcss.com"></script>
-  <script type="importmap">
-{
-  "imports": {
-    "react/": "https://esm.sh/react@^19.1.0/",
-    "react": "https://esm.sh/react@^19.1.0",
-    "react-dom/": "https://esm.sh/react-dom@^19.1.0/"
-  }
-}
-</script>
+    <script type="module" src="/index.tsx"></script>
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <script src="scripts/index.js"></script>
     <script async="async" data-cfasync="false" src="//pl27246921.profitableratecpm.com/86f295a00166ddfdf3c7bdb7c13ce400/invoke.js"></script>

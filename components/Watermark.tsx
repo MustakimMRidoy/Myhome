@@ -127,79 +127,92 @@ const Watermark: React.FC = () => {
   }, []);
 
   const isTextVisible = phase === 'forming' || phase === 'displaying' || phase === 'dissolving';
+  const isAnimationActive = phase !== 'idle';
 
   return (
     <>
       <AnimationStyles />
-      <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-[10000]">
-        {/* Color Snakes for Gathering */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          {snakes.map((s, i) => {
-             const isGathering = phase === 'gathering';
-            return (
-              <div
-                key={s.id}
-                className={`
-                  absolute h-3 w-80 md:h-4 md:w-96 rounded-full filter blur-xl
-                  bg-gradient-to-l ${s.gradient} to-transparent
-                  transition-all duration-[1500ms] ease-[cubic-bezier(0.25,1,0.5,1)]
-                `}
-                style={{
-                  transitionDelay: `${i * 80}ms`,
-                  transform: isGathering ? 'translateX(0) scale(1)' : s.initialTransform,
-                  opacity: isGathering ? 0.9 : 0,
-                }}
-              />
-            )
-           }
-          )}
-        </div>
-
-        {/* Color Balls for Dispersing */}
-        <div className="absolute inset-0 flex items-center justify-center">
-            {balls.map((ball, i) => {
-                const isDissolving = phase === 'dissolving';
-                const isDispersing = phase === 'dispersing';
-                const areBallsActive = isDissolving || isDispersing;
-
+      {/* This container now acts as a full-screen dialog overlay during the animation */}
+      <div
+        className={`
+          fixed inset-0 flex items-center justify-center 
+          z-[10000] transition-all duration-500
+          ${isAnimationActive ? 'opacity-100 bg-black/85 pointer-events-auto' : 'opacity-0 bg-transparent pointer-events-none'}
+        `}
+      >
+        {/* The animation content is only rendered when the dialog is active to improve performance */}
+        {isAnimationActive && (
+          <>
+            {/* Color Snakes for Gathering */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              {snakes.map((s, i) => {
+                 const isGathering = phase === 'gathering';
                 return (
-                    <div
-                        key={ball.id}
-                        className={`absolute rounded-full filter blur-md ${ball.color}`}
-                        style={{
-                            width: ball.size,
-                            height: ball.size,
-                            transition: 'transform 1.2s cubic-bezier(0.5, 0, 0.75, 0), opacity 1.2s ease-out',
-                            transitionDelay: isDispersing ? `${i * 20}ms` : '0ms',
-                            transform: areBallsActive ? (isDispersing ? ball.transform : 'scale(1)') : 'scale(0)',
-                            opacity: isDispersing ? 0 : (isDissolving ? 1 : 0),
-                        }}
-                    />
-                );
-            })}
-        </div>
-
-        {/* Watermark Text */}
-        <div
-          className={`
-            absolute
-            transition-all duration-1000
-            ${phase === 'forming' ? 'anim-text-form' : ''}
-            ${phase === 'dissolving' ? 'anim-text-dissolve' : ''}
-            ${isTextVisible ? 'opacity-100' : 'opacity-0'}
-            ${phase === 'displaying' ? 'scale-100 anim-float' : ''}
-            ${(phase === 'idle' || phase === 'gathering' || phase === 'dispersing') ? 'scale-75 opacity-0' : ''}
-          `}
-        >
-            <div className={`
-                font-extrabold bg-clip-text text-transparent
-                bg-gradient-to-r from-cyan-400 via-fuchsia-500 to-orange-500
-                ${phase === 'displaying' ? 'anim-rainbow-glass' : ''}
-            `}>
-                <h2 className="text-6xl md:text-7xl text-center">© RidoyKhan</h2>
-                <p className="text-3xl md:text-4xl mt-2 text-left">MR Mustakim</p>
+                  <div
+                    key={s.id}
+                    className={`
+                      absolute h-3 w-80 md:h-4 md:w-96 rounded-full filter blur-xl
+                      bg-gradient-to-l ${s.gradient} to-transparent
+                      transition-all duration-[1500ms] ease-[cubic-bezier(0.25,1,0.5,1)]
+                    `}
+                    style={{
+                      transitionDelay: `${i * 80}ms`,
+                      transform: isGathering ? 'translateX(0) scale(1)' : s.initialTransform,
+                      opacity: isGathering ? 0.9 : 0,
+                    }}
+                  />
+                )
+               }
+              )}
             </div>
-        </div>
+
+            {/* Color Balls for Dispersing */}
+            <div className="absolute inset-0 flex items-center justify-center">
+                {balls.map((ball, i) => {
+                    const isDissolving = phase === 'dissolving';
+                    const isDispersing = phase === 'dispersing';
+                    const areBallsActive = isDissolving || isDispersing;
+
+                    return (
+                        <div
+                            key={ball.id}
+                            className={`absolute rounded-full filter blur-md ${ball.color}`}
+                            style={{
+                                width: ball.size,
+                                height: ball.size,
+                                transition: 'transform 1.2s cubic-bezier(0.5, 0, 0.75, 0), opacity 1.2s ease-out',
+                                transitionDelay: isDispersing ? `${i * 20}ms` : '0ms',
+                                transform: areBallsActive ? (isDispersing ? ball.transform : 'scale(1)') : 'scale(0)',
+                                opacity: isDispersing ? 0 : (isDissolving ? 1 : 0),
+                            }}
+                        />
+                    );
+                })}
+            </div>
+
+            {/* Watermark Text */}
+            <div
+              className={`
+                absolute
+                transition-all duration-1000
+                ${phase === 'forming' ? 'anim-text-form' : ''}
+                ${phase === 'dissolving' ? 'anim-text-dissolve' : ''}
+                ${isTextVisible ? 'opacity-100' : 'opacity-0'}
+                ${phase === 'displaying' ? 'scale-100 anim-float' : ''}
+                ${(phase === 'gathering' || phase === 'dispersing') ? 'scale-75 opacity-0' : ''}
+              `}
+            >
+                <div className={`
+                    font-extrabold bg-clip-text text-transparent
+                    bg-gradient-to-r from-cyan-400 via-fuchsia-500 to-orange-500
+                    ${phase === 'displaying' ? 'anim-rainbow-glass' : ''}
+                `}>
+                    <h2 className="text-6xl md:text-7xl text-center">© RidoyKhan</h2>
+                    <p className="text-3xl md:text-4xl mt-2 text-left">MR Mustakim</p>
+                </div>
+            </div>
+          </>
+        )}
       </div>
     </>
   );

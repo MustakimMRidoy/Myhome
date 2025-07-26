@@ -1380,7 +1380,7 @@ function onCaptchaSuccess(token) {
 function onCaptchaExpired() {
   grecaptcha.reset(); // checkbox রিসেট
 }
-
+//-----------------
 // ডেস্কটপ শুরু করার ফাংশন
 function startDesktop() {
   initializeSystem();
@@ -1399,19 +1399,6 @@ function startDesktop() {
     }, 4000);
 }
 
-window.addEventListener('animationFinished', () => {
-    console.log('Animation finished, starting desktop...');
-    startDesktop();
-});
-
-// যদি কোনো কারণে অ্যানিমেশন লোড না হয় (ফলব্যাক), 
-// তাহলে একটি নির্দিষ্ট সময় পরে ডেস্কটপ চালু করুন।
 window.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => {
-        // চেক করুন ডেস্কটপ ইতিমধ্যে চালু হয়েছে কিনা
-        if (!document.getElementById('taskbarItems').hasChildNodes()) {
-            console.log('Animation event did not fire, forcing desktop start.');
-            startDesktop();
-        }
-    }, 15000); // অ্যানিমেশনের মোট সময়ের চেয়ে কিছুটা বেশি সময় দিন
+startDesktop();
 });

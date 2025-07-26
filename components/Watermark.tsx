@@ -131,7 +131,7 @@ const Watermark: React.FC = () => {
   return (
     <>
       <AnimationStyles />
-      <div className="fixed inset-0 flex items-center justify-center pointer-events-none">
+      <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-[10000]">
         {/* Color Snakes for Gathering */}
         <div className="absolute inset-0 flex items-center justify-center">
           {snakes.map((s, i) => {

@@ -1387,7 +1387,7 @@ function onCaptchaExpired() {
 function startDesktop() {
   initializeSystem();
   isMobileDeviceWindow();
-
+  
   const startFullscreen = () => {
     enterFullscreen();
     history.pushState({ panel: null }, '');
@@ -1396,6 +1396,8 @@ function startDesktop() {
   document.addEventListener('click', startFullscreen);
 	
     setTimeout(() => {
+    document.getElementById('taskbar').style.display = 'flex';
+	    
       scheduleAdNotification();
 	    recapcha();
     }, 4000);

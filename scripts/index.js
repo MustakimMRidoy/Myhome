@@ -1,7 +1,7 @@
 // Enhanced App Database
         const apps = [
 	    { id: 'Market', name: 'Market', icon: 'fas fa-shopping-basket', color: '#FF4100', page: 'https://mustakimridoymr.github.io/affiliate.html', type: 'Internet', pinned: true },
-	    { id: 'MRBot', name: 'MR Bot', icon: 'fab fa-android', color: '#00FF00', page: 'https://mustakimridoymr.github.io/MR-Bot/', type: 'System', pinned: true },
+	    { id: 'MRBot', name: 'MR Bot', icon: 'fas fa-robot', color: '#00FF00', page: 'https://mustakimridoymr.github.io/MR-Bot/', type: 'System', pinned: true },
 	    { id: 'browser', name: 'Browser', icon: 'fas fa-globe', color: '#ff6b35', page: 'installedApps/browser.html', type: 'Internet', pinned: true },
 	    { id: 'documents', name: 'File Explorer', icon: 'fas fa-folder', color: '#ffb900', page: 'systemApps/documents.html', type: 'System', pinned: true },
 	    { id: 'ridoysPortifolio', name: 'Ridoy,s Portifolio', icon: 'fab fa-github', color: '#000050', page: 'https://mustakimridoymr.github.io', type: 'System', pinned: true },
@@ -21,7 +21,8 @@
 	    { id: 'jobSearch', name: 'Job Search portal', icon: 'fas fa-briefcase', color: '#A40C99', page: 'https://mustakimridoymr.github.io/Jobs.html', type: 'Internet', pinned: false },
 	    { id: 'news', name: 'Global News Hub Pro', icon: 'fas fa-rss', color: '#0056FF', page: 'https://mustakimridoymr.github.io/newsApp.html', type: 'Internet', pinned: false },
 	    { id: 'AmazonAppstoreCollection', name: 'Amazon Appstore Collection', icon: 'fab fa-amazon', color: '#000000', page: 'https://amzn.to/3NOG3er', type: 'Internet', pinned: false },
-	    { id: 'APKPureMarketplace', name: 'APKPure Marketplace', icon: 'fas fa-mobile-alt', color: '#008E3E', page: 'https://apkpure.com/developer?id=23399507', type: 'Internet', pinned: false }
+	    { id: 'APKPureMarketplace', name: 'APKPure Marketplace', icon: 'fas fa-mobile-alt', color: '#008E3E', page: 'https://apkpure.com/developer?id=23399507', type: 'Internet', pinned: false },
+	    { id: 'ModApk', name: 'Android Mod Apk', icon: 'fab fa-android', color: '#3ddc84', page: 'https://mustakimridoymr.github.io/AndroidAppsUnlocked.html', type: 'Internet', pinned: false }
         ];
         // Background Images
         const backgrounds = [

@@ -1334,13 +1334,14 @@ dialog#robotOverlay[open] {
         <!-- Desktop Icons -->
         <div class="desktop-icons" id="desktopIcons"></div>
         
-         <!-- reCaptcha -->
+         <!--dialog-->
   <div id="robotOverlay">
-      <!-- Watermark div -->
+      <!-- Watermark Animated -->
 <div class="watermarkAnim">
-  <h2>© RidoyKhan</h2>
-  <p>MR Mustakim</p>
+  <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
 </div>
+      <!-- reCaptcha -->
   <div id="robotBox">
     <h2>Robot Check</h2>
     <form id="captchaForm" action="javascript:void(0);">
@@ -1558,6 +1559,16 @@ dialog#robotOverlay[open] {
             </div>
         </div>
     </div>
+    <script src="https://cdn.tailwindcss.com"></script>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.1.0/",
+    "react": "https://esm.sh/react@^19.1.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.1.0/"
+  }
+}
+</script>
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <script src="scripts/index.js"></script>
     <script async="async" data-cfasync="false" src="//pl27246921.profitableratecpm.com/86f295a00166ddfdf3c7bdb7c13ce400/invoke.js"></script>

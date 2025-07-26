@@ -1404,6 +1404,8 @@ function startDesktop() {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+ const task = document.getElementById('taskbar');
+ task.style.display = 'none';
 setTimeout(() => {
 startDesktop();
     }, 15000);

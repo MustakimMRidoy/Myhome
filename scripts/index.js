@@ -1387,7 +1387,8 @@ function onCaptchaExpired() {
 function startDesktop() {
   initializeSystem();
   isMobileDeviceWindow();
-  document.getElementById('taskbar').style.display = 'flex';
+  const task = document.getElementById('taskbar');
+	task.style.display = 'flex';
 	
   const startFullscreen = () => {
     enterFullscreen();

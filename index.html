@@ -141,7 +141,7 @@
 #robotOverlay {
   position: fixed !important;
   top: 0; left: 0; width: 100vw; height: 100vh;
-  display: flex;  
+  display: none;  
   align-items: center; justify-content: center;
   background: rgba(0, 0, 0, 0.85) !important;
   z-index: 9999 ;
@@ -1333,13 +1333,13 @@ dialog#robotOverlay[open] {
         
         <!-- Desktop Icons -->
         <div class="desktop-icons" id="desktopIcons"></div>
-        
-         <!--dialog-->
-  <div id="robotOverlay">
-      <!-- Watermark Animated -->
-  <div id="root"></div>
+
+        <!-- Watermark Animated -->
+  <div id="root" class="WatermarkAnim"></div>
     <script type="module" src="/index.tsx"></script>
     
+         <!--dialog-->
+  <div id="robotOverlay">
       <!-- reCaptcha -->
   <div id="robotBox">
     <h2>Robot Check</h2>

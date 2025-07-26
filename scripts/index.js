@@ -1404,5 +1404,5 @@ function startDesktop() {
 window.addEventListener('DOMContentLoaded', () => {
 setTimeout(() => {
 startDesktop();
-    }, 4000);
+    }, 15000);
 });

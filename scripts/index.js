@@ -14,7 +14,7 @@
 	    { id: 'ridoysPortifolio', name: 'Ridoy,s Portifolio', icon: 'fab fa-github', color: '#000050', page: 'https://mustakimridoymr.github.io', type: 'System', pinned: true },
 	    { id: 'ColorMaster', name: 'Color Master', icon: 'fas fa-eye-dropper', color: '#26E974', page: 'https://mustakimridoymr.github.io/ColorMaster.html', type: 'Utility', pinned: false },
 	    { id: 'MRBot', name: 'MR Bot', icon: 'fab fa-android', color: '#00FF00', page: 'https://mustakimridoymr.github.io/MR-Bot/', type: 'System', pinned: true },
-	    { id: 'Products', name: 'Products', icon: 'fas fa-shopping-bag', color: '#FF4100', page: 'https://mustakimridoymr.github.io/Products.html', type: 'Internet', pinned: true }
+	    { id: 'Products', name: 'Products', icon: 'fas fa-shopping-bag', color: '#FF4100', page: 'https://mustakimridoymr.github.io/affiliate.html', type: 'Internet', pinned: true }
         ];
         // Background Images
         const backgrounds = [

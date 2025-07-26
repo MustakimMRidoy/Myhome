@@ -20,7 +20,7 @@
 	    { id: 'CoinEarnerPro', name: 'Coin Earner Pro', icon: 'fas fa-coins', color: '#FF8F00', page: 'https://dailyearningmony.netlify.app', type: 'Creative', pinned: false },
 	    { id: 'jobSearch', name: 'Job Search portal', icon: 'fas fa-briefcase', color: '#A40C99', page: 'https://mustakimridoymr.github.io/Jobs.html', type: 'Internet', pinned: false },
 	    { id: 'news', name: 'Global News Hub Pro', icon: 'fas fa-rss', color: '#0056FF', page: 'https://mustakimridoymr.github.io/newsApp.html', type: 'Internet', pinned: false },
-	    { id: 'AmazonAppstoreCollection', name: 'Amazon Appstore Collection', icon: 'fab fa-amazon', color: '#FFFFFF', page: 'https://amzn.to/3NOG3er', type: 'Internet', pinned: false },
+	    { id: 'AmazonAppstoreCollection', name: 'Amazon Appstore Collection', icon: 'fab fa-amazon', color: '#D2A800', page: 'https://amzn.to/3NOG3er', type: 'Internet', pinned: false },
 	    { id: 'APKPureMarketplace', name: 'APKPure Marketplace', icon: 'fas fa-mobile-alt', color: '#008E3E', page: 'https://apkpure.com/developer?id=23399507', type: 'Internet', pinned: false }
         ];
         // Background Images

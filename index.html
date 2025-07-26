@@ -164,7 +164,7 @@ dialog#robotOverlay[open] {
   border: 1px solid var(--glass-border) !important;
   border-radius: 8px;
   padding: 24px;
-  display: none;
+  display: flex;
 }
 
 /* Button styling */
@@ -180,45 +180,6 @@ dialog#robotOverlay[open] {
   background: var(--accent-hover) !important;
 }
 
-        /* 
-.watermarkAnim {
-  position: fixed;
-  top: 0; left: 0;
-  align-items: center; justify-content: center;
-  font-size: 50px;
-  font-weight: 600;
-  pointer-events: none;
-  user-select: none;
-  z-index: 1100;
-  padding: 8px 12px;
-  border-radius: 8px;
-  background: rgba(255,255,255,0.1);
-  backdrop-filter: blur(10px) saturate(200%);
-  border: 1px solid rgba(255,255,255,0.2);
-  animation: rainbow-glass 6s linear infinite, float 4s ease-in-out infinite;
-  background-clip: border-box;
-  -webkit-background-clip: text;
-  color: transparent;
-  background-image: linear-gradient(60deg,
-    #e81123,#f7630c,#ffb900,#bad80a,#00bcf2,#0050ef,#ae00ff,#e3008c);
-  background-size: 300% 300%;
-}
-
-
-@keyframes rainbow-glass {
-  0%   { background-position: 0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-
-@keyframes float {
-  0%,100% { transform: translateY(0) translateX(0); }
-  25%     { transform: translateY(-4px) translateX(2px); }
-  50%     { transform: translateY(-8px) translateX(0); }
-  75%     { transform: translateY(-4px) translateX(-2px); }
-}
-*/
         /* Desktop Container */
         .desktop {
             width: 100%;
@@ -1337,6 +1298,9 @@ dialog#robotOverlay[open] {
 
          <!--dialog-->
   <div id="robotOverlay">
+      <div class="watermarkAnim">
+
+</div>
       <!-- reCaptcha -->
   <div id="robotBox">
     <h2>Robot Check</h2>

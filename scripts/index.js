@@ -1387,8 +1387,6 @@ function onCaptchaExpired() {
 function startDesktop() {
   initializeSystem();
   isMobileDeviceWindow();
-  const task = document.getElementById('taskbar');
-	task.style.display = 'flex';
 	
   const startFullscreen = () => {
     enterFullscreen();
@@ -1404,8 +1402,6 @@ function startDesktop() {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
- const task = document.getElementById('taskbar');
- task.style.display = 'none';
 setTimeout(() => {
 startDesktop();
     }, 15000);

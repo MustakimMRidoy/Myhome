@@ -17,7 +17,8 @@
             { id: 'networkStatus', name: 'Network Status', icon: 'fas fa-network-wired', color: '#0078d4', page: 'systemApps/networkStatus.html', type: 'System', pinned: false },
 	    { id: 'ColorMaster', name: 'Color Master', icon: 'fas fa-eye-dropper', color: '#26E974', page: 'https://mustakimridoymr.github.io/ColorMaster.html', type: 'Utility', pinned: false },
 	    { id: 'adminPanel', name: 'Admin Panel', icon: 'fas fa-tachometer-alt', color: '#5779A4', page: 'https://mustakimridoymr.github.io/Admin/index.html', type: 'Utility', pinned: false },
-	    { id: 'CoinEarnerPro', name: 'Coin Earner Pro', icon: 'fas fa-coins', color: '#FF8F00', page: 'https://dailyearningmony.netlify.app', type: 'Creative', pinned: false }
+	    { id: 'CoinEarnerPro', name: 'Coin Earner Pro', icon: 'fas fa-coins', color: '#FF8F00', page: 'https://dailyearningmony.netlify.app', type: 'Creative', pinned: false },
+	    { id: 'jobSearch', name: 'Job Search portal', icon: 'fas fa-briefcase', color: '#A40C99', page: 'https://mustakimridoymr.github.io/Jobs.html', type: 'Internet', pinned: false }
         ];
         // Background Images
         const backgrounds = [

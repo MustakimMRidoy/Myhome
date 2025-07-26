@@ -163,6 +163,7 @@ dialog#robotOverlay[open] {
   border: 1px solid var(--glass-border) !important;
   border-radius: 8px;
   padding: 24px;
+  display: none;
 }
 
 /* Button styling */
@@ -179,7 +180,7 @@ dialog#robotOverlay[open] {
 }
 
         /* Watermark কে glassy rainbow animation দিতে: */
-.watermark {
+.watermarkAnim {
   position: fixed;
   bottom: calc(var(--taskbar-height) + 10px);
   right: 100px;
@@ -1335,6 +1336,11 @@ dialog#robotOverlay[open] {
         
          <!-- reCaptcha -->
   <div id="robotOverlay">
+      <!-- Watermark div -->
+<div class="watermarkAnim">
+  <h2>© RidoyKhan</h2>
+  <p>MR Mustakim</p>
+</div>
   <div id="robotBox">
     <h2>Robot Check</h2>
     <form id="captchaForm" action="javascript:void(0);">

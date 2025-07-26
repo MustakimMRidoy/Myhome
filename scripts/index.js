@@ -1363,12 +1363,17 @@ function addExternalShortcut(windowId, url, title) {
 
   //-----------------------
 function recapcha() {
-	  const overlay = document.getElementById('robotOverlay');
+ const overlay = document.getElementById('robotOverlay');
+ const capcha = document.getElementById('robotBox');
+ const watermarkAnimated = document.getElementById('watermarkAnim');
+
   const lastPass = localStorage.getItem('captchaPassedDate');
   if (lastPass === getToday()) {
     overlay.style.display = 'none';
   } else {
     overlay.style.display = 'flex';
+    capcha.style.display = 'flex';
+    watermarkAnimated.style.display = 'none';
   }
 }
  // আজকের তারিখ নেওয়ার হেল্পার

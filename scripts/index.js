@@ -1028,23 +1028,6 @@ function updateBadge() {
                 contentArea.innerHTML = errorMessage;
             }
         }
-        // Initialize when page loads
-window.addEventListener('DOMContentLoaded', () => {
-  initializeSystem();
-  isMobileDeviceWindow();
-
-  const startFullscreen = () => {
-    enterFullscreen();
-    history.pushState({ panel: null }, '');
-    document.removeEventListener('click', startFullscreen);
-  };
-  document.addEventListener('click', startFullscreen);
-	
-    setTimeout(() => {
-      scheduleAdNotification();
-	    recapcha();
-    }, 4000);
-});
 
 // Popstate হ্যান্ডলার
 window.addEventListener('popstate', (event) => {
@@ -1365,7 +1348,6 @@ function addExternalShortcut(windowId, url, title) {
 function recapcha() {
  const overlay = document.getElementById('robotOverlay');
  const capcha = document.getElementById('robotBox');
- const watermarkAnimated = document.getElementById('watermarkAnim');
 
   const lastPass = localStorage.getItem('captchaPassedDate');
   if (lastPass === getToday()) {
@@ -1373,7 +1355,6 @@ function recapcha() {
   } else {
     overlay.style.display = 'flex';
     capcha.style.display = 'flex';
-    watermarkAnimated.style.display = 'none';
   }
 }
  // আজকের তারিখ নেওয়ার হেল্পার
@@ -1399,3 +1380,38 @@ function onCaptchaSuccess(token) {
 function onCaptchaExpired() {
   grecaptcha.reset(); // checkbox রিসেট
 }
+
+// ডেস্কটপ শুরু করার ফাংশন
+function startDesktop() {
+  initializeSystem();
+  isMobileDeviceWindow();
+
+  const startFullscreen = () => {
+    enterFullscreen();
+    history.pushState({ panel: null }, '');
+    document.removeEventListener('click', startFullscreen);
+  };
+  document.addEventListener('click', startFullscreen);
+	
+    setTimeout(() => {
+      scheduleAdNotification();
+	    recapcha();
+    }, 4000);
+}
+
+window.addEventListener('animationFinished', () => {
+    console.log('Animation finished, starting desktop...');
+    startDesktop();
+});
+
+// যদি কোনো কারণে অ্যানিমেশন লোড না হয় (ফলব্যাক), 
+// তাহলে একটি নির্দিষ্ট সময় পরে ডেস্কটপ চালু করুন।
+window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        // চেক করুন ডেস্কটপ ইতিমধ্যে চালু হয়েছে কিনা
+        if (!document.getElementById('taskbarItems').hasChildNodes()) {
+            console.log('Animation event did not fire, forcing desktop start.');
+            startDesktop();
+        }
+    }, 15000); // অ্যানিমেশনের মোট সময়ের চেয়ে কিছুটা বেশি সময় দিন
+});

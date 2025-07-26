@@ -1,6 +1,6 @@
 // Enhanced App Database
         const apps = [
-	    { id: 'Market', name: 'Market', icon: 'fas fa-store', color: '#FF4100', page: 'https://mustakimridoymr.github.io/affiliate.html', type: 'Internet', pinned: true },
+	    { id: 'Market', name: 'Market', icon: 'fas fa-shopping-basket', color: '#FF4100', page: 'https://mustakimridoymr.github.io/affiliate.html', type: 'Internet', pinned: true },
 	    { id: 'MRBot', name: 'MR Bot', icon: 'fab fa-android', color: '#00FF00', page: 'https://mustakimridoymr.github.io/MR-Bot/', type: 'System', pinned: true },
 	    { id: 'browser', name: 'Browser', icon: 'fas fa-globe', color: '#ff6b35', page: 'installedApps/browser.html', type: 'Internet', pinned: true },
 	    { id: 'documents', name: 'File Explorer', icon: 'fas fa-folder', color: '#ffb900', page: 'systemApps/documents.html', type: 'System', pinned: true },

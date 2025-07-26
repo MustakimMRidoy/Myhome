@@ -180,6 +180,15 @@ dialog#robotOverlay[open] {
   background: var(--accent-hover) !important;
 }
 
+        .watermarkAnim {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+}
+
         /* Desktop Container */
         .desktop {
             width: 100%;
@@ -1297,14 +1306,17 @@ dialog#robotOverlay[open] {
         <div class="desktop-icons" id="desktopIcons"></div>
 
          <div class="watermarkAnim">
-  <iframe src="/copyright.html"
+  <iframe 
+    src="/copyright.html"
     sandbox="allow-scripts allow-forms allow-popups allow-modals allow-downloads"
     loading="lazy"
     referrerpolicy="no-referrer"
+    width="100%"
+    height="100%"
     allowfullscreen
-    style="border: none; overflow: hidden; width: 100%; height: 100%;"
-    scrolling="no">
-  </iframe>
+    style="border: none; overflow: hidden;"
+    scrolling="no"
+></iframe>
 </div>
 
          <!--dialog-->

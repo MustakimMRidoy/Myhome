@@ -24,6 +24,8 @@
 	    { id: 'APKPureMarketplace', name: 'APKPure Marketplace', icon: 'fas fa-mobile-alt', color: '#008E3E', page: 'https://apkpure.com/developer?id=23399507', type: 'Internet', pinned: false },
 	    { id: 'ModApk', name: 'Android Mod Apk', icon: 'fab fa-android', color: '#3ddc84', page: 'https://mustakimridoymr.github.io/AndroidAppsUnlocked.html', type: 'Internet', pinned: false }
         ];
+       
+        let shortcuts = ['documents', 'notes', 'jobSearch', 'AmazonAppstoreCollection','blasterGame', 'ModApk', 'imageEditor', 'news'];
         // Background Images
         const backgrounds = [
             'https://picsum.photos/seed/windows1/1920/1080',
@@ -134,7 +136,6 @@
         let activeWindowId = null;
         let zIndexCounter = 100;
         let pinnedApps = apps.filter(app => app.pinned).map(app => app.id);
-        let shortcuts = ['settings', 'documents', 'calculator', 'imageEditor', 'browser'];
         let isDragging = false;
         let dragWindow = null;
         let isResizing = false;

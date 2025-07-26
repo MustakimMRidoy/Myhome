@@ -1396,7 +1396,7 @@ function onCaptchaExpired() {
 function startDesktop() {
   initializeSystem();
   isMobileDeviceWindow();
-	
+  setupSelectionSystem();
   const startFullscreen = () => {
     enterFullscreen();
     history.pushState({ panel: null }, '');
@@ -1415,3 +1415,135 @@ setTimeout(() => {
 startDesktop();
     }, 15000);
 });
+
+//----------------------------------------------------------
+
+// ১. প্রথমে আমরা গ্লোবাল ভ্যারিয়েবল ডিক্লেয়ার করব
+let isSelecting = false;
+let selectionBox = null;
+let startX = 0;
+let startY = 0;
+
+// ২. সিলেকশন বক্স তৈরির ফাংশন 
+function createSelectionBox() {
+  if (!selectionBox) {
+    selectionBox = document.createElement('div');
+    selectionBox.style.cssText = `
+      position: fixed;
+      border: 2px solid rgba(0, 120, 215, 0.8);
+      background: rgba(0, 120, 215, 0.1);
+      pointer-events: none;
+      z-index: 99;
+      display: none;
+    `;
+    document.body.appendChild(selectionBox);
+  }
+  return selectionBox;
+}
+
+// ৩. মাউস ইভেন্ট হ্যান্ডলার
+function handleSelectionStart(e) {
+  // শুধুমাত্র ডেস্কটপে ক্লিক করলেই সিলেকশন শুরু হবে
+  if (!e.target.closest('.desktop-icon') && !e.target.closest('.window') && e.button === 0) {
+    isSelecting = true;
+    startX = e.clientX;
+    startY = e.clientY;
+    
+    const box = createSelectionBox();
+    box.style.left = startX + 'px';
+    box.style.top = startY + 'px';
+    box.style.width = '0px';
+    box.style.height = '0px';
+    box.style.display = 'block';
+  }
+}
+
+function handleSelectionMove(e) {
+  if (!isSelecting) return;
+
+  const currentX = e.clientX;
+  const currentY = e.clientY;
+  
+  // বক্সের সাইজ ক্যালকুলেট
+  const width = Math.abs(currentX - startX);
+  const height = Math.abs(currentY - startY);
+  
+  // বক্সের পজিশন ক্যালকুলেট
+  const left = currentX > startX ? startX : currentX;
+  const top = currentY > startY ? startY : currentY;
+  
+  // বক্স আপডেট
+  selectionBox.style.width = width + 'px';
+  selectionBox.style.height = height + 'px';
+  selectionBox.style.left = left + 'px';
+  selectionBox.style.top = top + 'px';
+  
+  // আইকন সিলেকশন চেক
+  checkIconSelection(left, top, width, height);
+}
+
+function handleSelectionEnd() {
+  if (isSelecting) {
+    isSelecting = false;
+    if (selectionBox) {
+      selectionBox.style.display = 'none';
+    }
+  }
+}
+
+// ৪. আইকন সিলেকশন চেক
+function checkIconSelection(left, top, width, height) {
+  const icons = document.querySelectorAll('.desktop-icon');
+  const selectionRect = {
+    left: left,
+    top: top,
+    right: left + width,
+    bottom: top + height
+  };
+
+  icons.forEach(icon => {
+    const rect = icon.getBoundingClientRect();
+    const isIntersecting = !(
+      rect.right < selectionRect.left ||
+      rect.left > selectionRect.right ||
+      rect.bottom < selectionRect.top ||
+      rect.top > selectionRect.bottom
+    );
+    
+    if (isIntersecting) {
+      icon.classList.add('selected');
+    } else if (!isIntersecting && !icon.contains(document.activeElement)) {
+      icon.classList.remove('selected');
+    }
+  });
+}
+
+// ৫. ইভেন্ট লিসেনার সেটআপ
+function setupSelectionSystem() {
+  const desktop = document.querySelector('.desktop');
+  
+  desktop.addEventListener('mousedown', handleSelectionStart);
+  document.addEventListener('mousemove', handleSelectionMove);
+  document.addEventListener('mouseup', handleSelectionEnd);
+  
+  // টাচ ডিভাইসের জন্য
+  desktop.addEventListener('touchstart', e => {
+    const touch = e.touches[0];
+    handleSelectionStart({ 
+      clientX: touch.clientX,
+      clientY: touch.clientY,
+      target: touch.target,
+      button: 0
+    });
+  });
+  
+  document.addEventListener('touchmove', e => {
+    const touch = e.touches[0];
+    handleSelectionMove({
+      clientX: touch.clientX,
+      clientY: touch.clientY
+    });
+  });
+  
+  document.addEventListener('touchend', handleSelectionEnd);
+}

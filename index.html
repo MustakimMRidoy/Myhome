@@ -1560,7 +1560,17 @@ dialog#robotOverlay[open] {
 
         <!-- Watermark Animated -->
   <div id="root" class="watermarkAnim"></div>
-  
+    <!-- Tailwind and React Dependencies -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="importmap">
+    {
+      "imports": {
+        "react/": "https://esm.sh/react@^19.1.0/",
+        "react": "https://esm.sh/react@^19.1.0",
+        "react-dom/": "https://esm.sh/react-dom@^19.1.0/"
+      }
+    }
+    </script>
     <script type="module" src="/index.tsx"></script>
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <script src="scripts/index.js"></script>

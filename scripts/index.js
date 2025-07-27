@@ -552,16 +552,28 @@ if (isAdsWindow) {
                 </div>
             </div>
             <div class="window-content">
-                    <iframe
-  src="${page}"
-  scrolling="yes"
-  loading="lazy"
-  onload="handleIframeLoad(this, '${windowId}', '${title}')"
-  onerror="handleIframeError(this, '${windowId}', '${title}')"
-  style="display: none;"
-  sandbox="allow-scripts allow-forms allow-same-origin"
-  referrerpolicy="strict-origin-when-cross-origin">
-</iframe>
+                    <!-- Wrapper div দিয়ে বাইরের overflow লুকিয়ে রাখলাম -->
+<div style="position: relative; width: 100%; height: 100%; overflow: hidden;">
+  <iframe
+    src="${page}"
+    scrolling="yes"
+    loading="lazy"
+    onload="handleIframeLoad(this, '${windowId}', '${title}')"
+    onerror="handleIframeError(this, '${windowId}', '${title}')"
+    sandbox="allow-scripts allow-forms allow-same-origin"
+    referrerpolicy="strict-origin-when-cross-origin"
+    style="
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      overflow: auto; /* iframe-র ভিতরেই স্ক্রলবার দেখাবে */
+    "
+  ></iframe>
+</div>
+
             </div>
             <div class="window-resize-handle"></div>
         `;

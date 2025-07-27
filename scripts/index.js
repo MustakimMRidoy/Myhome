@@ -1582,3 +1582,9 @@ function setupSelectionSystem() {
   
   document.addEventListener('touchend', handleSelectionEnd);
 }
+
+//--------------------------
+// অ্যাডস ম্যানেজার ইনিশিয়ালাইজ
+if (typeof window.adsManager === 'undefined') {
+    window.adsManager = new AdvancedAdsManager();
+}

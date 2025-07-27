@@ -941,7 +941,7 @@ dialog#robotOverlay[open] {
         .window-content {
             flex: 1;
             background: var(--bg-primary);
-            /*overflow: auto;*/
+            overflow: auto;
             overflow-x: auto;
             overflow-y: auto;
             position: relative;
@@ -950,19 +950,6 @@ dialog#robotOverlay[open] {
             isolation: isolate;
             cursor: default !important; /* Reset cursor for content */
         }
-
-        .iframe-ads {
-    transform: translateZ(0); /* সবচেয়ে নির্ভরযোগ্য হ্যাক */
-    /* অথবা নিচের গুলো */
-    /* perspective: 1px; */
-    /* filter: blur(0px); */
-    
-    /* কন্টেইনারের আকার ও অবস্থান ঠিক রাখতে */
-    width: 100%; /* আপনার প্রয়োজন অনুযায়ী পরিবর্তন করুন */
-    height: 100%; /* আপনার প্রয়োজন অনুযায়ী পরিবর্তন করুন */
-    overflow: hidden; /* ভেতরের কিছু বাইরে চলে গেলে তা লুকিয়ে ফেলবে */
-    position: relative; /* এটিও থাকা ভালো */
-}
 
         .content-wrapper {
   width: 100%;

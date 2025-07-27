@@ -42,6 +42,9 @@ const notifAudio = document.getElementById('notifSound');
           const ad = [
           `<a href="https://beta.publishers.adsterra.com/referral/QdnQT7GTLa" rel="nofollow"><img alt="banner" src="https://landings-cdn.adsterratech.com/referralBanners/png/300%20x%20250%20px.png" /></a>`,
           `<a href="https://beta.publishers.adsterra.com/referral/QdnQT7GTLa" rel="nofollow"><img alt="banner" src="https://landings-cdn.adsterratech.com/referralBanners/png/600%20x%20250%20px.png" /></a>`,
+	  `<a href="" rel="nofollow" class="block">
+                <img alt="banner" src="https://landings-cdn.adsterratech.com/referralBanners/gif/600x250_adsterra_reff.gif" class="mx-auto rounded-lg" />
+            </a>`,
           `<script type="text/javascript">
 	atOptions = {
 		'key' : '0ac4fbd843cf0e8de1726ccc4e310cab',

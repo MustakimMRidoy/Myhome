@@ -1446,8 +1446,8 @@ function startDesktop() {
     }, 4000);
 }
 
-const startSound = document.getElementById('startSound');
 window.addEventListener('DOMContentLoaded', () => {
+const startSound = document.getElementById('startSound');
 startSound.currentTime = 0; // যাতে প্রতি বার শুরু থেকে বাজে
 startSound.play().catch(e => {
   showNotification('sound play blocked', e);

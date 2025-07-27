@@ -559,7 +559,7 @@ if (isAdsWindow) {
   onload="handleIframeLoad(this, '${windowId}', '${title}')"
   onerror="handleIframeError(this, '${windowId}', '${title}')"
   style="width:100%; height:100%; border:none;"
-  sandbox="allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
+  sandbox="allow-scripts allow-forms allow-same-origin allow-popups"
   allow="fullscreen 'none'; payment 'none'; geolocation 'none'; microphone 'none'; camera 'none';"
   referrerpolicy="strict-origin-when-cross-origin">
 </iframe>

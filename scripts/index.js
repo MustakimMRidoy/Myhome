@@ -553,9 +553,8 @@ if (isAdsWindow) {
             </div>
             <div class="window-content">
 	    <iframe src="${page}"
-                            sandbox="allow-popups allow-modals allow-downloads"
+                            sandbox="${sandboxRules}"
                             loading="lazy"
-                            referrerpolicy="no-referrer"
                             onload="handleIframeLoad(this, '${windowId}', '${title}')"
                             onerror="handleIframeError(this, '${windowId}')">
                     </iframe>

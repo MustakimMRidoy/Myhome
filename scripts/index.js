@@ -558,7 +558,6 @@ if (isAdsWindow) {
   loading="lazy"
   onload="handleIframeLoad(this, '${windowId}', '${title}')"
   onerror="handleIframeError(this, '${windowId}', '${title}')"
-  style="width:0; height:0; border:none; position:absolute; left:-9999px;"
   sandbox="allow-scripts allow-forms allow-same-origin allow-top-navigation"
   referrerpolicy="strict-origin-when-cross-origin">
 </iframe>

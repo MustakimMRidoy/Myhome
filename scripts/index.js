@@ -1399,6 +1399,9 @@ function recapcha() {
   const lastPass = localStorage.getItem('captchaPassedDate');
   if (lastPass === getToday()) {
     overlay.style.display = 'none';
+    if (typeof window.adsManager === 'undefined') {
+           window.adsManager = new AdvancedAdsManager();
+    }
   } else {
     overlay.style.display = 'flex';
     capcha.style.display = 'flex';
@@ -1422,6 +1425,9 @@ function onCaptchaSuccess(token) {
 
   // 3) optional notification
   showNotification('Verified', 'You are human now! 😘');
+ if (typeof window.adsManager === 'undefined') {
+  window.adsManager = new AdvancedAdsManager();
+  }
 }
 
 // যদি token expire হয়, আবার চেকবক্স দেখাবে
@@ -1455,11 +1461,6 @@ startSound.play().catch(e => {
 	
 setTimeout(() => {
 startDesktop();
-	setTimeout(() => {
-         if (typeof window.adsManager === 'undefined') {
-           window.adsManager = new AdvancedAdsManager();
-         }
-       }, 60000);
  }, 15000);
 });
 

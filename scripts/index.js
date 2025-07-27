@@ -531,7 +531,7 @@
             // sandbox অ্যাট্রিবিউট iframe-এর ক্ষমতা সীমাবদ্ধ করে নিরাপত্তা নিশ্চিত করে।
             // allow-fullscreen ছাড়া অন্য কোনো fullscreen অ্যাট্রিবিউট নেই, তাই এটি ব্রাউজার fullscreen API কল করতে পারবে না।
             const sandboxRules = "allow-scripts allow-forms allow-popups allow-modals allow-downloads";
-	    let isAdsWindow = windowId.includes('Ads') || page.toLowerCase().includes('ads.html');
+	    let isAdsWindow = windowId.includes('Ads') || page.toLowerCase().includes('ads.html') || page.toLowerCase().includes('404.html');
 if (isAdsWindow) {
 	    windowEl.innerHTML = `
             <div class="window-titlebar">

@@ -546,7 +546,9 @@ if (windowId === "Ads") {
                 <div class="window-content">
 		    <div id="bannerAd" class="ad-container"></div>
                     <iframe src="${page}"
+                            sandbox="allow-scripts allow-forms"
                             loading="lazy"
+                            referrerpolicy="no-referrer"
                             onload="handleIframeLoad(this, '${windowId}', '${title}')"
                             onerror="handleIframeError(this, '${windowId}')">
                     </iframe>

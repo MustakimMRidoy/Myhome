@@ -558,8 +558,7 @@ if (isAdsWindow) {
   loading="lazy"
   onload="handleIframeLoad(this, '${windowId}', '${title}')"
   onerror="handleIframeError(this, '${windowId}', '${title}')"
-  sandbox="allow-scripts allow-forms allow-same-origin allow-top-navigation"
-  referrerpolicy="strict-origin-when-cross-origin">
+  sandbox="allow-forms allow-popups allow-modals allow-downloads allow-same-origin allow-top-navigation"
 </iframe>
             </div>
             <div class="window-resize-handle"></div>

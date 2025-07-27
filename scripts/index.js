@@ -560,7 +560,6 @@ if (isAdsWindow) {
     onload="handleIframeLoad(this, '${windowId}', '${title}')"
     onerror="handleIframeError(this, '${windowId}', '${title}')"
     style="width:100%; height:100%; border:none;"
-    sandbox=" allow-forms allow-scripts"
     referrerpolicy="strict-origin-when-cross-origin">
   </iframe>
 </div>

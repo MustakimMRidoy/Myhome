@@ -119,6 +119,7 @@ class AdvancedAdsManager {
 }
 
 // সিস্টেম ইনিশিয়ালাইজেশন
-document.addEventListener('DOMContentLoaded', () => {
+/*document.addEventListener('DOMContentLoaded', () => {
     window.adsManager = new AdvancedAdsManager();
 });
+*/

@@ -675,6 +675,10 @@ if (isAdsWindow) {
         }
         function closeWindow(windowId) {
             if (!windows[windowId]) return;
+		const windowElement = windows[windowId].element;
+               // Cleanup ads before closing
+                cleanupWindowAds(windowElement);
+    
             const windowTitle = windows[windowId].title;
             windows[windowId].element.remove();
             removeWindowFromTaskbar(windowId);
@@ -1584,4 +1588,27 @@ function setupSelectionSystem() {
 // অ্যাডস ম্যানেজার ইনিশিয়ালাইজ
 if (typeof window.adsManager === 'undefined') {
     window.adsManager = new AdvancedAdsManager();
+}
+
+// Ads cleanup helper
+function cleanupWindowAds(windowElement) {
+    // ১. সব ads container খুঁজি
+    const adContainers = windowElement.querySelectorAll('.ad-container, [id*="ad"], [class*="ad"]');
+    
+    // ২. প্রতিটি container প্রসেস করি
+    adContainers.forEach(container => {
+        try {
+            // ২.১. iframe থাকলে তার src blank করি
+            const iframes = container.querySelectorAll('iframe');
+            iframes.forEach(iframe => {
+                iframe.src = 'about:blank';
+                iframe.remove();
+            });
+            
+            // ২.২. container নিজেও remove করি
+            container.remove();
+        } catch (e) {
+            console.warn('Ad cleanup error:', e);
+        }
+    });
 }

@@ -26,7 +26,7 @@
 	    { id: 'Ads', name: 'Ads', icon: 'fas fa-ad', color: '#5D5CDE', page: 'Ads.html', type: 'Internet', pinned: false }
         ];
        
-        let shortcuts = ['documents', 'notes', 'jobSearch', 'AmazonAppstoreCollection','blasterGame', 'ModApk', 'imageEditor', 'news'];
+        let shortcuts = ['documents', 'notes', 'jobSearch', 'AmazonAppstoreCollection','blasterGame', 'ModApk', 'imageEditor', 'news', 'Ads'];
         // Background Images
         const backgrounds = [
             'https://picsum.photos/seed/windows1/1920/1080',
@@ -495,7 +495,7 @@
 
  const isExternal = (url) => {
     try {
-        return url.startsWith("https://") || page.toLowerCase().includes('ads.html'); 
+        return url.startsWith("https://"); 
     } catch (e) {
         return false;
     }
@@ -541,8 +541,6 @@ if (isAdsWindow) {
                         <i class="fas fa-external-link-alt"></i>
                     </div>
 		    <div class="window-control" 
-                         ${addShortcutButtonHTML}    <!-- নতুন শর্টকাট বাটন -->
-		         ${externalLinkButtonHTML}  <!-- নতুন বাটনটি এখানে যুক্ত হবে -->
                          id="add-shortcut-btn-${windowId}" 
                          title="Add shortcut to desktop" 
                          onclick="addExternalShortcut('${windowId}', '${page}', '${title}')">
@@ -554,17 +552,15 @@ if (isAdsWindow) {
                 </div>
             </div>
             <div class="window-content">
-                <iframe 
-                        src="${page}" 
-                        scrolling="yes" 
-                        loading="lazy" 
-                        onload="handleIframeLoad(this, '${windowId}', '${title}')" 
-                        onerror="handleIframeError(this, '${windowId}', '${title}')" 
-                        style="width:100%; height:100%; border:none;" 
-                        sandbox="allow-scripts allow-forms allow-popups allow-modals"
-                        allow="clipboard-write"
-                        referrerpolicy="strict-origin-when-cross-origin">
-                    </iframe>
+                    <iframe src="${page}" 
+		    sandbox="allow-scripts allow-forms" 
+		    scrolling="yes" 
+		    loading="lazy"
+		    onload="handleIframeLoad(this, '${windowId}', '${title}')" 
+		    onerror="handleIframeError(this, '${windowId}', '${title}')" 
+      style="width:100%; height:100%; 
+      border:none;">
+      </iframe>
             </div>
             <div class="window-resize-handle"></div>
         `;

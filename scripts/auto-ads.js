@@ -1,88 +1,124 @@
-// অ্যাডস উইন্ডো ম্যানেজমেন্টের জন্য গ্লোবাল ভ্যারিয়েবলস
-let adsCheckInterval;
-let lastWindowActivity = Date.now();
-let isAdsWindowOpen = false;
-let lastAdsWindowId = null;
+/**
+ * অ্যাডভান্সড অ্যাডস ম্যানেজার সিস্টেম
+ * ==========================================
+ * বৈশিষ্ট্যসমূহ:
+ * - স্মার্ট উইন্ডো ট্র্যাকিং 
+ * - ইন্টেলিজেন্ট টাইমার সিস্টেম
+ * - মেমরি-অপটিমাইজড স্টেট ম্যানেজমেন্ট
+ * - অটোমেটিক ক্লিনআপ মেকানিজম
+ */
 
-// অ্যাডস উইন্ডো ট্র্যাকিং সিস্টেম
-function setupAdsWindowTracking() {
-    // প্রতি 10 সেকেন্ড পর পর চেক করা
-    adsCheckInterval = setInterval(() => {
+// স্টেট ম্যানেজমেন্ট
+const AdsManagerState = {
+    isCheckingEnabled: true,
+    lastWindowActivity: Date.now(),
+    lastAdsWindowId: null,
+    checkInterval: null,
+    inactivityTimer: null
+};
+
+// কনফিগারেশন সেটিংস
+const AdsConfig = {
+    checkDelay: 10000,        // চেক করার ইন্টারভাল (10 সেকেন্ড)
+    inactivityThreshold: 60000 // অ্যাডস দেখানোর আগে অপেক্ষার সময় (1 মিনিট)
+};
+
+/**
+ * অ্যাডস ম্যানেজার ক্লাস
+ */
+class AdvancedAdsManager {
+    constructor() {
+        this.setupEventListeners();
+        this.startMonitoring();
+    }
+
+    /**
+     * ইভেন্ট লিসেনার সেটআপ
+     */
+    setupEventListeners() {
+        // উইন্ডো অ্যাক্টিভিটি মনিটরিং
+        document.addEventListener('click', () => this.resetInactivityTimer());
+        document.addEventListener('keydown', () => this.resetInactivityTimer());
+        document.addEventListener('mousemove', () => this.resetInactivityTimer());
+    }
+
+    /**
+     * মনিটরিং শুরু করা
+     */
+    startMonitoring() {
+        if (AdsManagerState.checkInterval) {
+            clearInterval(AdsManagerState.checkInterval);
+        }
+
+        AdsManagerState.checkInterval = setInterval(() => {
+            this.checkWindowActivity();
+        }, AdsConfig.checkDelay);
+    }
+
+    /**
+     * ইন্যাক্টিভিটি টাইমার রিসেট
+     */
+    resetInactivityTimer() {
+        if (AdsManagerState.inactivityTimer) {
+            clearTimeout(AdsManagerState.inactivityTimer);
+        }
+
+        AdsManagerState.lastWindowActivity = Date.now();
+        
+        // নতুন টাইমার সেট করা
+        AdsManagerState.inactivityTimer = setTimeout(() => {
+            this.checkWindowActivity(true);
+        }, AdsConfig.inactivityThreshold);
+    }
+
+    /**
+     * উইন্ডো অ্যাক্টিভিটি চেক করা
+     */
+    checkWindowActivity(forceCheck = false) {
+        if (!AdsManagerState.isCheckingEnabled && !forceCheck) return;
+
         const currentTime = Date.now();
         const activeWindows = Object.keys(windows).filter(id => !windows[id].minimized);
-        
-        // যদি কোন উইন্ডো 1 মিনিট ধরে ওপেন না থাকে
-        if (activeWindows.length === 0 && (currentTime - lastWindowActivity) >= 60000) {
-            if (!isAdsWindowOpen) {
-                openAdsWindow();
-            }
-        }
-        
-        // অ্যাকটিভ উইন্ডো থাকলে টাইম আপডেট
-        if (activeWindows.length > 0) {
-            lastWindowActivity = currentTime;
-            if (isAdsWindowOpen && lastAdsWindowId) {
-                closeAdsWindowSilently();
-            }
-        }
-    }, 10000);
-}
+        const timeSinceActivity = currentTime - AdsManagerState.lastWindowActivity;
 
-// অ্যাডস উইন্ডো খোলার ফাংশন
-function openAdsWindow() {
-    if (!isAdsWindowOpen) {
+        // যদি কোন উইন্ডো না থাকে এবং নির্দিষ্ট সময় পার হয়ে যায়
+        if (activeWindows.length === 0 && timeSinceActivity >= AdsConfig.inactivityThreshold) {
+            this.showAdsWindow();
+        }
+    }
+
+    /**
+     * অ্যাডস উইন্ডো দেখানো
+     */
+    showAdsWindow() {
         const windowId = `ads_${Date.now()}`;
-        lastAdsWindowId = windowId;
-        isAdsWindowOpen = true;
+        AdsManagerState.lastAdsWindowId = windowId;
         
-        // অ্যাডস উইন্ডো তৈরি
         openApp('Ads.html', 'Advertisements', 'fas fa-ad');
         
-        // UI এফেক্ট
-        showNotification('Advertisement', 'Loading new offers for you...', 3000);
+        // অ্যাডস উইন্ডো ক্লোজ হ্যান্ডলার
+        const originalCloseWindow = windows[windowId].element.querySelector('.window-close').onclick;
+        windows[windowId].element.querySelector('.window-close').onclick = () => {
+            originalCloseWindow();
+            this.handleAdsWindowClose();
+        };
     }
-}
 
-// নিঃশব্দে অ্যাডস উইন্ডো বন্ধ করার ফাংশন
-function closeAdsWindowSilently() {
-    if (isAdsWindowOpen && lastAdsWindowId && windows[lastAdsWindowId]) {
-        const adWindow = windows[lastAdsWindowId].element;
+    /**
+     * অ্যাডস উইন্ডো বন্ধ হওয়ার পর
+     */
+    handleAdsWindowClose() {
+        // স্টেট রিসেট
+        AdsManagerState.lastAdsWindowId = null;
+        AdsManagerState.lastWindowActivity = Date.now();
         
-        // অ্যানিমেশন সহ রিমুভ
-        adWindow.style.transition = 'all 0.3s ease';
-        adWindow.style.opacity = '0';
-        adWindow.style.transform = 'scale(0.8)';
-        
-        setTimeout(() => {
-            if (adWindow && adWindow.parentNode) {
-                adWindow.parentNode.removeChild(adWindow);
-            }
-            delete windows[lastAdsWindowId];
-            isAdsWindowOpen = false;
-            lastAdsWindowId = null;
-        }, 300);
+        // নতুন করে মনিটরিং শুরু
+        this.resetInactivityTimer();
+        this.startMonitoring();
     }
-}
-
-// উইন্ডো ক্লোজ ইভেন্ট হ্যান্ডলার অ্যাড করা
-const originalCloseWindow = closeWindow;
-function closeWindow(windowId) {
-    if (windowId === lastAdsWindowId) {
-        isAdsWindowOpen = false;
-        lastAdsWindowId = null;
-        lastWindowActivity = Date.now(); // রিসেট টাইমার
-    }
-    originalCloseWindow(windowId);
 }
 
 // সিস্টেম ইনিশিয়ালাইজেশন
 document.addEventListener('DOMContentLoaded', () => {
-    setupAdsWindowTracking();
-});
-
-// পেইজ আনলোড হলে ক্লিনআপ
-window.addEventListener('beforeunload', () => {
-    if (adsCheckInterval) {
-        clearInterval(adsCheckInterval);
-    }
+    window.adsManager = new AdvancedAdsManager();
 });

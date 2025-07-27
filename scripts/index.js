@@ -844,6 +844,7 @@ if (isAdsWindow) {
         let notificationCount = 0;
         // Notification System
         function showNotification(title, htmlContent, duration = 5000) {
+		document.body.appendChild(notificationContainer);
   const notification = document.createElement('div');
   notification.className = 'notification';
 
@@ -1444,6 +1445,11 @@ function startDesktop() {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+const startAudio = document.getElementById('startSound');
+startAudio.currentTime = 0; // যাতে প্রতি বার শুরু থেকে বাজে
+startAudio.play().catch(e => {
+  console.warn("Notification sound play blocked:", e);
+});
 setTimeout(() => {
 startDesktop();
     }, 15000);

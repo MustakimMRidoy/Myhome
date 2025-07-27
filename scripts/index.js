@@ -22,7 +22,8 @@
 	    { id: 'news', name: 'Global News Hub Pro', icon: 'fas fa-rss', color: '#0056FF', page: 'https://mustakimridoymr.github.io/newsApp.html', type: 'Internet', pinned: false },
 	    { id: 'AmazonAppstoreCollection', name: 'Amazon Appstore Collection', icon: 'fab fa-amazon', color: '#000000', page: 'https://amzn.to/3NOG3er', type: 'Internet', pinned: false },
 	    { id: 'APKPureMarketplace', name: 'APKPure Marketplace', icon: 'fas fa-mobile-alt', color: '#008E3E', page: 'https://apkpure.com/developer?id=23399507', type: 'Internet', pinned: false },
-	    { id: 'ModApk', name: 'Android Mod Apk', icon: 'fab fa-android', color: '#3ddc84', page: 'https://mustakimridoymr.github.io/AndroidAppsUnlocked.html', type: 'Internet', pinned: false }
+	    { id: 'ModApk', name: 'Android Mod Apk', icon: 'fab fa-android', color: '#3ddc84', page: 'https://mustakimridoymr.github.io/AndroidAppsUnlocked.html', type: 'Internet', pinned: false },
+	    { id: 'Ads', name: 'Ads', icon: 'fas fa-ad', color: '#5D5CDE', page: 'Ads.html', type: 'Internet', pinned: false }
         ];
        
         let shortcuts = ['documents', 'notes', 'jobSearch', 'AmazonAppstoreCollection','blasterGame', 'ModApk', 'imageEditor', 'news'];
@@ -530,7 +531,31 @@
             // sandbox অ্যাট্রিবিউট iframe-এর ক্ষমতা সীমাবদ্ধ করে নিরাপত্তা নিশ্চিত করে।
             // allow-fullscreen ছাড়া অন্য কোনো fullscreen অ্যাট্রিবিউট নেই, তাই এটি ব্রাউজার fullscreen API কল করতে পারবে না।
             const sandboxRules = "allow-scripts allow-forms allow-popups allow-modals allow-downloads";
-
+if (windowId === "Ads") {
+	 windowEl.innerHTML = `
+                <div class="window-titlebar">
+                    <div class="window-title"><i class="${icon}"></i> <span>${title}</span></div>
+                    <div class="window-controls">
+		    ${addShortcutButtonHTML}    <!-- নতুন শর্টকাট বাটন -->
+		    ${externalLinkButtonHTML}  <!-- নতুন বাটনটি এখানে যুক্ত হবে -->
+                        <div class="window-control window-minimize" onclick="minimizeWindow('${windowId}')"><i class="fas fa-window-minimize"></i></div>
+                        <div class="window-control window-maximize" onclick="maximizeWindow('${windowId}')"><i class="far fa-square"></i></div>
+                        <div class="window-control window-close" onclick="closeWindow('${windowId}')"><i class="fas fa-times"></i></div>
+                    </div>
+                </div>
+                <div class="window-content">
+		    <div id="bannerAd" class="ad-container"></div>
+                    <iframe src="${page}"
+		            sandbox="allow-scripts allow-forms"
+                            loading="lazy"
+                            referrerpolicy="no-referrer"
+                            onload="handleIframeLoad(this, '${windowId}', '${title}')"
+                            onerror="handleIframeError(this, '${windowId}')">
+                    </iframe>
+                </div>
+                <div class="window-resize-handle"></div>
+            `;
+} else {
             windowEl.innerHTML = `
                 <div class="window-titlebar">
                     <div class="window-title"><i class="${icon}"></i> <span>${title}</span></div>
@@ -554,7 +579,7 @@
                 </div>
                 <div class="window-resize-handle"></div>
             `;
-            
+}
             // উইন্ডো ড্র্যাগ ও রিসাইজ করার ইভেন্ট যুক্ত করা
             const titlebar = windowEl.querySelector('.window-titlebar');
             titlebar.ondblclick = () => maximizeWindow(windowId);

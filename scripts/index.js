@@ -1450,10 +1450,13 @@ window.addEventListener('DOMContentLoaded', () => {
 const startSound = document.getElementById('startSound');
 startSound.currentTime = 0; // যাতে প্রতি বার শুরু থেকে বাজে
 startSound.play().catch(e => {
-  showNotification('sound play blocked', e);
+  //showNotification('sound play blocked', e);
 });
 setTimeout(() => {
 startDesktop();
+if (typeof window.adsManager === 'undefined') {
+    window.adsManager = new AdvancedAdsManager();
+}
     }, 15000);
 });
 
@@ -1587,10 +1590,4 @@ function setupSelectionSystem() {
   });
   
   document.addEventListener('touchend', handleSelectionEnd);
-}
-
-//--------------------------
-// অ্যাডস ম্যানেজার ইনিশিয়ালাইজ
-if (typeof window.adsManager === 'undefined') {
-    window.adsManager = new AdvancedAdsManager();
 }

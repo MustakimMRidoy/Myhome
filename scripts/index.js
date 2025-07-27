@@ -616,7 +616,7 @@ if (isAdsWindow) {
                 }
             } catch (e) {
                  // Cross-origin iframe-এর ক্ষেত্রে contentDocument অ্যাক্সেস করা যায় না, যা একটি স্বাভাবিক নিরাপত্তা ব্যবস্থা।
-                console.warn("Could not access iframe title due to cross-origin policy.");
+               showNotification('Could not access iframe title due to cross-origin policy.', e);
             }
         }
 
@@ -882,7 +882,7 @@ if (isAdsWindow) {
 
 notifAudio.currentTime = 0; // যাতে প্রতি বার শুরু থেকে বাজে
 notifAudio.play().catch(e => {
-  console.warn("Notification sound play blocked:", e);
+  showNotification('Notification sound play blocked', e);
 });
 		notificationCount++;
     updateBadge();
@@ -1446,11 +1446,11 @@ function startDesktop() {
     }, 4000);
 }
 
+const startSound = document.getElementById('startSound');
 window.addEventListener('DOMContentLoaded', () => {
-const startAudio = document.getElementById('startSound');
-startAudio.currentTime = 0; // যাতে প্রতি বার শুরু থেকে বাজে
-startAudio.play().catch(e => {
-  console.warn("sound play blocked:", e);
+startSound.currentTime = 0; // যাতে প্রতি বার শুরু থেকে বাজে
+startSound.play().catch(e => {
+  showNotification('sound play blocked', e);
 });
 setTimeout(() => {
 startDesktop();

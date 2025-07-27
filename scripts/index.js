@@ -559,8 +559,7 @@ if (isAdsWindow) {
                         onload="handleIframeLoad(this, '${windowId}', '${title}')" 
                         onerror="handleIframeError(this, '${windowId}', '${title}')" 
                         style="width:100%; height:100%; border:none;" 
-                        sandbox="allow-scripts allow-forms allow-popups allow-modals"
-                        allow="clipboard-write"
+                        sandbox="allow-scripts allow-forms"
                         referrerpolicy="strict-origin-when-cross-origin">
                     </iframe>
             </div>

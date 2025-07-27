@@ -618,7 +618,7 @@ if (isAdsWindow) {
                 }
             } catch (e) {
                  // Cross-origin iframe-এর ক্ষেত্রে contentDocument অ্যাক্সেস করা যায় না, যা একটি স্বাভাবিক নিরাপত্তা ব্যবস্থা।
-               showNotification('Could not access iframe title due to cross-origin policy.', e);
+               //showNotification('Could not access iframe title due to cross-origin policy.', e);
             }
         }
 
@@ -883,7 +883,7 @@ if (isAdsWindow) {
 
 notifAudio.currentTime = 0; // যাতে প্রতি বার শুরু থেকে বাজে
 notifAudio.play().catch(e => {
-  showNotification('Notification sound play blocked', e);
+  //showNotification('Notification sound play blocked', e);
 });
 		notificationCount++;
     updateBadge();

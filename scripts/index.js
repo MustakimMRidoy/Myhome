@@ -492,6 +492,15 @@ const notifAudio = document.getElementById('notifSound');
                         referrerpolicy="strict-origin-when-cross-origin">
                     </iframe> -->
 */
+function updateSandboxFlags(windowId) {
+  const input = document.getElementById(`sandbox-input-${windowId}`);
+  const iframe = document.getElementById(`iframe-${windowId}`);
+  if (iframe && input) {
+    // যত flags আছে, সেগুলো space দিয়ে আলাদা করে সেট করবে
+    iframe.setAttribute('sandbox', input.value.trim());
+  }
+}
+
          function createWindow(windowId, title, icon, page) {
             const windowEl = document.createElement('div');
             windowEl.className = 'window animate-slide-up';
@@ -538,37 +547,62 @@ const notifAudio = document.getElementById('notifSound');
 	    let isAdsWindow = windowId.includes('Ads') || page.toLowerCase().includes('ads.html') || page.toLowerCase().includes('404.html');
 if (isAdsWindow) {
 	    windowEl.innerHTML = `
-            <div class="window-titlebar">
-                <div class="window-title"><i class="${icon}"></i> <span>${title}</span></div>
-                <div class="window-controls">
-		     <div class="window-control" title="Open in new tab" onclick="window.open('${page}', '_blank', 'noopener,noreferrer')">
-                        <i class="fas fa-external-link-alt"></i>
-                    </div>
-		    <div class="window-control" 
-                         id="add-shortcut-btn-${windowId}" 
-                         title="Add shortcut to desktop" 
-                         onclick="addExternalShortcut('${windowId}', '${page}', '${title}')">
-                        <i class="fas fa-plus-square"></i>
-                    </div>
-                    <div class="window-control window-minimize" onclick="minimizeWindow('${windowId}')"><i class="fas fa-window-minimize"></i></div>
-                    <div class="window-control window-maximize" onclick="maximizeWindow('${windowId}')"><i class="far fa-square"></i></div>
-                    <div class="window-control window-close" onclick="closeWindow('${windowId}')"><i class="fas fa-times"></i></div>
-                </div>
-            </div>
-            <div class="window-content">
-	    <iframe 
-                        src="${page}" 
-                        scrolling="yes" 
-                        loading="lazy" 
-                        onload="handleIframeLoad(this, '${windowId}', '${title}')" 
-                        onerror="handleIframeError(this, '${windowId}', '${title}')" 
-                        style="width:100%; height:100%; border:none;" 
-                        sandbox="allow-forms iframe allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-scripts allow-storage-access-by-user-activation allow-top-navigation allow-top-navigation-by-user-activation allow-same-origin"
-                        allow="clipboard-write">
-                    </iframe>
-            </div>
-            <div class="window-resize-handle"></div>
-        `;
+  <div class="window-titlebar">
+    <div class="window-title"><i class="${icon}"></i> <span>${title}</span></div>
+    <div class="window-controls">
+      <div class="window-control" title="Open in new tab" onclick="window.open('${page}', '_blank', 'noopener,noreferrer')">
+        <i class="fas fa-external-link-alt"></i>
+      </div>
+      
+      <!-- ✨ নতুন: Sandbox Control Input -->
+      <div class="window-control sandbox-control">
+        <input
+          type="text"
+          id="sandbox-input-${windowId}"
+          placeholder="Enter sandbox flags"
+          style="width: 150px; padding: 2px; border-radius: 4px; border: 1px solid #ccc;"
+          oninput="updateSandboxFlags('${windowId}')"
+        />
+      </div>
+
+      <!-- আগের Add Shortcut Button -->
+      <div
+        class="window-control"
+        id="add-shortcut-btn-${windowId}"
+        title="Add shortcut to desktop"
+        onclick="addExternalShortcut('${windowId}', '${page}', '${title}')"
+      >
+        <i class="fas fa-plus-square"></i>
+      </div>
+
+      <div class="window-control window-minimize" onclick="minimizeWindow('${windowId}')">
+        <i class="fas fa-window-minimize"></i>
+      </div>
+      <div class="window-control window-maximize" onclick="maximizeWindow('${windowId}')">
+        <i class="far fa-square"></i>
+      </div>
+      <div class="window-control window-close" onclick="closeWindow('${windowId}')">
+        <i class="fas fa-times"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="window-content">
+    <iframe
+      id="iframe-${windowId}"
+      src="${page}"
+      scrolling="yes"
+      loading="lazy"
+      onload="handleIframeLoad(this, '${windowId}', '${title}')"
+      onerror="handleIframeError(this, '${windowId}', '${title}')"
+      style="width:100%; height:100%; border:none;"
+      sandbox="allow-scripts allow-same-origin"
+      allow="clipboard-write"
+    ></iframe>
+  </div>
+  <div class="window-resize-handle"></div>
+`;
+
 } else {
             windowEl.innerHTML = `
                 <div class="window-titlebar">

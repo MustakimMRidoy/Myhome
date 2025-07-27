@@ -495,7 +495,7 @@
 
  const isExternal = (url) => {
     try {
-        return url.startsWith("https://"); 
+        return url.startsWith("https://") || page.toLowerCase().includes('ads.html'); 
     } catch (e) {
         return false;
     }
@@ -541,6 +541,8 @@ if (isAdsWindow) {
                         <i class="fas fa-external-link-alt"></i>
                     </div>
 		    <div class="window-control" 
+                         ${addShortcutButtonHTML}    <!-- নতুন শর্টকাট বাটন -->
+		         ${externalLinkButtonHTML}  <!-- নতুন বাটনটি এখানে যুক্ত হবে -->
                          id="add-shortcut-btn-${windowId}" 
                          title="Add shortcut to desktop" 
                          onclick="addExternalShortcut('${windowId}', '${page}', '${title}')">
@@ -552,13 +554,17 @@ if (isAdsWindow) {
                 </div>
             </div>
             <div class="window-content">
-                <iframe src="${page}"
-                        sandbox="${sandboxRules} allow-same-origin"
-                        loading="lazy"
-                            referrerpolicy="no-referrer"
-                            onload="handleIframeLoad(this, '${windowId}', '${title}')"
-                            onerror="handleIframeError(this, '${windowId}')">
-                </iframe>
+                <iframe 
+                        src="${page}" 
+                        scrolling="yes" 
+                        loading="lazy" 
+                        onload="handleIframeLoad(this, '${windowId}', '${title}')" 
+                        onerror="handleIframeError(this, '${windowId}', '${title}')" 
+                        style="width:100%; height:100%; border:none;" 
+                        sandbox="allow-scripts allow-forms allow-popups allow-modals"
+                        allow="clipboard-write"
+                        referrerpolicy="strict-origin-when-cross-origin">
+                    </iframe>
             </div>
             <div class="window-resize-handle"></div>
         `;

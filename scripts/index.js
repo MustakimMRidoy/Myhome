@@ -682,6 +682,9 @@ if (isAdsWindow) {
             if (!windows[windowId]) return;
 	
             const windowTitle = windows[windowId].title;
+		//if (windowTitle.toLowerCase().includes('advertisements') || windowTitle.toLowerCase().includes('ads')) {
+        forcefullyCleanUpAds(); // আমাদের নতুন ক্লিনিং ফাংশন
+    //}
             windows[windowId].element.remove();
             removeWindowFromTaskbar(windowId);
             delete windows[windowId];
@@ -1595,4 +1598,55 @@ function setupSelectionSystem() {
   });
   
   document.addEventListener('touchend', handleSelectionEnd);
+}
+//-----------------------------
+/**
+ * মূল পেইজ থেকে জোরপূর্বক ভাসমান বিজ্ঞাপন খুঁজে বের করে মুছে ফেলার ফাংশন।
+ * এটি বিভিন্ন কৌশল অবলম্বন করে, যেমন - অ্যাডের ডোমেইন, CSS স্টাইল ইত্যাদি।
+ */
+function forcefullyCleanUpAds() {
+    console.log("Running force clean-up for ads...");
+
+    // কৌশল ১: বিজ্ঞাপনের ডোমেইন দিয়ে iframe খোঁজা (সবচেয়ে নির্ভরযোগ্য)
+    const adDomains = ['profitableratecpm.com', 'adsterratech.com', 'highperformanceformat.com'];
+    const allIframes = document.querySelectorAll('iframe');
+
+    allIframes.forEach(iframe => {
+        try {
+            const src = iframe.src || '';
+            // যদি iframe-এর সোর্স কোনো বিজ্ঞাপনের ডোমেইনের হয়, তবে তার প্যারেন্টকে ডিলিট করো
+            if (adDomains.some(domain => src.includes(domain))) {
+                const adWrapper = iframe.closest('div'); // বিজ্ঞাপনটি সাধারণত একটি div এর ভেতরে থাকে
+                if (adWrapper) {
+                    console.log('Found and removed an ad wrapper by domain:', adWrapper);
+                    adWrapper.remove();
+                } else {
+                    console.log('Found and removed an ad iframe by domain:', iframe);
+                    iframe.remove();
+                }
+            }
+        } catch (e) {
+            // Cross-origin iframe-এর src অ্যাক্সেস করা যায় না, তাই এই এরর স্বাভাবিক
+        }
+    });
+
+    // কৌশল ২: খুব উঁচু z-index এবং position:fixed থাকা এলিমেন্ট খোঁজা (আগ্রাসী পদ্ধতি)
+    const potentialAdElements = document.querySelectorAll('body > div[style*="z-index"], body > iframe[style*="z-index"]');
+    
+    potentialAdElements.forEach(el => {
+        const zIndex = parseInt(window.getComputedStyle(el).zIndex, 10);
+        const position = window.getComputedStyle(el).position;
+
+        // যদি z-index অনেক বেশি হয় (যেমন 9999) এবং এলিমেন্টটি fixed থাকে
+        if (zIndex > 9999 && (position === 'fixed' || position === 'absolute')) {
+            // নিশ্চিত করুন যে এটি আপনার নিজের UI এর অংশ নয়
+            // উদাহরণস্বরূপ, আপনার নোটিফিকেশন কন্টেইনারের z-index 9999999999। এটিকে বাদ দিতে হবে।
+            if (el.id !== 'notificationContainer' && !el.classList.contains('notification')) {
+                console.log('Found and removed a potential ad element by high z-index:', el);
+                el.remove();
+            }
+        }
+    });
+
+    console.log("Clean-up finished.");
 }

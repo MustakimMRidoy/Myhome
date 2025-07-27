@@ -537,6 +537,15 @@ if (isAdsWindow) {
             <div class="window-titlebar">
                 <div class="window-title"><i class="${icon}"></i> <span>${title}</span></div>
                 <div class="window-controls">
+		     <div class="window-control" title="Open in new tab" onclick="window.open('${page}', '_blank', 'noopener,noreferrer')">
+                        <i class="fas fa-external-link-alt"></i>
+                    </div>
+		    <div class="window-control" 
+                         id="add-shortcut-btn-${windowId}" 
+                         title="Add shortcut to desktop" 
+                         onclick="addExternalShortcut('${windowId}', '${page}', '${title}')">
+                        <i class="fas fa-plus-square"></i>
+                    </div>
                     <div class="window-control window-minimize" onclick="minimizeWindow('${windowId}')"><i class="fas fa-window-minimize"></i></div>
                     <div class="window-control window-maximize" onclick="maximizeWindow('${windowId}')"><i class="far fa-square"></i></div>
                     <div class="window-control window-close" onclick="closeWindow('${windowId}')"><i class="fas fa-times"></i></div>
@@ -544,16 +553,14 @@ if (isAdsWindow) {
             </div>
             <div class="window-content">
                 <iframe src="${page}"
-                        sandbox="${sandboxRules} allow-same-origin"
+                        sandbox="allow-same-origin"
                         loading="lazy"
                         referrerpolicy="no-referrer"
-                        onload="handleIframeLoad(this, '${windowId}', '${title}')"
-                        onerror="handleIframeError(this, '${windowId}')">
+                        onload="handleIframeLoad(this, '${windowId}', '${title}')">
                 </iframe>
             </div>
             <div class="window-resize-handle"></div>
         `;
-	showNotification('Ads', 'Ads loaded successfully');
 } else {
             windowEl.innerHTML = `
                 <div class="window-titlebar">
@@ -578,7 +585,6 @@ if (isAdsWindow) {
                 </div>
                 <div class="window-resize-handle"></div>
             `;
-	showNotification('Apps', 'Apps loaded successfully');
 }
             // উইন্ডো ড্র্যাগ ও রিসাইজ করার ইভেন্ট যুক্ত করা
             const titlebar = windowEl.querySelector('.window-titlebar');

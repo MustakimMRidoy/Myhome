@@ -40,7 +40,12 @@
           const ad = [
           `<a href="https://beta.publishers.adsterra.com/referral/QdnQT7GTLa" rel="nofollow"><img alt="banner" src="https://landings-cdn.adsterratech.com/referralBanners/png/300%20x%20250%20px.png" /></a>`,
           `<a href="https://beta.publishers.adsterra.com/referral/QdnQT7GTLa" rel="nofollow"><img alt="banner" src="https://landings-cdn.adsterratech.com/referralBanners/png/600%20x%20250%20px.png" /></a>`,
-          `<a href="https://beta.publishers.adsterra.com/referral/QdnQT7GTLa" rel="nofollow"><img alt="banner" src="https://landings-cdn.adsterratech.com/referralBanners/png/300%20x%20425.png" /></a>`,
+          `<!-- Adsterra banner with improved styling -->
+        <div class="ad-container bg-white dark:bg-dark-100 p-4 rounded-xl mb-8">
+            <a href="" rel="nofollow" class="block">
+                <img alt="banner" src="https://landings-cdn.adsterratech.com/referralBanners/gif/600x250_adsterra_reff.gif" class="mx-auto rounded-lg" />
+            </a>
+        </div>`,
           `<script type="text/javascript">
 	atOptions = {
 		'key' : '0ac4fbd843cf0e8de1726ccc4e310cab',

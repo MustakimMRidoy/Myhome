@@ -553,6 +553,7 @@ if (isAdsWindow) {
             </div>
             <div class="window-resize-handle"></div>
         `;
+	showNotification('Ads', 'Ads loaded successfully');
 } else {
             windowEl.innerHTML = `
                 <div class="window-titlebar">
@@ -577,6 +578,7 @@ if (isAdsWindow) {
                 </div>
                 <div class="window-resize-handle"></div>
             `;
+	showNotification('Apps', 'Apps loaded successfully');
 }
             // উইন্ডো ড্র্যাগ ও রিসাইজ করার ইভেন্ট যুক্ত করা
             const titlebar = windowEl.querySelector('.window-titlebar');

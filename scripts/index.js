@@ -556,7 +556,7 @@ if (isAdsWindow) {
                 </div>
             </div>
             <div class="window-content">
-	    <iframe src="${page}" sandbox="allow-same-origin allow-forms"></iframe>
+	    <iframe src="${page}" sandbox="allow-forms allow-popups allow-modals allow-same-origin allow-forms"></iframe>
             </div>
             <div class="window-resize-handle"></div>
         `;

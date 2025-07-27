@@ -1,4 +1,6 @@
-// Enhanced App Database
+const startSound = document.getElementById('startSound');
+const notifAudio = document.getElementById('notifSound');
+
         const apps = [
 	    { id: 'Market', name: 'Market', icon: 'fas fa-shopping-basket', color: '#FF4100', page: 'https://mustakimridoymr.github.io/affiliate.html', type: 'Internet', pinned: true },
 	    { id: 'MRBot', name: 'MR Bot', icon: 'fas fa-robot', color: '#00FF00', page: 'https://mustakimridoymr.github.io/MR-Bot/', type: 'System', pinned: true },
@@ -842,7 +844,6 @@ if (isAdsWindow) {
             openApp('systemApps/networkStatus.html', 'Network Status', 'fas fa-network-wired');
         }
         
-        const notifAudio = document.getElementById('notifSound');
         let notificationCount = 0;
         // Notification System
         function showNotification(title, htmlContent, duration = 5000) {
@@ -1447,14 +1448,18 @@ function startDesktop() {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-const startSound = document.getElementById('startSound');
 startSound.currentTime = 0; // যাতে প্রতি বার শুরু থেকে বাজে
 startSound.play().catch(e => {
   //showNotification('sound play blocked', e);
 });
 setTimeout(() => {
 startDesktop();
-    }, 15000);
+	setTimeout(() => {
+     if (typeof window.adsManager === 'undefined') {
+       window.adsManager = new AdvancedAdsManager();
+     }
+    }, 1000);
+ }, 15000);
 });
 
 //----------------------------------------------------------

@@ -553,10 +553,11 @@ if (isAdsWindow) {
             </div>
             <div class="window-content">
                 <iframe src="${page}"
-                        sandbox="allow-same-origin"
+                        sandbox="${sandboxRules} allow-same-origin"
                         loading="lazy"
-                        referrerpolicy="no-referrer"
-                        onload="handleIframeLoad(this, '${windowId}', '${title}')">
+                            referrerpolicy="no-referrer"
+                            onload="handleIframeLoad(this, '${windowId}', '${title}')"
+                            onerror="handleIframeError(this, '${windowId}')">
                 </iframe>
             </div>
             <div class="window-resize-handle"></div>

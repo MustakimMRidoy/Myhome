@@ -1454,9 +1454,6 @@ startSound.play().catch(e => {
 });
 setTimeout(() => {
 startDesktop();
-if (typeof window.adsManager === 'undefined') {
-    window.adsManager = new AdvancedAdsManager();
-}
     }, 15000);
 });
 

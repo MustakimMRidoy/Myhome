@@ -563,7 +563,7 @@ if (isAdsWindow) {
                         onload="handleIframeLoad(this, '${windowId}', '${title}')" 
                         onerror="handleIframeError(this, '${windowId}', '${title}')" 
                         style="width:100%; height:100%; border:none;" 
-                        sandbox="allow-forms	iframe allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-scripts allow-storage-access-by-user-activation allow-top-navigation allow-top-navigation-by-user-activation allow-same-origin"
+                        sandbox="allow-forms iframe allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-scripts allow-storage-access-by-user-activation allow-top-navigation allow-top-navigation-by-user-activation allow-same-origin"
                         allow="clipboard-write">
                     </iframe>
             </div>

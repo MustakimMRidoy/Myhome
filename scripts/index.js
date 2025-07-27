@@ -531,29 +531,28 @@
             // sandbox অ্যাট্রিবিউট iframe-এর ক্ষমতা সীমাবদ্ধ করে নিরাপত্তা নিশ্চিত করে।
             // allow-fullscreen ছাড়া অন্য কোনো fullscreen অ্যাট্রিবিউট নেই, তাই এটি ব্রাউজার fullscreen API কল করতে পারবে না।
             const sandboxRules = "allow-scripts allow-forms allow-popups allow-modals allow-downloads";
-	    let isAdsWindow = windowId.includes('Ads') || windowId.toLowerCase().includes('ads') || page.toLowerCase().includes('ads.html');
+	    let isAdsWindow = windowId.includes('Ads') || page.toLowerCase().includes('ads.html');
 if (isAdsWindow) {
-	 windowEl.innerHTML = `
-                <div class="window-titlebar">
-                    <div class="window-title"><i class="${icon}"></i> <span>${title}</span></div>
-                    <div class="window-controls">
-		    ${addShortcutButtonHTML}    <!-- নতুন শর্টকাট বাটন -->
-		    ${externalLinkButtonHTML}  <!-- নতুন বাটনটি এখানে যুক্ত হবে -->
-                        <div class="window-control window-minimize" onclick="minimizeWindow('${windowId}')"><i class="fas fa-window-minimize"></i></div>
-                        <div class="window-control window-maximize" onclick="maximizeWindow('${windowId}')"><i class="far fa-square"></i></div>
-                        <div class="window-control window-close" onclick="closeWindow('${windowId}')"><i class="fas fa-times"></i></div>
-                    </div>
+	    windowEl.innerHTML = `
+            <div class="window-titlebar">
+                <div class="window-title"><i class="${icon}"></i> <span>${title}</span></div>
+                <div class="window-controls">
+                    <div class="window-control window-minimize" onclick="minimizeWindow('${windowId}')"><i class="fas fa-window-minimize"></i></div>
+                    <div class="window-control window-maximize" onclick="maximizeWindow('${windowId}')"><i class="far fa-square"></i></div>
+                    <div class="window-control window-close" onclick="closeWindow('${windowId}')"><i class="fas fa-times"></i></div>
                 </div>
-                <div class="window-content">
-		    <div id="bannerAd" class="ad-container"></div>
-                    <iframe src="${page}"
-		            sandbox="allow-scripts allow-same-origin allow-popups"
-                            onload="handleIframeLoad(this, '${windowId}', '${title}')"
-                            onerror="handleIframeError(this, '${windowId}')">
-                    </iframe>
-                </div>
-                <div class="window-resize-handle"></div>
-            `;
+            </div>
+            <div class="window-content">
+                <iframe src="${page}"
+                        sandbox="${sandboxRules} allow-same-origin"
+                        loading="lazy"
+                        referrerpolicy="no-referrer"
+                        onload="handleIframeLoad(this, '${windowId}', '${title}')"
+                        onerror="handleIframeError(this, '${windowId}')">
+                </iframe>
+            </div>
+            <div class="window-resize-handle"></div>
+        `;
 } else {
             windowEl.innerHTML = `
                 <div class="window-titlebar">

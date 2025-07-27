@@ -552,26 +552,13 @@ if (isAdsWindow) {
                 </div>
             </div>
             <div class="window-content">
-                    <iframe
-  src="${page}"
-  scrolling="yes"
-  loading="lazy"
-  onload="handleIframeLoad(this, '${windowId}', '${title}')"
-  onerror="handleIframeError(this, '${windowId}', '${title}')"
-  sandbox="
-      allow-forms
-      allow-modals
-      allow-orientation-lock
-      allow-pointer-lock
-      allow-popups
-      allow-same-origin
-      allow-scripts
-      allow-storage-access-by-user-activation
-      allow-top-navigation
-      allow-downloads
-      allow-downloads-without-user-activation
-    "
-</iframe>
+                    <iframe src="${page}"
+                            sandbox="${sandboxRules} allow-same-origin"
+                            loading="lazy"
+                            referrerpolicy="no-referrer"
+                            onload="handleIframeLoad(this, '${windowId}', '${title}')"
+                            onerror="handleIframeError(this, '${windowId}')">
+                    </iframe>
             </div>
             <div class="window-resize-handle"></div>
         `;

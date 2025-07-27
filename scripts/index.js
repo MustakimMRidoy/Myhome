@@ -1453,11 +1453,13 @@ startSound.play().catch(e => {
   //showNotification('sound play blocked', e);
 });
 	
-if (typeof window.adsManager === 'undefined') {
-       window.adsManager = new AdvancedAdsManager();
-}
 setTimeout(() => {
 startDesktop();
+	setTimeout(() => {
+         if (typeof window.adsManager === 'undefined') {
+           window.adsManager = new AdvancedAdsManager();
+         }
+       }, 60000);
  }, 15000);
 });
 

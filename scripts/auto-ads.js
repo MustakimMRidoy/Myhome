@@ -20,7 +20,7 @@ const AdsManagerState = {
 // কনফিগারেশন সেটিংস
 const AdsConfig = {
     checkDelay: 10000,        // চেক করার ইন্টারভাল (10 সেকেন্ড)
-    inactivityThreshold: 60000 // অ্যাডস দেখানোর আগে অপেক্ষার সময় (1 মিনিট)
+    inactivityThreshold: 60000 * 2 // অ্যাডস দেখানোর আগে অপেক্ষার সময় (2 মিনিট)
 };
 
 /**

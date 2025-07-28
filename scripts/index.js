@@ -185,8 +185,9 @@ const notifAudio = document.getElementById('notifSound');
             
             // Set initial background
             shuffleArray(backgrounds);
-            desktopBackground.style.backgroundImage = `url('${backgrounds[0]}')`;
-            
+            //desktopBackground.style.backgroundImage = `url('${backgrounds[0]}')`;
+            setBackground(backgrounds[0]);
+		
             // Show welcome notification
             setTimeout(() => {
                 showNotification('System Ready', 'Windows 11 Desktop Environment loaded successfully');
@@ -206,7 +207,8 @@ const notifAudio = document.getElementById('notifSound');
         function startBackgroundRotation() {
             setInterval(() => {
                 currentBgIndex = (currentBgIndex + 1) % backgrounds.length;
-                desktopBackground.style.backgroundImage = `url('${backgrounds[currentBgIndex]}')`;
+                //desktopBackground.style.backgroundImage = `url('${backgrounds[currentBgIndex]}')`;
+	        setBackground(backgrounds[currentBgIndex]);
             }, 60000); // Change every minute
         }
         // Desktop Icons Management

@@ -1482,12 +1482,20 @@ function startDesktop() {
     }, 4000);
 }
 
-window.addEventListener('DOMContentLoaded', () => {	
+window.addEventListener('DOMContentLoaded', () => {
+      document.addEventListener('click', startClick);
+});
+
+function startClick() {
+	document.removeEventListener('click', startClick);
+	startSound.currentTime = 0; // যাতে প্রতি বার শুরু থেকে বাজে
+            startSound.play().catch(e => {
+              //showNotification('sound play blocked', e);
+             });
 setTimeout(() => {
 startDesktop();
  }, 15000);
-});
-
+}
 //----------------------------------------------------------
 
 // ১. প্রথমে আমরা গ্লোবাল ভ্যারিয়েবল ডিক্লেয়ার করব

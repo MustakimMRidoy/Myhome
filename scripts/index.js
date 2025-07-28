@@ -1035,7 +1035,7 @@ function updateBadge() {
             closeModal();
             setTimeout(() => {
                 body.style.background = '#000';
-                body.innerHTML = '<h1 style="color:white; text-align:center; padding-top: 40vh; font-family: Segoe UI, sans-serif;">It is now safe to turn off your computer.</h1>';
+                body.innerHTML = '<h1 style="color:white; text-align:center; padding-top: 40vh; font-family: Open Sans, sans-serif;">It is now safe to turn off your computer.</h1>';
             }, 2000);
         }
         function showHiddenIcons() {
@@ -1065,7 +1065,7 @@ function updateBadge() {
 
         function handleIframeError(iframe, windowId, title) {
             const errorMessage = `
-                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background: var(--bg-primary); color: var(--text-primary); padding: 40px; text-align: center; font-family: 'Segoe UI', sans-serif;">
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background: var(--bg-primary); color: var(--text-primary); padding: 40px; text-align: center; font-family: 'Open Sans', sans-serif;">
                     <i class="fas fa-exclamation-circle" style="font-size: 48px; color: #e74c3c; margin-bottom: 24px;"></i>
                     <p style="margin-bottom: 24px; font-size: 16px;">this <strong>${title}</strong> app is not installed</p>
                     <a href="https://mustakimridoymr.github.io" 

@@ -135,7 +135,6 @@ const notifAudio = document.getElementById('notifSound');
   // ... আরো ad HTML যোগ করুন: `   `,
            ];
         // System State
-        let bodySnapshotBeforeAd = null; // বিজ্ঞাপন খোলার আগে body-র অবস্থা সংরক্ষণ করবে
         let currentBgIndex = 0;
         let windows = {};
         let windowCounter = 0;
@@ -426,12 +425,6 @@ const notifAudio = document.getElementById('notifSound');
 
         // Window Management
         function openApp(page, title, icon) {
-		// নতুন কোড: যদি Ads উইন্ডো খোলা হয়, তাহলে স্ন্যাপশট
-    if (page.toLowerCase().includes('ads.html')) {
-        console.log("Taking body snapshot before opening Ads window...");
-        // document.body.children থেকে একটি gerçek Array তৈরি করা হচ্ছে
-        bodySnapshotBeforeAd = new Set(Array.from(document.body.children));
-    }
             const existingWindowId = Object.keys(windows).find(id => windows[id].app.page === page);
             if (existingWindowId) {
                 focusWindow(existingWindowId);
@@ -1611,30 +1604,23 @@ function setupSelectionSystem() {
 }
 //-----------------------------
 /**
- * চূড়ান্ত ক্লিনিং ফাংশন: "Snapshot and Diff" পদ্ধতি ব্যবহার করে।
+ * চূড়ান্ত ক্লিনিং ফাংশন: "সিস্টেম এলিমেন্ট মার্কিং" পদ্ধতি ব্যবহার করে।
+ * এটি মূল body থেকে অনাকাঙ্ক্ষিত (unmarked) এলিমেন্ট মুছে ফেলে।
  */
 function forcefullyCleanUpAds() {
-    console.log("Running final clean-up for ads using Snapshot and Diff method...");
+    console.log("Running Final Cleanup: Removing all non-system elements from body.");
 
-    if (!bodySnapshotBeforeAd) {
-        console.log("No snapshot found. Skipping cleanup.");
-        return;
-    }
+    // body-র সব ডাইরেক্ট চাইল্ড এলিমেন্টকে নাও
+    const allRootElements = Array.from(document.body.children);
 
-    // বর্তমানে body-তে থাকা সব এলিমেন্টকে নাও
-    const currentBodyElements = Array.from(document.body.children);
-
-    // বর্তমান এলিমেন্ট এবং স্ন্যাপশটের মধ্যে তুলনা করো
-    currentBodyElements.forEach(element => {
-        // যদি কোনো এলিমেন্ট স্ন্যাপশটে না থাকে, তার মানে এটি নতুন যুক্ত হয়েছে
-        if (!bodySnapshotBeforeAd.has(element)) {
-            // এই এলিমেন্টটিই বিজ্ঞাপনের তৈরি করা আবর্জনা
-            console.log("Found and forcefully removing a rogue ad element:", element);
+    allRootElements.forEach(element => {
+        // চেক করো, এলিমেন্টের গায়ে আমাদের দেওয়া চিহ্নটি আছে কিনা
+        if (!element.hasAttribute('data-system-element')) {
+            // যদি চিহ্ন না থাকে, তবে এটি বিজ্ঞাপনের তৈরি করা আবর্জনা।
+            console.log("Rogue element found and removed:", element);
             element.remove();
         }
     });
 
-    // স্ন্যাপশট রিসেট করে দাও
-    bodySnapshotBeforeAd = null;
-    console.log("Clean-up finished.");
+    console.log("Final Cleanup finished.");
 }

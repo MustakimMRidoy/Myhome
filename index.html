@@ -377,6 +377,34 @@ dialog#robotOverlay[open] {
             background: var(--accent-color);
             border-radius: 1px;
         }
+
+        /* Hidden Icons Panel Styling */
+.hidden-icons-panel {
+    position: absolute;
+    bottom: calc(var(--taskbar-height) + 8px); /* টাস্কবারের ঠিক উপরে */
+    right: 120px; /* আপনার সিস্টেম ট্রে আইকনের পজিশন অনুযায়ী মান পরিবর্তন করুন */
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    padding: 8px;
+    box-shadow: var(--shadow);
+    display: flex;
+    gap: 4px;
+    z-index: 3100;
+
+    /* ডিফল্টভাবে লুকিয়ে এবং অ্যানিমেশনের জন্য প্রস্তুত থাকবে */
+    opacity: 0;
+    transform: translateY(10px);
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.hidden-icons-panel.open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
         
         .taskbar-item.minimized {
             opacity: 0.6;
@@ -1419,9 +1447,18 @@ dialog#robotOverlay[open] {
         </div>
         
         <div class="system-tray">
-            <div class="system-tray-item" onclick="showHiddenIcons()" title="Show hidden icons">
+            <div class="system-tray-item" onclick="toggleHiddenIconsPanel()" title="Show hidden icons">
                 <i class="fas fa-chevron-up"></i>
             </div>
+
+            <!-- হিডেন আইকনের জন্য পপআপ প্যানেল -->
+    <div class="hidden-icons-panel" id="hiddenIconsPanel">
+        <!-- উদাহরণস্বরূপ কিছু আইকন যোগ করা হলো -->
+        <div class="system-tray-item" title="Bluetooth"><i class="fab fa-bluetooth-b"></i></div>
+        <div class="system-tray-item" title="Security"><i class="fas fa-shield-alt"></i></div>
+        <div class="system-tray-item" title="Cloud Sync"><i class="fas fa-cloud"></i></div>
+    </div>
+            
             <div class="system-tray-item" onclick="toggleVolumeControl()" title="Volume">
                 <i class="fas fa-volume-up"></i>
             </div>

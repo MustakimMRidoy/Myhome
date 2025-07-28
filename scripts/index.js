@@ -682,11 +682,7 @@ if (isAdsWindow) {
             if (!windows[windowId]) return;
 	
             const windowTitle = windows[windowId].title;
-		const windowInfo = windows[windowId];
-		const isAdsWindow = windowInfo.app.page.toLowerCase().includes('ads.html');
-		if (isAdsWindow) {
-                 forcefullyCleanUpAds();
-                }
+	    const windowInfo = windows[windowId];
 
             windowInfo.element.remove();
             removeWindowFromTaskbar(windowId);
@@ -1603,24 +1599,3 @@ function setupSelectionSystem() {
   document.addEventListener('touchend', handleSelectionEnd);
 }
 //-----------------------------
-/**
- * চূড়ান্ত ক্লিনিং ফাংশন: "সিস্টেম এলিমেন্ট মার্কিং" পদ্ধতি ব্যবহার করে।
- * এটি মূল body থেকে অনাকাঙ্ক্ষিত (unmarked) এলিমেন্ট মুছে ফেলে।
- */
-function forcefullyCleanUpAds() {
-    console.log("Running Final Cleanup: Removing all non-system elements from body.");
-
-    // body-র সব ডাইরেক্ট চাইল্ড এলিমেন্টকে নাও
-    const allRootElements = Array.from(document.body.children);
-
-    allRootElements.forEach(element => {
-        // চেক করো, এলিমেন্টের গায়ে আমাদের দেওয়া চিহ্নটি আছে কিনা
-        if (!element.hasAttribute('data-system-element')) {
-            // যদি চিহ্ন না থাকে, তবে এটি বিজ্ঞাপনের তৈরি করা আবর্জনা।
-            console.log("Rogue element found and removed:", element);
-            element.remove();
-        }
-    });
-
-    console.log("Final Cleanup finished.");
-}

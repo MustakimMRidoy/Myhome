@@ -426,7 +426,7 @@ const notifAudio = document.getElementById('notifSound');
         // Window Management
         function openApp(page, title, icon) {
             const existingWindowId = Object.keys(windows).find(id => windows[id].app.page === page);
-            if (existingWindowId) {
+            if (existingWindowId && isMobileDevice()) {
                 focusWindow(existingWindowId);
                 return;
             }

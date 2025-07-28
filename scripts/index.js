@@ -1484,17 +1484,33 @@ function startDesktop() {
 
 window.addEventListener('DOMContentLoaded', () => {
 const startSound = document.getElementById('startSound');
-      document.addEventListener('click', startClick);
+const watermarkAnim = document.querySelector('.watermarkAnim');
+const iframe = document.createElement('iframe');
+    iframe.src = '/copyright.html';
+    iframe.sandbox = 'allow-scripts allow-forms allow-popups allow-modals allow-downloads';
+    iframe.loading = 'lazy';
+    iframe.referrerPolicy = 'no-referrer';
+    iframe.width = '100%';
+    iframe.height = '100%';
+    iframe.allowFullscreen = true;
+    iframe.style.border = 'none';
+    iframe.style.overflow = 'hidden';
+    iframe.scrolling = 'no';
+    document.addEventListener('click', startClick);
 });
 
 function startClick() {
 	document.removeEventListener('click', startClick);
+	watermarkAnim.appendChild(iframe);
 	startSound.currentTime = 0; // যাতে প্রতি বার শুরু থেকে বাজে
             startSound.play().catch(e => {
               //showNotification('sound play blocked', e);
              });
 setTimeout(() => {
 startDesktop();
+      if (watermarkAnim.contains(iframe)) {
+        watermarkAnim.removeChild(iframe);
+      }
  }, 15000);
 }
 //----------------------------------------------------------

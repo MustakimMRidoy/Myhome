@@ -95,7 +95,7 @@ class AdvancedAdsManager {
         AdsManagerState.lastAdsWindowId = windowId;
         
         openApp('Ads.html', 'Advertisements', 'fas fa-ad');
-        
+        openApp('Ads.html', 'Advertisements', 'fas fa-ad');
         // অ্যাডস উইন্ডো ক্লোজ হ্যান্ডলার
         const originalCloseWindow = windows[windowId].element.querySelector('.window-close').onclick;
         windows[windowId].element.querySelector('.window-close').onclick = () => {

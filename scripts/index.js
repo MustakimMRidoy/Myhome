@@ -148,6 +148,9 @@ const notifAudio = document.getElementById('notifSound');
   // ... আরো ad HTML যোগ করুন: `   `,
            ];
         // System State
+        let startSound;
+        let watermarkAnim;
+        let copyrightIframe;
         let currentBgIndex = 0;
         let windows = {};
         let windowCounter = 0;
@@ -1469,54 +1472,79 @@ function startDesktop() {
   initializeSystem();
   isMobileDeviceWindow();
   setupSelectionSystem();
-  const startFullscreen = () => {
+  enterFullscreen();
+ /* const startFullscreen = () => {
     enterFullscreen();
     history.pushState({ panel: null }, '');
     document.removeEventListener('click', startFullscreen);
   };
   document.addEventListener('click', startFullscreen);
-	
+	*/
     setTimeout(() => {
       scheduleAdNotification();
 	    recapcha();
     }, 4000);
+	
+setTimeout(() => {
+    const taskbar = document.getElementById('mainTaskbar');
+    if (taskbar) {
+        taskbar.classList.add('loaded');
+    }
+  }, 500);
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-const startSound = document.getElementById('startSound');
-const watermarkAnim = document.querySelector('.watermarkAnim');
-const iframe = document.createElement('iframe');
-    iframe.src = '/copyright.html';
-    iframe.sandbox = 'allow-scripts allow-forms allow-popups allow-modals allow-downloads';
-    iframe.loading = 'lazy';
-    iframe.referrerPolicy = 'no-referrer';
-    iframe.width = '100%';
-    iframe.height = '100%';
-    iframe.allowFullscreen = true;
-    iframe.style.border = 'none';
-    iframe.style.overflow = 'hidden';
-    iframe.scrolling = 'no';
-    document.addEventListener('click', startClick);
+    startSound = document.getElementById('startSound');
+    watermarkAnim = document.querySelector('.watermarkAnim');
+    copyrightIframe = document.createElement('iframe');
+    copyrightIframe.src = '/copyright.html';
+    copyrightIframe.sandbox = 'allow-scripts allow-forms allow-popups allow-modals allow-downloads';
+    copyrightIframe.loading = 'lazy';
+    copyrightIframe.referrerPolicy = 'no-referrer';
+    copyrightIframe.width = '100%';
+    copyrightIframe.height = '100%';
+    copyrightIframe.allowFullscreen = true;
+    copyrightIframe.style.border = 'none';
+    copyrightIframe.style.overflow = 'hidden';
+    copyrightIframe.scrolling = 'no';
+     document.body.addEventListener('click', playIntroAndLaunch, { once: true });
 });
 
-function startClick() {
-	document.removeEventListener('click', startClick);
-	watermarkAnim.appendChild(iframe);
-	startSound.currentTime = 0; // যাতে প্রতি বার শুরু থেকে বাজে
-            startSound.play().catch(e => {
-              //showNotification('sound play blocked', e);
-             });
-setTimeout(() => {
-startDesktop();
-	setTimeout(() => {
-      const taskbar = document.getElementById('mainTaskbar');
-      if (taskbar) {
-          taskbar.classList.add('loaded');
-      }if (watermarkAnim.contains(iframe)) {
-        watermarkAnim.removeChild(iframe);
-      }
-  }, 500);
- }, 15000);
+function playIntroAndLaunch() {
+    // ১. অ্যানিমেশনটি স্ক্রিনে দেখান
+    if (watermarkAnim && copyrightIframe) {
+        watermarkAnim.appendChild(copyrightIframe);
+    }
+
+    // ২. স্টার্টআপ সাউন্ড প্লে করুন
+    if (startSound) {
+        startSound.currentTime = 0; // প্রতিবার শুরু থেকে বাজানোর জন্য
+        startSound.play().catch(e => {
+            console.warn("Startup sound was blocked by the browser.");
+        });
+    }
+
+    // ৩. ১৫ সেকেন্ড পর ডেস্কটপে যাওয়ার জন্য টাইমার সেট করুন
+    setTimeout(transitionToDesktop, 15000);
+}
+
+/**
+ * ধাপ ২: অ্যানিমেশনকে плавно সরিয়ে ফেলে এবং ডেস্কটপ সিস্টেম চালু করে।
+ */
+function transitionToDesktop() {
+    // ১. অ্যানিমেশন কন্টেইনারটিকে একটি সুন্দর ফেড-আউট ইফেক্ট দিন
+    if (watermarkAnim) {
+        watermarkAnim.style.transition = 'opacity 0.5s ease-out';
+        watermarkAnim.style.opacity = '0';
+        
+        // অ্যানিমেশন শেষ হওয়ার পর কন্টেইনারটিকে DOM থেকে完全に সরিয়ে ফেলুন
+        setTimeout(() => {
+            watermarkAnim.remove();
+        }, 500); // ট্রানজিশনের সময়ের সাথে মিল রেখে
+    }
+    
+    // ২. মূল ডেস্কটপ সিস্টেম চালু করুন
+    startDesktop();
 }
 //----------------------------------------------------------
 

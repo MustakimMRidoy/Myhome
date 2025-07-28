@@ -22,12 +22,12 @@
             --accent-hover: #ff5252;
             --glass-bg: rgba(255, 255, 255, 0.15);
             --glass-border: rgba(255, 255, 255, 0.3);
-            --microsoft-blue: #0078d4;
-            --microsoft-green: #107c10;
-            --microsoft-yellow: #ffb900;
-            --microsoft-red: #d83b01;
-            --microsoft-orange: #f25022;
-            --microsoft-purple: #8064a2;
+            --nice-blue: #0078d4;
+            --nice-green: #107c10;
+            --nice-yellow: #ffb900;
+            --nice-red: #d83b01;
+            --nice-orange: #f25022;
+            --nice-purple: #8064a2;
             --neon-cyan: #00ffff;
             --neon-pink: #ff00ff;
             --neon-yellow: #ffff00;
@@ -112,7 +112,7 @@
         }
         .error-icon {
             font-size: 120px;
-            color: var(--microsoft-red);
+            color: var(--nice-red);
             margin-bottom: 40px;
             animation: iconBounce 2s infinite, iconGlow 1.5s ease-in-out infinite alternate;
             display: inline-block;
@@ -164,10 +164,10 @@
             color: var(--text-primary);
             margin-bottom: 40px; /* Changed from 50px to 40px */
             background: linear-gradient(45deg, 
-                var(--microsoft-blue), 
-                var(--microsoft-green), 
-                var(--microsoft-yellow), 
-                var(--microsoft-red));
+                var(--nice-blue), 
+                var(--nice-green), 
+                var(--nice-yellow), 
+                var(--nice-red));
             background-size: 300% 300%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -178,10 +178,10 @@
         }
         .install-btn {
             background: linear-gradient(45deg, 
-                var(--microsoft-blue), 
-                var(--microsoft-green), 
-                var(--microsoft-yellow), 
-                var(--microsoft-red));
+                var(--nice-blue), 
+                var(--nice-green), 
+                var(--nice-yellow), 
+                var(--nice-red));
             background-size: 300% 300%;
             color: white;
             padding: 20px 50px;
@@ -225,20 +225,20 @@
                 0 0 80px rgba(255, 255, 255, 0.4);
             animation: buttonExplode 0.6s ease-out;
         }
-        .microsoft-ribbon {
+        .nice-ribbon {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 8px;
             background: linear-gradient(90deg, 
-                var(--microsoft-red) 0%, 
-                var(--microsoft-orange) 16.66%, 
-                var(--microsoft-yellow) 33.33%, 
-                var(--microsoft-green) 50%, 
-                var(--microsoft-blue) 66.66%, 
-                var(--microsoft-purple) 83.33%, 
-                var(--microsoft-red) 100%);
+                var(--nice-red) 0%, 
+                var(--nice-orange) 16.66%, 
+                var(--nice-yellow) 33.33%, 
+                var(--nice-green) 50%, 
+                var(--nice-blue) 66.66%, 
+                var(--nice-purple) 83.33%, 
+                var(--nice-red) 100%);
             animation: ribbonFlow 5s linear infinite;
         }
         .bubbles {
@@ -332,8 +332,8 @@
             60% { transform: translateY(-15px); }
         }
         @keyframes iconGlow {
-            0% { text-shadow: 0 0 20px var(--microsoft-red); }
-            100% { text-shadow: 0 0 40px var(--microsoft-red), 0 0 60px var(--microsoft-red); }
+            0% { text-shadow: 0 0 20px var(--nice-red); }
+            100% { text-shadow: 0 0 40px var(--nice-red), 0 0 60px var(--nice-red); }
         }
         @keyframes textShine {
             0%, 100% { background-position: 0% 50%; }
@@ -458,7 +458,7 @@
     
     <div class="container">
         <div class="error-card" id="errorCard">
-            <div class="microsoft-ribbon"></div>
+            <div class="nice-ribbon"></div>
             <i class="fas fa-exclamation-circle error-icon" id="errorIcon"></i>
             
             <div class="error-title">App Not Installed</div>

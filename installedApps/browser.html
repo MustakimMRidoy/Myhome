@@ -1,0 +1,1758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MR Browser - Advanced Web Browser</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D5CDE',
+                        secondary: '#FF6B6B',
+                        accent: '#4ECDC4',
+                        success: '#00D084',
+                        warning: '#FFB800',
+                        error: '#FF5757',
+                        glass: 'rgba(255, 255, 255, 0.1)',
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'bounce-slow': 'bounce 3s infinite',
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        .glass-effect {
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.15), 
+                rgba(255, 255, 255, 0.05));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+        
+        .glass-effect-dark {
+            background: linear-gradient(135deg, 
+                rgba(0, 0, 0, 0.25), 
+                rgba(0, 0, 0, 0.15));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(45deg, 
+                #667eea 0%, #764ba2 12.5%, 
+                #f093fb 25%, #f5576c 37.5%, 
+                #4facfe 50%, #00f2fe 62.5%,
+                #43e97b 75%, #38f9d7 87.5%, 
+                #667eea 100%);
+            background-size: 600% 600%;
+            animation: gradient 20s ease infinite;
+        }
+        
+        .gradient-bg-dark {
+            background: linear-gradient(45deg, 
+                #2D3748 0%, #1A202C 12.5%, 
+                #2B6CB0 25%, #3182CE 37.5%, 
+                #2C5282 50%, #2A4365 62.5%,
+                #1A365D 75%, #153E75 87.5%, 
+                #2D3748 100%);
+            background-size: 600% 600%;
+            animation: gradient 20s ease infinite;
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            25% { background-position: 100% 50%; }
+            50% { background-position: 50% 100%; }
+            75% { background-position: 50% 0%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            25% { transform: translateY(-10px) rotate(2deg); }
+            50% { transform: translateY(-20px) rotate(0deg); }
+            75% { transform: translateY(-10px) rotate(-2deg); }
+        }
+        
+        @keyframes glow {
+            from { 
+                box-shadow: 0 0 20px rgba(93, 92, 222, 0.5),
+                           0 0 40px rgba(93, 92, 222, 0.3); 
+            }
+            to { 
+                box-shadow: 0 0 30px rgba(93, 92, 222, 0.8),
+                           0 0 60px rgba(93, 92, 222, 0.5); 
+            }
+        }
+        
+        .tab-active {
+            background: linear-gradient(135deg, 
+                rgba(93, 92, 222, 0.9), 
+                rgba(116, 75, 162, 0.8));
+            color: #fff;
+            animation: glow 3s ease-in-out infinite alternate;
+        }
+        
+        .tab-incognito {
+            background: linear-gradient(135deg, 
+                rgba(55, 65, 81, 0.9), 
+                rgba(31, 41, 55, 0.8));
+            border: 1px solid rgba(156, 163, 175, 0.3);
+        }
+        
+        .tab-incognito.tab-active {
+            background: linear-gradient(135deg, 
+                rgba(75, 85, 99, 0.9), 
+                rgba(55, 65, 81, 0.8));
+            animation: none;
+            box-shadow: 0 0 20px rgba(156, 163, 175, 0.3);
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(45deg, #5a67d8, #6b46c1);
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-corner {
+            background: transparent;
+        }
+        
+        .browser-content {
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.95), 
+                rgba(248, 250, 252, 0.95));
+            border-radius: 12px;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .browser-content.dark {
+            background: linear-gradient(135deg, 
+                rgba(31, 41, 55, 0.95), 
+                rgba(17, 24, 39, 0.95));
+        }
+        
+        .loading-bar {
+            height: 3px;
+            background: linear-gradient(90deg, 
+                #667eea 0%, #764ba2 25%, 
+                #f093fb 50%, #f5576c 75%, 
+                #4facfe 100%);
+            background-size: 300% 100%;
+            animation: loading 2s linear infinite;
+        }
+        
+        @keyframes loading {
+            0% { background-position: -300% 0; }
+            100% { background-position: 300% 0; }
+        }
+        
+        .address-bar-glow {
+            box-shadow: 0 0 0 2px rgba(93, 92, 222, 0.3),
+                       0 0 20px rgba(93, 92, 222, 0.2);
+            border-color: rgba(93, 92, 222, 0.5);
+        }
+        
+        .extension-item {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .extension-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .bookmark-folder {
+            background: linear-gradient(135deg, 
+                rgba(251, 191, 36, 0.1), 
+                rgba(245, 158, 11, 0.1));
+        }
+        
+        .developer-tools {
+            background: linear-gradient(135deg, 
+                rgba(16, 185, 129, 0.1), 
+                rgba(5, 150, 105, 0.1));
+            border-left: 3px solid #10b981;
+        }
+        
+        .performance-monitor {
+            background: linear-gradient(135deg, 
+                rgba(59, 130, 246, 0.1), 
+                rgba(37, 99, 235, 0.1));
+        }
+        
+        .security-badge {
+            background: linear-gradient(135deg, 
+                rgba(34, 197, 94, 0.2), 
+                rgba(21, 128, 61, 0.2));
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+        
+        .notification-slide {
+            animation: slideInRight 0.3s ease-out;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .tab-preview {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            border-radius: 8px;
+            padding: 8px;
+            color: white;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .tab:hover .tab-preview {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="gradient-bg dark:gradient-bg-dark min-h-screen transition-all duration-500 font-sans">
+    <!-- Browser Window -->
+    <div class="max-w-7xl mx-auto p-2 md:p-4">
+        <div class="glass-effect dark:glass-effect-dark rounded-3xl shadow-2xl overflow-hidden">
+            
+            <!-- Browser Header -->
+            <div class="flex items-center justify-between p-4 border-b border-white/20">
+                <div class="flex items-center space-x-4">
+                    <div class="flex space-x-2">
+                        <div class="w-3 h-3 bg-red-400 rounded-full animate-pulse cursor-pointer hover:bg-red-500"></div>
+                        <div class="w-3 h-3 bg-yellow-400 rounded-full animate-pulse cursor-pointer hover:bg-yellow-500" style="animation-delay: 0.1s"></div>
+                        <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse cursor-pointer hover:bg-green-500" style="animation-delay: 0.2s"></div>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <div class="relative">
+                            <i class="fas fa-globe text-primary text-3xl animate-float drop-shadow-lg"></i>
+                            <div class="absolute -top-1 -right-1 w-3 h-3 bg-success rounded-full animate-ping"></div>
+                        </div>
+                        <div>
+                            <h1 class="text-white font-bold text-xl bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                                MR Browser
+                            </h1>
+                            <p class="text-gray-300 text-xs">Advanced Web Browser</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button onclick="showPerformance()" class="text-white hover:text-blue-400 transition-colors p-2 rounded-lg hover:bg-white/10" title="Performance Monitor">
+                        <i class="fas fa-chart-line"></i>
+                    </button>
+                    <button onclick="showExtensions()" class="text-white hover:text-purple-400 transition-colors p-2 rounded-lg hover:bg-white/10" title="Extensions">
+                        <i class="fas fa-puzzle-piece"></i>
+                    </button>
+                    <button onclick="showDeveloperTools()" class="text-white hover:text-green-400 transition-colors p-2 rounded-lg hover:bg-white/10" title="Developer Tools">
+                        <i class="fas fa-code"></i>
+                    </button>
+                    <button onclick="showSettings()" class="text-white hover:text-primary transition-colors p-2 rounded-lg hover:bg-white/10" title="Settings">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                    <button onclick="showDownloads()" class="text-white hover:text-accent transition-colors p-2 rounded-lg hover:bg-white/10" title="Downloads">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <button onclick="toggleSidebar()" class="text-white hover:text-secondary transition-colors p-2 rounded-lg hover:bg-white/10" title="Toggle Sidebar">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <button onclick="toggleTheme()" class="text-white hover:text-warning transition-colors p-2 rounded-lg hover:bg-white/10" title="Toggle Theme">
+                        <i class="fas fa-moon" id="themeIcon"></i>
+                    </button>
+                    <button onclick="toggleFullscreen()" class="text-white hover:text-orange-400 transition-colors p-2 rounded-lg hover:bg-white/10" title="Fullscreen">
+                        <i class="fas fa-expand" id="fullscreenIcon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab Bar -->
+            <div class="flex items-center p-2 border-b border-white/20 overflow-x-auto custom-scrollbar">
+                <div id="tabContainer" class="flex space-x-1 min-w-max">
+                    <div class="tab tab-active relative px-4 py-3 rounded-t-xl flex items-center space-x-2 min-w-[200px] max-w-[250px] cursor-pointer transition-all duration-300" data-tab-id="1" data-incognito="false">
+                        <div class="tab-preview">New Tab</div>
+                        <i class="fas fa-globe text-sm"></i>
+                        <span class="text-sm truncate font-medium">New Tab</span>
+                        <button onclick="closeTab(1)" class="ml-auto hover:bg-white/20 rounded-full p-1 transition-colors">
+                            <i class="fas fa-times text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="flex space-x-2 ml-3">
+                    <button onclick="addNewTab(false)" class="text-white hover:text-primary transition-colors px-3 py-2 rounded-lg hover:bg-white/10 flex items-center space-x-1" title="New Tab">
+                        <i class="fas fa-plus"></i>
+                        <span class="hidden md:inline text-sm">Tab</span>
+                    </button>
+                    <button onclick="addNewTab(true)" class="text-white hover:text-gray-400 transition-colors px-3 py-2 rounded-lg hover:bg-white/10 flex items-center space-x-1" title="New Incognito Tab">
+                        <i class="fas fa-user-secret"></i>
+                        <span class="hidden md:inline text-sm">Incognito</span>
+                    </button>
+                    <button onclick="showTabGroups()" class="text-white hover:text-blue-400 transition-colors px-3 py-2 rounded-lg hover:bg-white/10" title="Tab Groups">
+                        <i class="fas fa-layer-group"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Navigation Bar -->
+            <div class="flex items-center p-3 space-x-3">
+                <div class="flex space-x-1">
+                    <button onclick="goBack()" class="text-white hover:text-primary transition-all duration-300 p-2 rounded-lg disabled:opacity-50 hover:bg-white/10 transform hover:scale-110" id="backBtn" disabled title="Go Back">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <button onclick="goForward()" class="text-white hover:text-primary transition-all duration-300 p-2 rounded-lg disabled:opacity-50 hover:bg-white/10 transform hover:scale-110" id="forwardBtn" disabled title="Go Forward">
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <button onclick="refreshPage()" class="text-white hover:text-accent transition-all duration-300 p-2 rounded-lg hover:bg-white/10 transform hover:scale-110" title="Refresh">
+                        <i class="fas fa-redo" id="refreshIcon"></i>
+                    </button>
+                    <button onclick="goHome()" class="text-white hover:text-secondary transition-all duration-300 p-2 rounded-lg hover:bg-white/10 transform hover:scale-110" title="Home">
+                        <i class="fas fa-home"></i>
+                    </button>
+                </div>
+                
+                <!-- Address Bar -->
+                <div class="flex-1 relative">
+                    <div class="glass-effect dark:glass-effect-dark rounded-full flex items-center px-4 py-3 transition-all duration-300 hover:shadow-lg" id="addressBarContainer">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-lock text-green-400" id="securityIcon"></i>
+                            <div class="security-badge px-2 py-1 rounded-full text-xs text-green-600 dark:text-green-400 font-medium" id="securityBadge">Secure</div>
+                        </div>
+                        <input 
+                            type="text" 
+                            id="addressBar" 
+                            placeholder="Search Google or type a URL"
+                            class="flex-1 bg-transparent text-white placeholder-gray-300 outline-none text-base mx-3 font-medium"
+                            onkeypress="handleAddressBar(event)"
+                            oninput="showSuggestions(this.value)"
+                            onfocus="focusAddressBar()"
+                            onblur="blurAddressBar()"
+                        >
+                        <div class="flex items-center space-x-2">
+                            <button onclick="voiceSearch()" class="text-white hover:text-red-400 transition-colors" title="Voice Search">
+                                <i class="fas fa-microphone"></i>
+                            </button>
+                            <button onclick="searchOrNavigate()" class="text-primary hover:text-white transition-colors bg-white/10 hover:bg-primary rounded-full p-2">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="suggestions" class="absolute top-full left-0 right-0 mt-2 glass-effect dark:glass-effect-dark rounded-xl shadow-2xl hidden z-50 max-h-80 overflow-y-auto custom-scrollbar"></div>
+                </div>
+
+                <div class="flex space-x-1">
+                    <button onclick="toggleBookmark()" class="text-white hover:text-yellow-400 transition-all duration-300 p-2 rounded-lg hover:bg-white/10 transform hover:scale-110" id="bookmarkBtn" title="Bookmark">
+                        <i class="far fa-star"></i>
+                    </button>
+                    <button onclick="shareUrl()" class="text-white hover:text-blue-400 transition-all duration-300 p-2 rounded-lg hover:bg-white/10 transform hover:scale-110" title="Share">
+                        <i class="fas fa-share-alt"></i>
+                    </button>
+                    <button onclick="translatePage()" class="text-white hover:text-purple-400 transition-all duration-300 p-2 rounded-lg hover:bg-white/10 transform hover:scale-110" title="Translate">
+                        <i class="fas fa-language"></i>
+                    </button>
+                    <button onclick="showMenu()" class="text-white hover:text-primary transition-all duration-300 p-2 rounded-lg hover:bg-white/10 transform hover:scale-110" title="Menu">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loading Bar -->
+            <div id="loadingBar" class="loading-bar hidden"></div>
+
+            <!-- Main Content Area -->
+            <div class="flex h-[650px]">
+                <!-- Sidebar -->
+                <div id="sidebar" class="w-80 border-r border-white/20 hidden overflow-y-auto custom-scrollbar">
+                    <div class="p-4 space-y-6">
+                        <!-- Quick Access -->
+                        <div>
+                            <h3 class="text-white font-semibold mb-3 flex items-center">
+                                <i class="fas fa-bolt mr-2 text-warning"></i>
+                                Quick Access
+                            </h3>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button onclick="showHistory()" class="glass-effect dark:glass-effect-dark p-3 rounded-lg hover:scale-105 transition-all text-white text-sm flex flex-col items-center space-y-1">
+                                    <i class="fas fa-history text-blue-400"></i>
+                                    <span>History</span>
+                                </button>
+                                <button onclick="showBookmarkManager()" class="glass-effect dark:glass-effect-dark p-3 rounded-lg hover:scale-105 transition-all text-white text-sm flex flex-col items-center space-y-1">
+                                    <i class="fas fa-bookmark text-yellow-400"></i>
+                                    <span>Bookmarks</span>
+                                </button>
+                                <button onclick="showPasswordManager()" class="glass-effect dark:glass-effect-dark p-3 rounded-lg hover:scale-105 transition-all text-white text-sm flex flex-col items-center space-y-1">
+                                    <i class="fas fa-key text-green-400"></i>
+                                    <span>Passwords</span>
+                                </button>
+                                <button onclick="showExtensions()" class="glass-effect dark:glass-effect-dark p-3 rounded-lg hover:scale-105 transition-all text-white text-sm flex flex-col items-center space-y-1">
+                                    <i class="fas fa-puzzle-piece text-purple-400"></i>
+                                    <span>Extensions</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Bookmarks -->
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="text-white font-semibold flex items-center">
+                                    <i class="fas fa-bookmark mr-2 text-yellow-400"></i>
+                                    Bookmarks
+                                </h3>
+                                <button onclick="addBookmarkFolder()" class="text-yellow-400 hover:text-yellow-300 text-sm">
+                                    <i class="fas fa-folder-plus"></i>
+                                </button>
+                            </div>
+                            <div id="bookmarksList" class="space-y-1 text-sm">
+                                <div class="text-gray-400 text-center p-4 italic">No bookmarks yet</div>
+                            </div>
+                        </div>
+
+                        <!-- Recent History -->
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="text-white font-semibold flex items-center">
+                                    <i class="fas fa-history mr-2 text-blue-400"></i>
+                                    Recent History
+                                </h3>
+                                <button onclick="clearHistory()" class="text-red-400 hover:text-red-300 text-sm">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                            <div id="historyList" class="space-y-1 text-sm max-h-48 overflow-y-auto custom-scrollbar">
+                                <div class="text-gray-400 text-center p-4 italic">No history yet</div>
+                            </div>
+                        </div>
+
+                        <!-- Downloads -->
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="text-white font-semibold flex items-center">
+                                    <i class="fas fa-download mr-2 text-green-400"></i>
+                                    Recent Downloads
+                                </h3>
+                                <button onclick="showDownloads()" class="text-green-400 hover:text-green-300 text-sm">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </button>
+                            </div>
+                            <div id="downloadsList" class="space-y-1 text-sm">
+                                <div class="text-gray-400 text-center p-4 italic">No downloads yet</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Area -->
+                <div class="flex-1 relative">
+                    <div id="contentArea" class="h-full browser-content dark:browser-content overflow-hidden">
+                        <!-- Start Page -->
+                        <div id="startPage" class="h-full flex flex-col overflow-y-auto custom-scrollbar">
+                            <!-- Hero Section -->
+                            <div class="flex-1 flex flex-col items-center justify-center p-8 text-center">
+                                <div class="mb-8">
+                                    <div class="relative">
+                                        <i class="fas fa-globe text-7xl text-primary mb-4 animate-float drop-shadow-2xl"></i>
+                                        <div class="absolute -top-2 -right-2 w-6 h-6 bg-success rounded-full animate-bounce flex items-center justify-center">
+                                            <i class="fas fa-check text-white text-xs"></i>
+                                        </div>
+                                    </div>
+                                    <h2 class="text-4xl font-bold text-gray-800 dark:text-white mb-3 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                                        Welcome to MR Browser
+                                    </h2>
+                                    <p class="text-gray-600 dark:text-gray-300 text-lg max-w-2xl mx-auto">
+                                        Experience the future of web browsing with advanced features, enhanced security, and lightning-fast performance.
+                                    </p>
+                                </div>
+
+                                <!-- Enhanced Search Bar -->
+                                <div class="w-full max-w-3xl mb-8">
+                                    <div class="glass-effect dark:glass-effect-dark rounded-full flex items-center px-6 py-4 shadow-2xl hover:shadow-3xl transition-all duration-300">
+                                        <i class="fas fa-search text-primary mr-4 text-xl"></i>
+                                        <input 
+                                            type="text" 
+                                            id="quickSearch"
+                                            placeholder="Search Google or type a URL..."
+                                            class="flex-1 bg-transparent text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 outline-none text-base font-medium"
+                                            onkeypress="handleQuickSearch(event)"
+                                        >
+                                        <div class="flex items-center space-x-2 ml-4">
+                                            <button onclick="voiceSearch()" class="text-red-400 hover:text-red-500 transition-colors p-2 rounded-full hover:bg-red-50 dark:hover:bg-red-900/20">
+                                                <i class="fas fa-microphone"></i>
+                                            </button>
+                                            <button onclick="searchWithImage()" class="text-blue-400 hover:text-blue-500 transition-colors p-2 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/20">
+                                                <i class="fas fa-camera"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Quick Access Grid -->
+                                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 w-full max-w-6xl mb-8">
+                                    <div onclick="navigateTo('https://www.google.com')" class="glass-effect dark:glass-effect-dark rounded-xl p-6 cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-xl group">
+                                        <i class="fab fa-google text-4xl text-blue-500 mb-3 group-hover:animate-bounce"></i>
+                                        <p class="text-gray-800 dark:text-white font-medium">Google</p>
+                                    </div>
+                                    <div onclick="navigateTo('https://www.youtube.com')" class="glass-effect dark:glass-effect-dark rounded-xl p-6 cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-xl group">
+                                        <i class="fab fa-youtube text-4xl text-red-500 mb-3 group-hover:animate-bounce"></i>
+                                        <p class="text-gray-800 dark:text-white font-medium">YouTube</p>
+                                    </div>
+                                    <div onclick="navigateTo('https://www.github.com')" class="glass-effect dark:glass-effect-dark rounded-xl p-6 cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-xl group">
+                                        <i class="fab fa-github text-4xl text-gray-700 dark:text-gray-300 mb-3 group-hover:animate-bounce"></i>
+                                        <p class="text-gray-800 dark:text-white font-medium">GitHub</p>
+                                    </div>
+                                    <div onclick="navigateTo('https://www.stackoverflow.com')" class="glass-effect dark:glass-effect-dark rounded-xl p-6 cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-xl group">
+                                        <i class="fab fa-stack-overflow text-4xl text-orange-500 mb-3 group-hover:animate-bounce"></i>
+                                        <p class="text-gray-800 dark:text-white font-medium">Stack Overflow</p>
+                                    </div>
+                                    <div onclick="navigateTo('https://www.twitter.com')" class="glass-effect dark:glass-effect-dark rounded-xl p-6 cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-xl group">
+                                        <i class="fab fa-twitter text-4xl text-blue-400 mb-3 group-hover:animate-bounce"></i>
+                                        <p class="text-gray-800 dark:text-white font-medium">Twitter</p>
+                                    </div>
+                                    <div onclick="navigateTo('https://www.linkedin.com')" class="glass-effect dark:glass-effect-dark rounded-xl p-6 cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-xl group">
+                                        <i class="fab fa-linkedin text-4xl text-blue-600 mb-3 group-hover:animate-bounce"></i>
+                                        <p class="text-gray-800 dark:text-white font-medium">LinkedIn</p>
+                                    </div>
+                                </div>
+
+                                <!-- Features Section -->
+                                <div class="w-full max-w-6xl">
+                                    <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">Browser Features</h3>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                        <button onclick="addNewTab(true)" class="glass-effect dark:glass-effect-dark p-6 rounded-xl hover:scale-105 transition-all duration-300 text-left group">
+                                            <i class="fas fa-user-secret text-3xl text-gray-600 dark:text-gray-300 mb-3 group-hover:text-primary"></i>
+                                            <h4 class="text-gray-800 dark:text-white font-semibold mb-2">Incognito Mode</h4>
+                                            <p class="text-gray-600 dark:text-gray-400 text-sm">Private browsing with enhanced security</p>
+                                        </button>
+                                        <button onclick="showExtensions()" class="glass-effect dark:glass-effect-dark p-6 rounded-xl hover:scale-105 transition-all duration-300 text-left group">
+                                            <i class="fas fa-puzzle-piece text-3xl text-purple-500 mb-3 group-hover:text-purple-600"></i>
+                                            <h4 class="text-gray-800 dark:text-white font-semibold mb-2">Extensions</h4>
+                                            <p class="text-gray-600 dark:text-gray-400 text-sm">Enhance your browsing experience</p>
+                                        </button>
+                                        <button onclick="showDeveloperTools()" class="glass-effect dark:glass-effect-dark p-6 rounded-xl hover:scale-105 transition-all duration-300 text-left group">
+                                            <i class="fas fa-code text-3xl text-green-500 mb-3 group-hover:text-green-600"></i>
+                                            <h4 class="text-gray-800 dark:text-white font-semibold mb-2">Developer Tools</h4>
+                                            <p class="text-gray-600 dark:text-gray-400 text-sm">Built-in development environment</p>
+                                        </button>
+                                        <button onclick="showSettings()" class="glass-effect dark:glass-effect-dark p-6 rounded-xl hover:scale-105 transition-all duration-300 text-left group">
+                                            <i class="fas fa-cog text-3xl text-blue-500 mb-3 group-hover:text-blue-600"></i>
+                                            <h4 class="text-gray-800 dark:text-white font-semibold mb-2">Advanced Settings</h4>
+                                            <p class="text-gray-600 dark:text-gray-400 text-sm">Customize your browser experience</p>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Web Content -->
+                        <div id="webContent" class="h-full hidden">
+                            <iframe id="webFrame" class="w-full h-full border-0" sandbox=""></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Developer Tools Panel -->
+            <div id="developerToolsPanel" class="hidden border-t border-white/20 h-64 glass-effect dark:glass-effect-dark">
+                <div class="developer-tools h-full p-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-white font-semibold flex items-center">
+                            <i class="fas fa-code mr-2 text-green-400"></i>
+                            Developer Tools
+                        </h3>
+                        <button onclick="closeDeveloperTools()" class="text-white hover:text-red-400 transition-colors">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 h-full">
+                        <div class="glass-effect dark:glass-effect-dark rounded-lg p-3">
+                            <h4 class="text-white font-medium mb-2">Console</h4>
+                            <div class="bg-black/20 rounded p-2 text-green-400 font-mono text-sm h-32 overflow-y-auto custom-scrollbar">
+                                <div>> Welcome to MR Browser Developer Console</div>
+                                <div>> Type help() for available commands</div>
+                                <div class="text-gray-400">> Ready for debugging...</div>
+                            </div>
+                        </div>
+                        <div class="glass-effect dark:glass-effect-dark rounded-lg p-3">
+                            <h4 class="text-white font-medium mb-2">Network</h4>
+                            <div class="text-gray-300 text-sm">
+                                <div class="flex justify-between py-1">
+                                    <span>Requests:</span>
+                                    <span class="text-blue-400">0</span>
+                                </div>
+                                <div class="flex justify-between py-1">
+                                    <span>Data Transfer:</span>
+                                    <span class="text-green-400">0 KB</span>
+                                </div>
+                                <div class="flex justify-between py-1">
+                                    <span>Load Time:</span>
+                                    <span class="text-yellow-400">0ms</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="glass-effect dark:glass-effect-dark rounded-lg p-3">
+                            <h4 class="text-white font-medium mb-2">Performance</h4>
+                            <div class="text-gray-300 text-sm">
+                                <div class="flex justify-between py-1">
+                                    <span>Memory Usage:</span>
+                                    <span class="text-purple-400">45 MB</span>
+                                </div>
+                                <div class="flex justify-between py-1">
+                                    <span>CPU Usage:</span>
+                                    <span class="text-orange-400">12%</span>
+                                </div>
+                                <div class="flex justify-between py-1">
+                                    <span>FPS:</span>
+                                    <span class="text-green-400">60</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals and Overlays -->
+    <!-- Performance Modal -->
+    <div id="performanceModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="glass-effect dark:glass-effect-dark p-6 rounded-xl shadow-2xl max-w-2xl w-full mx-4">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-white font-semibold text-xl flex items-center">
+                    <i class="fas fa-chart-line mr-3 text-blue-400"></i>Performance Monitor
+                </h3>
+                <button onclick="closePerformance()" class="text-white hover:text-red-400 transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="performance-monitor p-4 rounded-lg">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-blue-400">45 MB</div>
+                        <div class="text-gray-300 text-sm">Memory</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-green-400">12%</div>
+                        <div class="text-gray-300 text-sm">CPU</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-purple-400">60 FPS</div>
+                        <div class="text-gray-300 text-sm">Framerate</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-orange-400">1.2s</div>
+                        <div class="text-gray-300 text-sm">Load Time</div>
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    <div>
+                        <div class="flex justify-between text-white text-sm mb-1">
+                            <span>Memory Usage</span>
+                            <span>45/128 MB</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-2">
+                            <div class="bg-blue-400 h-2 rounded-full" style="width: 35%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-white text-sm mb-1">
+                            <span>CPU Usage</span>
+                            <span>12%</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-2">
+                            <div class="bg-green-400 h-2 rounded-full" style="width: 12%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Extensions Modal -->
+    <div id="extensionsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="glass-effect dark:glass-effect-dark p-6 rounded-xl shadow-2xl max-w-4xl w-full mx-4 max-h-[80vh] overflow-y-auto custom-scrollbar">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-white font-semibold text-xl flex items-center">
+                    <i class="fas fa-puzzle-piece mr-3 text-purple-400"></i>Extensions Store
+                </h3>
+                <button onclick="closeExtensions()" class="text-white hover:text-red-400 transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Sample Extensions -->
+                <div class="extension-item glass-effect dark:glass-effect-dark p-4 rounded-lg">
+                    <div class="flex items-center space-x-3 mb-3">
+                        <i class="fas fa-shield-alt text-green-400 text-2xl"></i>
+                        <div>
+                            <h4 class="text-white font-medium">AdBlock Plus</h4>
+                            <p class="text-gray-400 text-sm">Block ads and trackers</p>
+                        </div>
+                    </div>
+                    <button class="w-full bg-primary text-white py-2 rounded-lg hover:bg-primary/80 transition-colors">Install</button>
+                </div>
+                <div class="extension-item glass-effect dark:glass-effect-dark p-4 rounded-lg">
+                    <div class="flex items-center space-x-3 mb-3">
+                        <i class="fas fa-key text-yellow-400 text-2xl"></i>
+                        <div>
+                            <h4 class="text-white font-medium">Password Manager</h4>
+                            <p class="text-gray-400 text-sm">Secure password storage</p>
+                        </div>
+                    </div>
+                    <button class="w-full bg-primary text-white py-2 rounded-lg hover:bg-primary/80 transition-colors">Install</button>
+                </div>
+                <div class="extension-item glass-effect dark:glass-effect-dark p-4 rounded-lg">
+                    <div class="flex items-center space-x-3 mb-3">
+                        <i class="fas fa-language text-blue-400 text-2xl"></i>
+                        <div>
+                            <h4 class="text-white font-medium">Google Translate</h4>
+                            <p class="text-gray-400 text-sm">Translate any webpage</p>
+                        </div>
+                    </div>
+                    <button class="w-full bg-primary text-white py-2 rounded-lg hover:bg-primary/80 transition-colors">Install</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="glass-effect dark:glass-effect-dark p-6 rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto custom-scrollbar">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-white font-semibold text-xl flex items-center">
+                    <i class="fas fa-cog mr-3 text-primary"></i>Browser Settings
+                </h3>
+                <button onclick="closeSettings()" class="text-white hover:text-red-400 transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="space-y-6">
+                <!-- Appearance -->
+                <div>
+                    <h4 class="text-white font-medium mb-3">Appearance</h4>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-white">Dark Mode</span>
+                            <button onclick="toggleTheme()" class="relative inline-flex h-6 w-11 items-center rounded-full bg-gray-600 transition-colors focus:outline-none" id="darkModeToggle">
+                                <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6"></span>
+                            </button>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-white">Show Bookmarks Bar</span>
+                            <button class="relative inline-flex h-6 w-11 items-center rounded-full bg-primary transition-colors focus:outline-none">
+                                <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Privacy & Security -->
+                <div>
+                    <h4 class="text-white font-medium mb-3">Privacy & Security</h4>
+                    <div class="space-y-3">
+                        <button onclick="clearBrowsingData()" class="w-full px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center justify-center">
+                            <i class="fas fa-trash mr-2"></i>Clear Browsing Data
+                        </button>
+                        <button onclick="showPasswordManager()" class="w-full px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors flex items-center justify-center">
+                            <i class="fas fa-key mr-2"></i>Manage Passwords
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Advanced -->
+                <div>
+                    <h4 class="text-white font-medium mb-3">Advanced</h4>
+                    <div class="space-y-3">
+                        <button onclick="resetBrowser()" class="w-full px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors flex items-center justify-center">
+                            <i class="fas fa-undo mr-2"></i>Reset Browser
+                        </button>
+                        <button onclick="showAbout()" class="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center">
+                            <i class="fas fa-info-circle mr-2"></i>About MR Browser
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Downloads Modal -->
+    <div id="downloadsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="glass-effect dark:glass-effect-dark p-6 rounded-xl shadow-2xl max-w-lg w-full mx-4">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-white font-semibold text-xl flex items-center">
+                    <i class="fas fa-download mr-3 text-green-400"></i>Downloads
+                </h3>
+                <button onclick="closeDownloads()" class="text-white hover:text-red-400 transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="downloadsContent" class="space-y-3 max-h-80 overflow-y-auto custom-scrollbar">
+                <div class="text-gray-400 text-center p-8 italic">No downloads yet</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+    <script>
+        // Dark mode support
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+
+        // Browser state
+        let currentTab = 1;
+        let tabCounter = 1;
+        let history = [];
+        let bookmarks = [];
+        let downloads = [];
+        let currentUrl = '';
+        let navigationHistory = [];
+        let currentHistoryIndex = -1;
+        let isFullscreen = false;
+
+        // Initialize browser
+        function initBrowser() {
+            loadData();
+            updateNavigationButtons();
+            setupEventListeners();
+        }
+
+        function setupEventListeners() {
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey || e.metaKey) {
+                    switch (e.key) {
+                        case 't':
+                            e.preventDefault();
+                            addNewTab(false);
+                            break;
+                        case 'w':
+                            e.preventDefault();
+                            closeTab(currentTab);
+                            break;
+                        case 'r':
+                            e.preventDefault();
+                            refreshPage();
+                            break;
+                        case 'l':
+                            e.preventDefault();
+                            document.getElementById('addressBar').focus();
+                            break;
+                        case 'f':
+                            e.preventDefault();
+                            toggleFullscreen();
+                            break;
+                    }
+                }
+            });
+        }
+
+        // Data management
+        function loadData() {
+            bookmarks = [];
+            history = [];
+            downloads = [];
+            updateUI();
+        }
+
+        function saveData() {
+            // Save data would go here in a real browser
+        }
+
+        function updateUI() {
+            loadBookmarks();
+            loadHistory();
+            loadDownloads();
+        }
+
+        // Tab management
+        function addNewTab(isIncognito = false) {
+            tabCounter++;
+            const tabContainer = document.getElementById('tabContainer');
+            const newTab = document.createElement('div');
+            const tabClass = isIncognito ? 'tab-incognito' : 'glass-effect dark:glass-effect-dark';
+            newTab.className = `tab ${tabClass} relative px-4 py-3 rounded-t-xl flex items-center space-x-2 min-w-[200px] max-w-[250px] text-white cursor-pointer transition-all duration-300`;
+            newTab.setAttribute('data-tab-id', tabCounter);
+            newTab.setAttribute('data-incognito', isIncognito);
+            
+            const icon = isIncognito ? 'fas fa-user-secret' : 'fas fa-globe';
+            const title = isIncognito ? 'Incognito Tab' : 'New Tab';
+            
+            newTab.innerHTML = `
+                <div class="tab-preview">${title}</div>
+                <i class="${icon} text-sm"></i>
+                <span class="text-sm truncate font-medium">${title}</span>
+                <button onclick="closeTab(${tabCounter})" class="ml-auto hover:bg-white/20 rounded-full p-1 transition-colors">
+                    <i class="fas fa-times text-xs"></i>
+                </button>
+            `;
+            newTab.onclick = (e) => {
+                if (!e.target.closest('button')) {
+                    switchTab(tabCounter);
+                }
+            };
+            tabContainer.appendChild(newTab);
+            switchTab(tabCounter);
+            showNotification(`${title} created!`, 'success');
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('tab-active');
+                const isIncognito = tab.getAttribute('data-incognito') === 'true';
+                if (isIncognito) {
+                    tab.className = 'tab tab-incognito relative px-4 py-3 rounded-t-xl flex items-center space-x-2 min-w-[200px] max-w-[250px] text-white cursor-pointer transition-all duration-300';
+                } else {
+                    tab.className = 'tab glass-effect dark:glass-effect-dark relative px-4 py-3 rounded-t-xl flex items-center space-x-2 min-w-[200px] max-w-[250px] text-white cursor-pointer transition-all duration-300';
+                }
+            });
+            
+            const activeTab = document.querySelector(`[data-tab-id="${tabId}"]`);
+            if (activeTab) {
+                activeTab.classList.add('tab-active');
+                currentTab = tabId;
+                showStartPage();
+                updateSecurityIcon();
+                updateSandboxRules();
+            }
+        }
+
+        function closeTab(tabId) {
+            const tab = document.querySelector(`[data-tab-id="${tabId}"]`);
+            if (tab) {
+                tab.remove();
+                const remainingTabs = document.querySelectorAll('.tab');
+                if (remainingTabs.length === 0) {
+                    addNewTab();
+                } else if (currentTab === tabId) {
+                    switchTab(parseInt(remainingTabs[0].getAttribute('data-tab-id')));
+                }
+                showNotification('Tab closed', 'info');
+            }
+        }
+
+        function updateSandboxRules() {
+            const currentTabElement = getCurrentTab();
+            const webFrame = document.getElementById('webFrame');
+            
+            if (currentTabElement && currentTabElement.getAttribute('data-incognito') === 'true') {
+                // Incognito tab with restricted sandbox
+                webFrame.sandbox = "allow-scripts allow-forms allow-popups allow-modals allow-downloads";
+            } else {
+                // Regular tab with allow-same-origin
+                webFrame.sandbox = "allow-scripts allow-forms allow-popups allow-modals allow-downloads allow-same-origin";
+            }
+        }
+
+        // Navigation
+        function handleAddressBar(event) {
+            if (event.key === 'Enter') {
+                searchOrNavigate();
+            }
+        }
+
+        function handleQuickSearch(event) {
+            if (event.key === 'Enter') {
+                const query = document.getElementById('quickSearch').value;
+                if (query.trim()) {
+                    navigateToGoogle(query);
+                }
+            }
+        }
+
+        function searchOrNavigate() {
+            const addressBar = document.getElementById('addressBar');
+            const query = addressBar.value.trim();
+            
+            if (query) {
+                hideSuggestions();
+                if (isUrl(query)) {
+                    navigateTo(query);
+                } else {
+                    navigateToGoogle(query);
+                }
+            }
+        }
+
+        function isUrl(text) {
+            try {
+                new URL(text);
+                return true;
+            } catch {
+                return text.includes('.') && !text.includes(' ') && text.indexOf('.') > 0;
+            }
+        }
+
+        function navigateToGoogle(query) {
+            const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+            navigateTo(searchUrl);
+        }
+
+        function navigateTo(url) {
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                url = 'https://' + url;
+            }
+            
+            currentUrl = url;
+            document.getElementById('addressBar').value = url;
+            
+            // Add to history
+            addToHistory(url);
+            addToNavigationHistory(url);
+            
+            // Show loading
+            showLoading();
+            
+            // Update iframe and show web content
+            const webFrame = document.getElementById('webFrame');
+            webFrame.src = url;
+            
+            document.getElementById('startPage').classList.add('hidden');
+            document.getElementById('webContent').classList.remove('hidden');
+            
+            // Update tab title
+            updateTabTitle(extractDomain(url));
+            
+            // Update security icon
+            updateSecurityIcon();
+            
+            // Update sandbox rules
+            updateSandboxRules();
+            
+            // Enable/disable navigation buttons
+            updateNavigationButtons();
+            
+            showNotification(`Navigating to ${extractDomain(url)}`, 'info');
+            
+            // Hide loading after timeout
+            setTimeout(hideLoading, 2000);
+        }
+
+        function showStartPage() {
+            document.getElementById('startPage').classList.remove('hidden');
+            document.getElementById('webContent').classList.add('hidden');
+            document.getElementById('addressBar').value = '';
+            currentUrl = '';
+            updateTabTitle(getCurrentTab().getAttribute('data-incognito') === 'true' ? 'Incognito Tab' : 'New Tab');
+        }
+
+        function getCurrentTab() {
+            return document.querySelector(`[data-tab-id="${currentTab}"]`);
+        }
+
+        function extractDomain(url) {
+            try {
+                const domain = new URL(url).hostname.replace('www.', '');
+                return domain.charAt(0).toUpperCase() + domain.slice(1);
+            } catch {
+                return 'New Tab';
+            }
+        }
+
+        function updateTabTitle(title) {
+            const activeTab = document.querySelector(`[data-tab-id="${currentTab}"] span`);
+            if (activeTab) {
+                activeTab.textContent = title;
+            }
+        }
+
+        function updateSecurityIcon() {
+            const securityIcon = document.getElementById('securityIcon');
+            const securityBadge = document.getElementById('securityBadge');
+            
+            if (currentUrl.startsWith('https://')) {
+                securityIcon.className = 'fas fa-lock text-green-400';
+                securityBadge.textContent = 'Secure';
+                securityBadge.className = 'security-badge px-2 py-1 rounded-full text-xs text-green-600 dark:text-green-400 font-medium';
+            } else if (currentUrl.startsWith('http://')) {
+                securityIcon.className = 'fas fa-unlock text-red-400';
+                securityBadge.textContent = 'Not Secure';
+                securityBadge.className = 'px-2 py-1 rounded-full text-xs text-red-600 dark:text-red-400 font-medium border border-red-400';
+            } else {
+                securityIcon.className = 'fas fa-globe text-gray-400';
+                securityBadge.textContent = 'Local';
+                securityBadge.className = 'px-2 py-1 rounded-full text-xs text-gray-600 dark:text-gray-400 font-medium border border-gray-400';
+            }
+        }
+
+        // Address bar effects
+        function focusAddressBar() {
+            document.getElementById('addressBarContainer').classList.add('address-bar-glow');
+        }
+
+        function blurAddressBar() {
+            document.getElementById('addressBarContainer').classList.remove('address-bar-glow');
+        }
+
+        // Navigation controls
+        function addToNavigationHistory(url) {
+            if (currentHistoryIndex < navigationHistory.length - 1) {
+                navigationHistory = navigationHistory.slice(0, currentHistoryIndex + 1);
+            }
+            navigationHistory.push(url);
+            currentHistoryIndex = navigationHistory.length - 1;
+        }
+
+        function goBack() {
+            if (currentHistoryIndex > 0) {
+                currentHistoryIndex--;
+                const url = navigationHistory[currentHistoryIndex];
+                currentUrl = url;
+                document.getElementById('addressBar').value = url;
+                document.getElementById('webFrame').src = url;
+                updateNavigationButtons();
+                showNotification('Going back', 'info');
+            }
+        }
+
+        function goForward() {
+            if (currentHistoryIndex < navigationHistory.length - 1) {
+                currentHistoryIndex++;
+                const url = navigationHistory[currentHistoryIndex];
+                currentUrl = url;
+                document.getElementById('addressBar').value = url;
+                document.getElementById('webFrame').src = url;
+                updateNavigationButtons();
+                showNotification('Going forward', 'info');
+            }
+        }
+
+        function goHome() {
+            showStartPage();
+            updateNavigationButtons();
+            showNotification('Welcome home!', 'success');
+        }
+
+        function refreshPage() {
+            const refreshIcon = document.getElementById('refreshIcon');
+            refreshIcon.classList.add('animate-spin');
+            
+            if (currentUrl) {
+                showLoading();
+                document.getElementById('webFrame').src = currentUrl;
+                setTimeout(() => {
+                    hideLoading();
+                    refreshIcon.classList.remove('animate-spin');
+                    showNotification('Page refreshed', 'success');
+                }, 1000);
+            } else {
+                setTimeout(() => {
+                    refreshIcon.classList.remove('animate-spin');
+                }, 500);
+            }
+        }
+
+        function updateNavigationButtons() {
+            const backBtn = document.getElementById('backBtn');
+            const forwardBtn = document.getElementById('forwardBtn');
+            
+            backBtn.disabled = currentHistoryIndex <= 0;
+            forwardBtn.disabled = currentHistoryIndex >= navigationHistory.length - 1;
+        }
+
+        // Loading indicator
+        function showLoading() {
+            document.getElementById('loadingBar').classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingBar').classList.add('hidden');
+        }
+
+        // Bookmarks
+        function toggleBookmark() {
+            if (currentUrl) {
+                const isBookmarked = bookmarks.some(b => b.url === currentUrl);
+                if (isBookmarked) {
+                    removeBookmark(currentUrl);
+                } else {
+                    addBookmark(currentUrl, extractDomain(currentUrl));
+                }
+                updateBookmarkIcon();
+            }
+        }
+
+        function addBookmark(url, title) {
+            bookmarks.push({ url, title, date: new Date().toISOString(), folder: 'default' });
+            saveData();
+            loadBookmarks();
+            showNotification('Bookmark added!', 'success');
+        }
+
+        function removeBookmark(url) {
+            bookmarks = bookmarks.filter(b => b.url !== url);
+            saveData();
+            loadBookmarks();
+            showNotification('Bookmark removed!', 'info');
+        }
+
+        function loadBookmarks() {
+            const bookmarksList = document.getElementById('bookmarksList');
+            bookmarksList.innerHTML = '';
+            
+            if (bookmarks.length === 0) {
+                bookmarksList.innerHTML = '<div class="text-gray-400 text-center p-4 italic">No bookmarks yet</div>';
+                return;
+            }
+            
+            bookmarks.forEach(bookmark => {
+                const div = document.createElement('div');
+                div.className = 'text-gray-300 hover:text-white p-2 rounded-lg hover:bg-white/10 transition-all duration-300 flex items-center justify-between group';
+                div.innerHTML = `
+                    <div onclick="navigateTo('${bookmark.url}')" class="flex items-center flex-1 cursor-pointer">
+                        <i class="fas fa-bookmark mr-2 text-yellow-400"></i>
+                        <span class="truncate">${bookmark.title}</span>
+                    </div>
+                    <button onclick="removeBookmark('${bookmark.url}')" class="text-red-400 hover:text-red-300 ml-2 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <i class="fas fa-times text-xs"></i>
+                    </button>
+                `;
+                bookmarksList.appendChild(div);
+            });
+        }
+
+        function updateBookmarkIcon() {
+            const bookmarkBtn = document.getElementById('bookmarkBtn');
+            const icon = bookmarkBtn.querySelector('i');
+            
+            if (currentUrl && bookmarks.some(b => b.url === currentUrl)) {
+                icon.className = 'fas fa-star';
+                bookmarkBtn.classList.add('text-yellow-400');
+            } else {
+                icon.className = 'far fa-star';
+                bookmarkBtn.classList.remove('text-yellow-400');
+            }
+        }
+
+        // History
+        function addToHistory(url) {
+            // Don't add to history if it's an incognito tab
+            const currentTabElement = getCurrentTab();
+            if (currentTabElement && currentTabElement.getAttribute('data-incognito') === 'true') {
+                return;
+            }
+            
+            const historyItem = {
+                url,
+                title: extractDomain(url),
+                date: new Date().toISOString()
+            };
+            
+            // Remove duplicate entries
+            history = history.filter(item => item.url !== url);
+            history.unshift(historyItem);
+            history = history.slice(0, 100); // Keep only last 100 items
+            saveData();
+            loadHistory();
+        }
+
+        function loadHistory() {
+            const historyList = document.getElementById('historyList');
+            historyList.innerHTML = '';
+            
+            if (history.length === 0) {
+                historyList.innerHTML = '<div class="text-gray-400 text-center p-4 italic">No history yet</div>';
+                return;
+            }
+            
+            history.slice(0, 10).forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'text-gray-300 hover:text-white p-2 rounded-lg hover:bg-white/10 transition-all duration-300 cursor-pointer group';
+                div.innerHTML = `
+                    <div onclick="navigateTo('${item.url}')" class="flex items-center">
+                        <i class="fas fa-globe mr-2 text-blue-400"></i>
+                        <div class="flex-1">
+                            <div class="truncate font-medium">${item.title}</div>
+                            <div class="text-xs text-gray-400">${new Date(item.date).toLocaleTimeString()}</div>
+                        </div>
+                    </div>
+                `;
+                historyList.appendChild(div);
+            });
+        }
+
+        function clearHistory() {
+            showConfirmDialog('Are you sure you want to clear all browsing history?', () => {
+                history = [];
+                navigationHistory = [];
+                currentHistoryIndex = -1;
+                saveData();
+                loadHistory();
+                updateNavigationButtons();
+                showNotification('History cleared!', 'success');
+            });
+        }
+
+        // Downloads
+        function downloadPage(url) {
+            const download = {
+                url,
+                name: extractDomain(url) + '.html',
+                date: new Date().toISOString(),
+                size: Math.floor(Math.random() * 5000) + 500 + ' KB',
+                status: 'Completed'
+            };
+            
+            downloads.unshift(download);
+            downloads = downloads.slice(0, 50); // Keep only last 50 items
+            saveData();
+            loadDownloads();
+            showNotification('Download started!', 'success');
+            
+            // Create download link
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = download.name;
+            link.target = '_blank';
+            link.click();
+        }
+
+        function loadDownloads() {
+            const downloadsList = document.getElementById('downloadsList');
+            const downloadsContent = document.getElementById('downloadsContent');
+            
+            // Update sidebar
+            downloadsList.innerHTML = '';
+            if (downloads.length === 0) {
+                downloadsList.innerHTML = '<div class="text-gray-400 text-center p-4 italic">No downloads yet</div>';
+            } else {
+                downloads.slice(0, 3).forEach(download => {
+                    const div = document.createElement('div');
+                    div.className = 'text-gray-300 p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors';
+                    div.innerHTML = `
+                        <div class="flex items-center">
+                            <i class="fas fa-file mr-2 text-green-400"></i>
+                            <div class="flex-1">
+                                <div class="truncate text-sm font-medium">${download.name}</div>
+                                <div class="text-xs text-gray-400">${download.size}</div>
+                            </div>
+                        </div>
+                    `;
+                    downloadsList.appendChild(div);
+                });
+            }
+            
+            // Update modal
+            downloadsContent.innerHTML = '';
+            if (downloads.length === 0) {
+                downloadsContent.innerHTML = '<div class="text-gray-400 text-center p-8 italic">No downloads yet</div>';
+            } else {
+                downloads.forEach(download => {
+                    const div = document.createElement('div');
+                    div.className = 'glass-effect dark:glass-effect-dark p-4 rounded-lg flex items-center justify-between hover:shadow-lg transition-all';
+                    div.innerHTML = `
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-file text-green-400 text-xl"></i>
+                            <div>
+                                <div class="text-white font-medium">${download.name}</div>
+                                <div class="text-gray-400 text-sm">${download.size} • ${new Date(download.date).toLocaleString()}</div>
+                            </div>
+                        </div>
+                        <div class="text-green-400 text-sm font-medium">${download.status}</div>
+                    `;
+                    downloadsContent.appendChild(div);
+                });
+            }
+        }
+
+        // Suggestions
+        function showSuggestions(query) {
+            if (!query.trim()) {
+                hideSuggestions();
+                return;
+            }
+
+            const commonSites = [
+                { name: 'Google', url: 'google.com', icon: 'fab fa-google', color: 'text-blue-500' },
+                { name: 'YouTube', url: 'youtube.com', icon: 'fab fa-youtube', color: 'text-red-500' },
+                { name: 'GitHub', url: 'github.com', icon: 'fab fa-github', color: 'text-gray-400' },
+                { name: 'Stack Overflow', url: 'stackoverflow.com', icon: 'fab fa-stack-overflow', color: 'text-orange-500' },
+                { name: 'Wikipedia', url: 'wikipedia.org', icon: 'fab fa-wikipedia-w', color: 'text-gray-600' },
+                { name: 'Twitter', url: 'twitter.com', icon: 'fab fa-twitter', color: 'text-blue-400' }
+            ];
+
+            const suggestions = commonSites.filter(site => 
+                site.name.toLowerCase().includes(query.toLowerCase()) || 
+                site.url.includes(query.toLowerCase())
+            );
+
+            const suggestionsDiv = document.getElementById('suggestions');
+            suggestionsDiv.innerHTML = '';
+
+            if (suggestions.length > 0 || query.trim()) {
+                // Add search suggestion
+                const searchDiv = document.createElement('div');
+                searchDiv.className = 'px-4 py-3 text-white hover:bg-white/10 cursor-pointer flex items-center transition-all duration-300 hover:scale-105';
+                searchDiv.innerHTML = `
+                    <i class="fas fa-search mr-3 text-primary"></i>
+                    <div>
+                        <div>Search for "${query}"</div>
+                        <div class="text-xs text-gray-400">Google Search</div>
+                    </div>
+                `;
+                searchDiv.onclick = () => {
+                    navigateToGoogle(query);
+                    hideSuggestions();
+                };
+                suggestionsDiv.appendChild(searchDiv);
+
+                suggestions.forEach(suggestion => {
+                    const div = document.createElement('div');
+                    div.className = 'px-4 py-3 text-white hover:bg-white/10 cursor-pointer flex items-center transition-all duration-300 hover:scale-105';
+                    div.innerHTML = `
+                        <i class="${suggestion.icon} mr-3 ${suggestion.color}"></i>
+                        <div>
+                            <div>${suggestion.name}</div>
+                            <div class="text-xs text-gray-400">${suggestion.url}</div>
+                        </div>
+                    `;
+                    div.onclick = () => {
+                        navigateTo(suggestion.url);
+                        hideSuggestions();
+                    };
+                    suggestionsDiv.appendChild(div);
+                });
+                suggestionsDiv.classList.remove('hidden');
+            } else {
+                hideSuggestions();
+            }
+        }
+
+        function hideSuggestions() {
+            document.getElementById('suggestions').classList.add('hidden');
+        }
+
+        // Advanced Features
+        function voiceSearch() {
+            showNotification('Voice search feature coming soon!', 'info');
+        }
+
+        function searchWithImage() {
+            showNotification('Image search feature coming soon!', 'info');
+        }
+
+        function shareUrl() {
+            if (currentUrl) {
+                if (navigator.share) {
+                    navigator.share({
+                        title: extractDomain(currentUrl),
+                        url: currentUrl
+                    });
+                } else {
+                    navigator.clipboard.writeText(currentUrl);
+                    showNotification('URL copied to clipboard!', 'success');
+                }
+            }
+        }
+
+        function translatePage() {
+            if (currentUrl) {
+                const translateUrl = `https://translate.google.com/translate?sl=auto&tl=en&u=${encodeURIComponent(currentUrl)}`;
+                navigateTo(translateUrl);
+            } else {
+                showNotification('No page to translate', 'warning');
+            }
+        }
+
+        function toggleFullscreen() {
+            if (!isFullscreen) {
+                if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen();
+                }
+                document.getElementById('fullscreenIcon').className = 'fas fa-compress';
+                isFullscreen = true;
+                showNotification('Entered fullscreen mode', 'info');
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+                document.getElementById('fullscreenIcon').className = 'fas fa-expand';
+                isFullscreen = false;
+                showNotification('Exited fullscreen mode', 'info');
+            }
+        }
+
+        // Sidebar
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('hidden');
+        }
+
+        // Theme toggle
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            const themeIcon = document.getElementById('themeIcon');
+            
+            if (document.documentElement.classList.contains('dark')) {
+                themeIcon.className = 'fas fa-sun';
+                showNotification('Dark mode enabled', 'info');
+            } else {
+                themeIcon.className = 'fas fa-moon';
+                showNotification('Light mode enabled', 'info');
+            }
+        }
+
+        // Modal functions
+        function showPerformance() {
+            document.getElementById('performanceModal').classList.remove('hidden');
+        }
+
+        function closePerformance() {
+            document.getElementById('performanceModal').classList.add('hidden');
+        }
+
+        function showExtensions() {
+            document.getElementById('extensionsModal').classList.remove('hidden');
+        }
+
+        function closeExtensions() {
+            document.getElementById('extensionsModal').classList.add('hidden');
+        }
+
+        function showDeveloperTools() {
+            const panel = document.getElementById('developerToolsPanel');
+            panel.classList.toggle('hidden');
+            showNotification('Developer tools toggled', 'info');
+        }
+
+        function closeDeveloperTools() {
+            document.getElementById('developerToolsPanel').classList.add('hidden');
+        }
+
+        function showSettings() {
+            document.getElementById('settingsModal').classList.remove('hidden');
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsModal').classList.add('hidden');
+        }
+
+        function showDownloads() {
+            document.getElementById('downloadsModal').classList.remove('hidden');
+        }
+
+        function closeDownloads() {
+            document.getElementById('downloadsModal').classList.add('hidden');
+        }
+
+        function showPasswordManager() {
+            showNotification('Password manager feature coming soon!', 'info');
+        }
+
+        function showBookmarkManager() {
+            showNotification('Advanced bookmark manager coming soon!', 'info');
+        }
+
+        function showHistory() {
+            showNotification('History manager coming soon!', 'info');
+        }
+
+        function showTabGroups() {
+            showNotification('Tab groups feature coming soon!', 'info');
+        }
+
+        function showAbout() {
+            showModal('About MR Browser', 'MR Browser v1.0 - A modern, feature-rich web browser built with cutting-edge technologies.');
+        }
+
+        function addBookmarkFolder() {
+            showNotification('Bookmark folders feature coming soon!', 'info');
+        }
+
+        function clearBrowsingData() {
+            showConfirmDialog('Are you sure you want to clear all browsing data?', () => {
+                history = [];
+                bookmarks = [];
+                downloads = [];
+                navigationHistory = [];
+                currentHistoryIndex = -1;
+                saveData();
+                updateUI();
+                updateNavigationButtons();
+                closeSettings();
+                showNotification('All browsing data cleared!', 'success');
+            });
+        }
+
+        function resetBrowser() {
+            showConfirmDialog('Are you sure you want to reset the browser?', () => {
+                location.reload();
+            });
+        }
+
+        // Menu
+        function showMenu() {
+            showMenuModal();
+        }
+
+        function showMenuModal() {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="glass-effect dark:glass-effect-dark p-6 rounded-xl shadow-2xl max-w-sm w-full mx-4">
+                    <h3 class="text-white font-semibold mb-4 text-xl flex items-center">
+                        <i class="fas fa-bars mr-3 text-primary"></i>Browser Menu
+                    </h3>
+                    <div class="space-y-2">
+                        <button onclick="showStartPage(); this.closest('.fixed').remove();" class="w-full text-left px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-colors flex items-center">
+                            <i class="fas fa-home mr-3 text-blue-400"></i>Home Page
+                        </button>
+                        <button onclick="addNewTab(true); this.closest('.fixed').remove();" class="w-full text-left px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-colors flex items-center">
+                            <i class="fas fa-user-secret mr-3 text-gray-400"></i>New Incognito Tab
+                        </button>
+                        <button onclick="showBookmarkManager(); this.closest('.fixed').remove();" class="w-full text-left px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-colors flex items-center">
+                            <i class="fas fa-bookmark mr-3 text-yellow-400"></i>Bookmark Manager
+                        </button>
+                        <button onclick="showHistory(); this.closest('.fixed').remove();" class="w-full text-left px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-colors flex items-center">
+                            <i class="fas fa-history mr-3 text-blue-400"></i>History
+                        </button>
+                        <button onclick="showDownloads(); this.closest('.fixed').remove();" class="w-full text-left px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-colors flex items-center">
+                            <i class="fas fa-download mr-3 text-green-400"></i>Downloads
+                        </button>
+                        <button onclick="showExtensions(); this.closest('.fixed').remove();" class="w-full text-left px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-colors flex items-center">
+                            <i class="fas fa-puzzle-piece mr-3 text-purple-400"></i>Extensions
+                        </button>
+                        <button onclick="showSettings(); this.closest('.fixed').remove();" class="w-full text-left px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-colors flex items-center">
+                            <i class="fas fa-cog mr-3 text-orange-400"></i>Settings
+                        </button>
+                    </div>
+                    <div class="flex justify-end mt-6">
+                        <button class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/80 transition-colors" onclick="this.closest('.fixed').remove()">Close</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Utility functions
+        function showConfirmDialog(message, onConfirm) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="glass-effect dark:glass-effect-dark p-6 rounded-xl shadow-2xl max-w-sm w-full mx-4">
+                    <div class="text-center">
+                        <i class="fas fa-exclamation-triangle text-yellow-400 text-5xl mb-4 animate-pulse"></i>
+                        <p class="text-white mb-6 text-lg">${message}</p>
+                        <div class="flex space-x-3 justify-center">
+                            <button class="px-6 py-3 text-gray-300 hover:bg-white/10 rounded-lg transition-colors font-medium" onclick="this.closest('.fixed').remove()">Cancel</button>
+                            <button class="px-6 py-3 bg-red-500 text-white hover:bg-red-600 rounded-lg transition-colors font-medium" onclick="this.closest('.fixed').remove(); (${onConfirm})()">Confirm</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function showModal(title, content) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="glass-effect dark:glass-effect-dark p-6 rounded-xl shadow-2xl max-w-md w-full mx-4">
+                    <h3 class="text-white font-semibold mb-4 text-xl">${title}</h3>
+                    <p class="text-gray-300 mb-6">${content}</p>
+                    <div class="flex justify-end">
+                        <button class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/80 transition-colors" onclick="this.closest('.fixed').remove()">OK</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            const colors = {
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                info: 'bg-blue-500',
+                warning: 'bg-yellow-500'
+            };
+            
+            const icons = {
+                success: 'fas fa-check-circle',
+                error: 'fas fa-exclamation-circle',
+                info: 'fas fa-info-circle',
+                warning: 'fas fa-exclamation-triangle'
+            };
+            
+            notification.className = `notification-slide ${colors[type]} text-white px-6 py-4 rounded-lg shadow-lg z-50 mb-2 flex items-center space-x-3 max-w-sm`;
+            notification.innerHTML = `
+                <i class="${icons[type]}"></i>
+                <span class="font-medium">${message}</span>
+                <button onclick="this.parentElement.remove()" class="ml-auto text-white hover:text-gray-200">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            document.getElementById('notificationContainer').appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.style.animation = 'slideInRight 0.3s ease-out reverse';
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 300);
+                }
+            }, 4000);
+        }
+
+        // Click outside to close
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('#suggestions') && !e.target.closest('#addressBar')) {
+                hideSuggestions();
+            }
+        });
+
+        // Initialize the browser
+        initBrowser();
+    </script>
+</body>
+</html>

@@ -5,7 +5,7 @@ const notifAudio = document.getElementById('notifSound');
 	    { id: 'Market', name: 'Market', icon: 'fas fa-shopping-basket', color: '#FF4100', page: 'https://mustakimridoymr.github.io/affiliate.html', type: 'Internet', pinned: true },
 	    { id: 'MRBot', name: 'MR Bot', icon: 'fas fa-robot', color: '#00FF00', page: 'https://mustakimridoymr.github.io/MR-Bot/', type: 'System', pinned: true },
 	    { id: 'browser', name: 'Browser', icon: 'fas fa-globe', color: '#ff6b35', page: 'installedApps/browser.html', type: 'Internet', pinned: true },
-	    { id: 'documents', name: 'File Explorer', icon: 'fas fa-folder', color: '#FF7600', page: 'systemApps/documents.html', type: 'System', pinned: true },
+	    { id: 'documents', name: 'File Explorer', icon: 'fas fa-folder', color: '#FFCC00', page: 'systemApps/documents.html', type: 'System', pinned: true },
 	    { id: 'ridoysPortifolio', name: 'Ridoy,s Portifolio', icon: 'fab fa-github', color: '#000050', page: 'https://mustakimridoymr.github.io', type: 'System', pinned: true },
 		
             { id: 'settings', name: 'Settings', icon: 'fas fa-cog', color: '#0057FF', page: 'systemApps/settings.html(pending)', type: 'System', pinned: false },

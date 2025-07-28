@@ -557,15 +557,15 @@ if (isAdsWindow) {
                 </div>
             </div>
             <div class="window-content">
-                  <div class="ad-iframe-container">
-      <iframe 
-          src="${page}" 
-          scrolling="yes" 
-          loading="lazy" 
-          style="width:100%; height:100%; border:none;" 
-          sandbox="allow-forms allow-modals allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-scripts allow-same-origin">
-      </iframe>
-  </div>
+                  <div class="iframe-ads">
+    <iframe 
+        src="${page}" 
+        scrolling="yes" 
+        loading="lazy" 
+        style="width:100%; height:100%; border:none;" 
+        sandbox="allow-forms allow-modals allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-scripts allow-same-origin">
+    </iframe>
+</div>
             </div>
             <div class="window-resize-handle"></div>
         `;

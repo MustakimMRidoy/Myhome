@@ -36,7 +36,21 @@ const notifAudio = document.getElementById('notifSound');
             'https://picsum.photos/seed/windows3/1920/1080',
             'https://picsum.photos/seed/windows4/1920/1080',
             'https://picsum.photos/seed/windows5/1920/1080',
-            'https://picsum.photos/seed/windows6/1920/1080'
+            'https://picsum.photos/seed/windows6/1920/1080',
+	    'https://assets.mixkit.co/videos/45674/45674-720.mp4',
+	    'https://assets.mixkit.co/videos/4681/4681-720.mp4',
+	    'https://assets.mixkit.co/videos/34045/34045-720.mp4',
+	    'https://assets.mixkit.co/videos/4682/4682-720.mp4',
+	    'https://assets.mixkit.co/videos/44974/44974-720.mp4',
+	    'https://assets.mixkit.co/videos/19179/19179-720.mp4',
+	    'https://assets.mixkit.co/sibgbztvdek1zlklf0s7wlchuzlm',
+	    'https://assets.mixkit.co/videos/9317/9317-720.mp4',
+	    'https://assets.mixkit.co/videos/17978/17978-720.mp4',
+	    'https://assets.mixkit.co/videos/1202/1202-720.mp4',
+	    'https://assets.mixkit.co/videos/11054/11054-720.mp4',
+	    'https://assets.mixkit.co/videos/45581/45581-720.mp4',
+	    'https://assets.mixkit.co/videos/4814/4814-720.mp4',
+	    'https://assets.mixkit.co/videos/9782/9782-720.mp4'
         ];
 
           const ad = [

@@ -455,6 +455,8 @@ const notifAudio = document.getElementById('notifSound');
             addWindowToTaskbar(windowId, app);
             focusWindow(windowId);
             positionWindow(windowEl);
+
+	   return windowId;
         }
 /*
         function createWindow(windowId, title, icon, page) {

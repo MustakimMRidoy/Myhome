@@ -232,6 +232,16 @@ dialog#robotOverlay[open] {
             padding: 0 8px;
             z-index: 1000;
             box-shadow: 0 -2px 20px rgba(0,0,0,0.1);
+            opacity: 0;
+            transform: translateY(100%);
+            pointer-events: none;
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+        }
+
+        .taskbar.loaded {
+         opacity: 1;
+         transform: translateY(0);
+         pointer-events: auto;
         }
         
         .start-button {
@@ -1420,7 +1430,7 @@ dialog#robotOverlay[open] {
     </div>
     
     <!-- Taskbar -->
-    <div class="taskbar" >
+    <div class="taskbar" id="mainTaskbar">
         <button class="start-button" id="startButton" onclick="toggleStartMenu()">
             <i class="fas fa-laptop"></i>
         </button>

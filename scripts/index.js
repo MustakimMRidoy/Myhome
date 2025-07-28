@@ -565,7 +565,7 @@ if (isAdsWindow) {
             </div>
             <div class="window-content">
 <iframe src="${page}"
-                            sandbox="${sandboxRules} allow-same-origin"
+                            sandbox="allow-forms allow-modals allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-scripts"
                             loading="lazy"
                             referrerpolicy="no-referrer"
                             onload="handleIframeLoad(this, '${windowId}', '${title}')"

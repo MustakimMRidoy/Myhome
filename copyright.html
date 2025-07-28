@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <audio id="startSound" src="https://github.com/MustakimRidoyMR/MustakimRidoyMR.github.io/raw/refs/heads/main/Audio/device_start_music__brand_company_RidoyKhan.mp3" preload="auto"></audio>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Color Watermark Animation</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: linear-gradient(45deg, #0a0a0a, #1a1a2e, #16213e, #0f3460);
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+            overflow: hidden;
+            font-family: 'Open Sans', Tahoma, Geneva, Verdana, sans-serif;
+            cursor: pointer; /* المستخدمকে ক্লিক করার জন্য উৎসাহিত করতে */
+        }
+
+        .click-prompt {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 24px;
+            z-index: 2000;
+            pointer-events: none;
+            text-shadow: 0 0 10px #fff;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .watermark-container {
+            position: fixed;
+            top: 50%;
+            left: 20%;
+            transform: translateY(-50%);
+            z-index: 1100;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .watermarkAnim {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .watermarkAnim h2 {
+            margin: 0;
+            font-size: 60px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            opacity: 0;
+        }
+
+        .watermarkAnim p {
+            margin: 15px 0 0 0;
+            font-size: 32px;
+            font-weight: 500;
+            letter-spacing: 3px;
+            opacity: 0;
+        }
+
+        .letter {
+            display: inline-block;
+            opacity: 0;
+            transform: scale(0);
+            color: transparent;
+            position: relative;
+            transition: all 0.8s ease;
+        }
+
+        .letter.forming {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .letter.active {
+            color: #fff;
+            text-shadow:
+                0 0 10px currentColor,
+                0 0 20px currentColor,
+                0 0 30px currentColor,
+                0 0 40px currentColor;
+            animation: textPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes textPulse {
+            0%, 100% {
+                text-shadow:
+                    0 0 10px #0078d4,
+                    0 0 20px #00bcf2,
+                    0 0 30px #40e0d0,
+                    0 0 40px #7b68ee;
+                transform: scale(1);
+            }
+            50% {
+                text-shadow:
+                    0 0 15px #ff6b6b,
+                    0 0 25px #ffa500,
+                    0 0 35px #32cd32,
+                    0 0 45px #ff1493;
+                transform: scale(1.05);
+            }
+        }
+
+        /* Particle cluster effect */
+        .letter-particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1099;
+            box-shadow: 0 0 10px currentColor;
+            animation: particleFloat 2s ease-in-out infinite;
+        }
+
+        @keyframes particleFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(5px, -5px) scale(1.2); }
+        }
+
+        /* Snake particle system */
+        .snake-particle {
+            position: fixed;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1090;
+            box-shadow: 0 0 15px currentColor, 0 0 30px currentColor;
+            transition: all 0.3s ease;
+        }
+
+        .snake-trail {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1085;
+            opacity: 0.6;
+            transition: all 0.2s ease;
+        }
+
+        /* Enhanced background effects */
+        .bg-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .floating-orb {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 120, 212, 0.1), transparent);
+            animation: floatOrb 15s linear infinite;
+        }
+
+        @keyframes floatOrb {
+            0% {
+                transform: translateY(100vh) translateX(0) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-10vh) translateX(100px) scale(1);
+                opacity: 0;
+            }
+        }
+
+        /* Pulse effect around watermark */
+        .pulse-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 400px;
+            border: 2px solid rgba(0, 120, 212, 0.3);
+            border-radius: 50%;
+            animation: pulseRing 4s ease-in-out infinite;
+        }
+
+        @keyframes pulseRing {
+            0% {
+                transform: translate(-50%, -50%) scale(0.5);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(2);
+                opacity: 0;
+            }
+        }
+
+        /* Particle explosion effect */
+        .explosion-particle {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1095;
+        }
+
+        @keyframes explode {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(3);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background particles -->
+    <div class="bg-particles" id="bgParticles"></div>
+    <div class="click-prompt" id="clickPrompt">Click to start animation</div>
+
+
+    <!-- Pulse rings -->
+    <div class="pulse-ring" style="animation-delay: 0s;"></div>
+    <div class="pulse-ring" style="animation-delay: 1s;"></div>
+    <div class="pulse-ring" style="animation-delay: 2s;"></div>
+
+    <!-- Watermark Container -->
+    <div class="watermark-container">
+        <div class="watermarkAnim">
+            <h2 id="mainText"></h2>
+            <p id="subText"></p>
+        </div>
+    </div>
+
+    <script>
+        const startSound = document.getElementById('startSound');
+        const colors = ['#0078d4', '#00bcf2', '#40e0d0', '#7b68ee', '#ff6b6b', '#ffa500', '#32cd32', '#ff1493'];
+        const mainText = "© RidoyKhan";
+        const subText = "MR Mustakim";
+        let snakeParticles = [];
+        let currentAnimation = 0;
+        let orbInterval; // ব্যাকগ্রাউন্ড পার্টিকেল থামানোর জন্য ভেরিয়েবল
+
+        // Create floating background orbs
+        function createBackgroundOrb() {
+            const orb = document.createElement('div');
+            orb.className = 'floating-orb';
+            orb.style.left = Math.random() * 100 + '%';
+            orb.style.width = orb.style.height = (Math.random() * 100 + 50) + 'px';
+            orb.style.animationDuration = (Math.random() * 10 + 10) + 's';
+            orb.style.animationDelay = Math.random() * 5 + 's';
+            document.getElementById('bgParticles').appendChild(orb);
+
+            setTimeout(() => orb.remove(), 20000);
+        }
+
+        // Create snake particle
+        function createSnakeParticle(x, y, color, targetX, targetY, delay = 0) {
+            setTimeout(() => {
+                const particle = document.createElement('div');
+                particle.className = 'snake-particle';
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                particle.style.background = color;
+                particle.style.color = color;
+                document.body.appendChild(particle);
+
+                // Create trail effect
+                let trailCount = 0;
+                const createTrail = () => {
+                    if (trailCount < 5) {
+                        const trail = document.createElement('div');
+                        trail.className = 'snake-trail';
+                        trail.style.left = particle.style.left;
+                        trail.style.top = particle.style.top;
+                        trail.style.background = color;
+                        trail.style.opacity = (5 - trailCount) * 0.1;
+                        document.body.appendChild(trail);
+
+                        setTimeout(() => trail.remove(), 1000);
+                        trailCount++;
+                    }
+                };
+
+                // Snake movement with curves
+                const duration = 3000;
+                const startTime = Date.now();
+                const startX = x;
+                const startY = y;
+
+                const animate = () => {
+                    const elapsed = Date.now() - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+
+                    // Bezier curve for snake-like movement
+                    const midX = startX + (targetX - startX) * 0.5 + Math.sin(progress * Math.PI * 4) * 100;
+                    const midY = startY + (targetY - startY) * 0.5 + Math.cos(progress * Math.PI * 3) * 80;
+
+                    const currentX = startX + (midX - startX) * progress + (targetX - midX) * progress;
+                    const currentY = startY + (midY - startY) * progress + (targetY - midY) * progress;
+
+                    particle.style.left = currentX + 'px';
+                    particle.style.top = currentY + 'px';
+
+                    // Create trail
+                    if (Math.random() < 0.3) createTrail();
+
+                    if (progress < 1) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        // Explosion effect at target
+                        createExplosion(targetX, targetY, color);
+                        particle.remove();
+                    }
+                };
+
+                animate();
+            }, delay);
+        }
+
+        // Create explosion effect
+        function createExplosion(x, y, color) {
+            for (let i = 0; i < 8; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'explosion-particle';
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                particle.style.background = color;
+                particle.style.animation = 'explode 0.8s ease-out forwards';
+
+                const angle = (i / 8) * Math.PI * 2;
+                const distance = 50;
+                particle.style.transform = `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px)`;
+
+                document.body.appendChild(particle);
+                setTimeout(() => particle.remove(), 800);
+            }
+        }
+
+        // Create letter particles that form the text
+        function createLetterParticles(letter, color, count = 6) {
+            const letterRect = letter.getBoundingClientRect();
+            const centerX = letterRect.left + letterRect.width / 2;
+            const centerY = letterRect.top + letterRect.height / 2;
+
+            for (let i = 0; i < count; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'letter-particle';
+                particle.style.background = color;
+                particle.style.color = color;
+
+                // Random position around letter
+                const angle = (i / count) * Math.PI * 2;
+                const radius = 20;
+                const x = centerX + Math.cos(angle) * radius;
+                const y = centerY + Math.sin(angle) * radius;
+
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                particle.style.animationDelay = (i * 0.1) + 's';
+
+                letter.appendChild(particle);
+
+                // Remove particle after animation
+                setTimeout(() => {
+                    if (particle.parentNode) {
+                        particle.remove();
+                    }
+                }, 3000);
+            }
+        }
+
+        // Animate text letter by letter with color formation
+        function animateText(text, container, startDelay = 0) {
+            return new Promise(resolve => {
+                container.innerHTML = '';
+                container.style.opacity = 1;
+
+                const letters = text.split('').map(char => {
+                    const span = document.createElement('span');
+                    span.className = 'letter';
+                    span.textContent = char === ' ' ? '\u00A0' : char;
+                    container.appendChild(span);
+                    return span;
+                });
+
+                // Create target positions first (letters are invisible)
+                setTimeout(() => {
+                    letters.forEach((letter, index) => {
+                        const letterRect = letter.getBoundingClientRect();
+                        const targetX = letterRect.left + letterRect.width / 2;
+                        const targetY = letterRect.top + letterRect.height / 2;
+
+                        // Create multiple snake particles for each letter
+                        const particleCount = 5;
+                        for (let i = 0; i < particleCount; i++) {
+                            const startX = Math.random() * window.innerWidth;
+                            const startY = Math.random() * window.innerHeight;
+                            const color = colors[Math.floor(Math.random() * colors.length)];
+                            const delay = startDelay + index * 250 + i * 80;
+
+                            createSnakeParticle(startX, startY, color, targetX, targetY, delay);
+                        }
+
+                        // Form letter after particles arrive
+                        setTimeout(() => {
+                            letter.classList.add('forming');
+                            const letterColor = colors[Math.floor(Math.random() * colors.length)];
+                            createLetterParticles(letter, letterColor);
+
+                            // Activate letter with full glow
+                            setTimeout(() => {
+                                letter.classList.add('active');
+                            }, 500);
+                        }, startDelay + index * 250 + 1800);
+                    });
+
+                    // Resolve the promise when the text animation is complete
+                    const totalDuration = startDelay + letters.length * 250 + 2300;
+                    setTimeout(resolve, totalDuration);
+                }, 100);
+            });
+        }
+
+        // Main animation sequence
+        async function startAnimation() {
+            const mainTextEl = document.getElementById('mainText');
+            const subTextEl = document.getElementById('subText');
+
+            // Reset previous animation
+            mainTextEl.innerHTML = '';
+            subTextEl.innerHTML = '';
+
+            // Start main text animation and wait for it
+            await animateText(mainText, mainTextEl, 500);
+
+            // Start sub text animation
+            await animateText(subText, subTextEl, 0);
+
+            // Hide text and stop all background activities after a while
+            setTimeout(() => {
+                document.querySelectorAll('.letter').forEach(letter => {
+                    letter.classList.remove('active');
+                    letter.style.opacity = 0;
+                });
+                stopAllActivities();
+            }, 6000); // অ্যানিমেশন শেষ হওয়ার কিছু সময় পর সব বন্ধ হবে
+        }
+
+        // Function to stop all intervals and animations
+        function stopAllActivities() {
+            clearInterval(orbInterval); // ব্যাকগ্রাউন্ড অর্ব তৈরি বন্ধ করে
+
+            // সমস্ত অ্যানিমেশন করা এলিমেন্টগুলি থেকে অ্যানিমেশন ক্লাস সরিয়ে দেয়
+            const animatedElements = document.querySelectorAll('.pulse-ring, .floating-orb');
+            animatedElements.forEach(el => el.style.animation = 'none');
+            
+            console.log("All animations and intervals stopped.");
+        }
+
+
+        // Initialize
+        function init() {
+            // অ্যানিমেশন এবং সাউন্ড শুরু করার জন্য ক্লিক ইভেন্ট
+            document.body.addEventListener('click', () => {
+                // শুধু প্রথম ক্লিকেই কাজ করবে
+                if (document.body.style.cursor === 'default') return;
+
+                document.getElementById('clickPrompt').style.display = 'none';
+                document.body.style.cursor = 'default';
+
+                // ব্যাকগ্রাউন্ড অরবিটাল তৈরি শুরু করে
+                orbInterval = setInterval(createBackgroundOrb, 2000);
+
+                // সাউন্ড প্লে করা
+                startSound.currentTime = 0;
+                startSound.play().catch(e => {
+                    console.error("Sound play failed:", e);
+                });
+
+                // অ্যানিমেশন শুরু করা
+                startAnimation();
+
+            }, { once: true }); // এই ইভেন্টটি শুধু একবারই কাজ করবে
+        }
+
+
+        // Start when page loads
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>

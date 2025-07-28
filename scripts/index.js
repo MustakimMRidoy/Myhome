@@ -1483,6 +1483,7 @@ function startDesktop() {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+const startSound = document.getElementById('startSound');
       document.addEventListener('click', startClick);
 });
 

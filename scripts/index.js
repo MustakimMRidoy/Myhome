@@ -968,6 +968,8 @@ function updateBadge() {
         // Event Listeners
         function setupEventListeners() {
             document.addEventListener('click', (event) => {
+		    const hiddenIconsPanel = document.getElementById('hiddenIconsPanel');
+        const hiddenIconsButton = document.querySelector('.system-tray-item[title="Show hidden icons"]');
                 if (!startMenu.contains(event.target) && !startButton.contains(event.target)) {
                     startMenu.style.display = 'none';
                     startButton.classList.remove('active');
@@ -978,6 +980,9 @@ function updateBadge() {
                 if (!volumeControl.contains(event.target) && !event.target.closest('.system-tray-item[title="Volume"]')) volumeControl.style.display = 'none';
                 if (!searchResults.contains(event.target) && !globalSearchInput.contains(event.target)) searchResults.style.display = 'none';
                 if (event.target.closest('.desktop') && !event.target.closest('.desktop-icon') && !event.target.closest('.window')) clearSelection();
+		if (!hiddenIconsPanel.contains(event.target) && !hiddenIconsButton.contains(event.target)) {
+                   hiddenIconsPanel.classList.remove('open');
+                   }
             });
             document.addEventListener('contextmenu', (event) => {
                 if (event.target.closest('.desktop') && !event.target.closest('.desktop-icon') && !event.target.closest('.window')) {
@@ -1038,9 +1043,13 @@ function updateBadge() {
                 body.innerHTML = '<h1 style="color:white; text-align:center; padding-top: 40vh; font-family: Open Sans, sans-serif;">It is now safe to turn off your computer.</h1>';
             }, 2000);
         }
-        function showHiddenIcons() {
-            showNotification('System Tray', 'More system icons would be shown here.');
-        }
+
+        function toggleHiddenIconsPanel() {
+    const panel = document.getElementById('hiddenIconsPanel');
+    
+    // 'open' ক্লাস যোগ বা حذف করার মাধ্যমে প্যানেল নিয়ন্ত্রণ করে
+    panel.classList.toggle('open');
+}
         // Modal System
         function showModal(title, content) {
             modalTitle.textContent = title;

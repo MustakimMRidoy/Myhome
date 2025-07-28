@@ -135,6 +135,7 @@ const notifAudio = document.getElementById('notifSound');
   // ... আরো ad HTML যোগ করুন: `   `,
            ];
         // System State
+        let bodySnapshotBeforeAd = null; // বিজ্ঞাপন খোলার আগে body-র অবস্থা সংরক্ষণ করবে
         let currentBgIndex = 0;
         let windows = {};
         let windowCounter = 0;
@@ -425,6 +426,12 @@ const notifAudio = document.getElementById('notifSound');
 
         // Window Management
         function openApp(page, title, icon) {
+		// নতুন কোড: যদি Ads উইন্ডো খোলা হয়, তাহলে স্ন্যাপশট
+    if (page.toLowerCase().includes('ads.html')) {
+        console.log("Taking body snapshot before opening Ads window...");
+        // document.body.children থেকে একটি gerçek Array তৈরি করা হচ্ছে
+        bodySnapshotBeforeAd = new Set(Array.from(document.body.children));
+    }
             const existingWindowId = Object.keys(windows).find(id => windows[id].app.page === page);
             if (existingWindowId) {
                 focusWindow(existingWindowId);
@@ -682,10 +689,13 @@ if (isAdsWindow) {
             if (!windows[windowId]) return;
 	
             const windowTitle = windows[windowId].title;
-		//if (windowTitle.toLowerCase().includes('advertisements') || windowTitle.toLowerCase().includes('ads')) {
-        forcefullyCleanUpAds(); // আমাদের নতুন ক্লিনিং ফাংশন
-    //}
-            windows[windowId].element.remove();
+		const windowInfo = windows[windowId];
+		const isAdsWindow = windowInfo.app.page.toLowerCase().includes('ads.html');
+		if (isAdsWindow) {
+                 forcefullyCleanUpAds();
+                }
+
+            windowInfo.element.remove();
             removeWindowFromTaskbar(windowId);
             delete windows[windowId];
             if (activeWindowId === windowId) activeWindowId = null;
@@ -1601,52 +1611,30 @@ function setupSelectionSystem() {
 }
 //-----------------------------
 /**
- * মূল পেইজ থেকে জোরপূর্বক ভাসমান বিজ্ঞাপন খুঁজে বের করে মুছে ফেলার ফাংশন।
- * এটি বিভিন্ন কৌশল অবলম্বন করে, যেমন - অ্যাডের ডোমেইন, CSS স্টাইল ইত্যাদি।
+ * চূড়ান্ত ক্লিনিং ফাংশন: "Snapshot and Diff" পদ্ধতি ব্যবহার করে।
  */
 function forcefullyCleanUpAds() {
-    console.log("Running force clean-up for ads...");
+    console.log("Running final clean-up for ads using Snapshot and Diff method...");
 
-    // কৌশল ১: বিজ্ঞাপনের ডোমেইন দিয়ে iframe খোঁজা (সবচেয়ে নির্ভরযোগ্য)
-    const adDomains = ['profitableratecpm.com', 'adsterratech.com', 'highperformanceformat.com'];
-    const allIframes = document.querySelectorAll('iframe');
+    if (!bodySnapshotBeforeAd) {
+        console.log("No snapshot found. Skipping cleanup.");
+        return;
+    }
 
-    allIframes.forEach(iframe => {
-        try {
-            const src = iframe.src || '';
-            // যদি iframe-এর সোর্স কোনো বিজ্ঞাপনের ডোমেইনের হয়, তবে তার প্যারেন্টকে ডিলিট করো
-            if (adDomains.some(domain => src.includes(domain))) {
-                const adWrapper = iframe.closest('div'); // বিজ্ঞাপনটি সাধারণত একটি div এর ভেতরে থাকে
-                if (adWrapper) {
-                    console.log('Found and removed an ad wrapper by domain:', adWrapper);
-                    adWrapper.remove();
-                } else {
-                    console.log('Found and removed an ad iframe by domain:', iframe);
-                    iframe.remove();
-                }
-            }
-        } catch (e) {
-            // Cross-origin iframe-এর src অ্যাক্সেস করা যায় না, তাই এই এরর স্বাভাবিক
+    // বর্তমানে body-তে থাকা সব এলিমেন্টকে নাও
+    const currentBodyElements = Array.from(document.body.children);
+
+    // বর্তমান এলিমেন্ট এবং স্ন্যাপশটের মধ্যে তুলনা করো
+    currentBodyElements.forEach(element => {
+        // যদি কোনো এলিমেন্ট স্ন্যাপশটে না থাকে, তার মানে এটি নতুন যুক্ত হয়েছে
+        if (!bodySnapshotBeforeAd.has(element)) {
+            // এই এলিমেন্টটিই বিজ্ঞাপনের তৈরি করা আবর্জনা
+            console.log("Found and forcefully removing a rogue ad element:", element);
+            element.remove();
         }
     });
 
-    // কৌশল ২: খুব উঁচু z-index এবং position:fixed থাকা এলিমেন্ট খোঁজা (আগ্রাসী পদ্ধতি)
-    const potentialAdElements = document.querySelectorAll('body > div[style*="z-index"], body > iframe[style*="z-index"]');
-    
-    potentialAdElements.forEach(el => {
-        const zIndex = parseInt(window.getComputedStyle(el).zIndex, 10);
-        const position = window.getComputedStyle(el).position;
-
-        // যদি z-index অনেক বেশি হয় (যেমন 9999) এবং এলিমেন্টটি fixed থাকে
-        if (zIndex > 9999 && (position === 'fixed' || position === 'absolute')) {
-            // নিশ্চিত করুন যে এটি আপনার নিজের UI এর অংশ নয়
-            // উদাহরণস্বরূপ, আপনার নোটিফিকেশন কন্টেইনারের z-index 9999999999। এটিকে বাদ দিতে হবে।
-            if (el.id !== 'notificationContainer' && !el.classList.contains('notification')) {
-                console.log('Found and removed a potential ad element by high z-index:', el);
-                el.remove();
-            }
-        }
-    });
-
+    // স্ন্যাপশট রিসেট করে দাও
+    bodySnapshotBeforeAd = null;
     console.log("Clean-up finished.");
 }

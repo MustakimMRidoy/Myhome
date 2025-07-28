@@ -1230,6 +1230,7 @@ function isMobileDevice() {
 function isMobileDeviceWindow() {
     // Existing windows check and maximize if mobile
     if (isMobileDevice()) {
+	AdsConfig.inactivityThreshold = 60000 * 10
         document.querySelectorAll('.window').forEach(window => {
             window.classList.add('maximized');
         });

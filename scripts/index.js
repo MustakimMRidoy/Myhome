@@ -1,4 +1,3 @@
-const startSound = document.getElementById('startSound');
 const notifAudio = document.getElementById('notifSound');
 
         const apps = [
@@ -1483,12 +1482,7 @@ function startDesktop() {
     }, 4000);
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-startSound.currentTime = 0; // যাতে প্রতি বার শুরু থেকে বাজে
-startSound.play().catch(e => {
-  //showNotification('sound play blocked', e);
-});
-	
+window.addEventListener('DOMContentLoaded', () => {	
 setTimeout(() => {
 startDesktop();
  }, 15000);

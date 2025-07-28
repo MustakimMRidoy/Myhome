@@ -1508,9 +1508,14 @@ function startClick() {
              });
 setTimeout(() => {
 startDesktop();
-      if (watermarkAnim.contains(iframe)) {
+	setTimeout(() => {
+      const taskbar = document.getElementById('mainTaskbar');
+      if (taskbar) {
+          taskbar.classList.add('loaded');
+      }if (watermarkAnim.contains(iframe)) {
         watermarkAnim.removeChild(iframe);
       }
+  }, 500);
  }, 15000);
 }
 //----------------------------------------------------------

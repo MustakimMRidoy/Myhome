@@ -5,7 +5,7 @@ const fetch = require('node-fetch');
 exports.handler = async function(event, context) {
   const params = new URLSearchParams(event.body);
   const token = params.get('g-recaptcha-response');
-  const secret = "6LcNEI8rAAAAANKZ9rsgGTfdZLLPuLkg_enpfljC";//process.env.RECAPTCHA_SECRET; // Netlify env var
+  const secret = "6LeXypUrAAAAAJjaX_Flg09k1ce7eBUIB2TMm50w";//process.env.RECAPTCHA_SECRET; // Netlify env var
 
   const resp = await fetch(
     `https://www.google.com/recaptcha/api/siteverify?secret=${secret}&response=${token}`,
